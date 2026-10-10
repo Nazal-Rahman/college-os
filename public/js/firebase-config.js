@@ -10,7 +10,11 @@ async function initializeFirebase() {
   try {
     const res = await fetch('/api/config/firebase');
     const config = await res.json();
-    if (config.apiKey && typeof firebase !== 'undefined') {
+    if (!config.apiKey) {
+      console.error('[Firebase] Config missing! Did you add the FIREBASE_ variables to your Vercel Environment Variables?');
+      return;
+    }
+    if (typeof firebase !== 'undefined') {
       firebaseConfig = config;
       firebaseApp = firebase.initializeApp(firebaseConfig);
       firebaseAuth = firebase.auth();
