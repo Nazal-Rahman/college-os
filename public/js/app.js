@@ -207,6 +207,31 @@ function navigateTo(viewName) {
   if (viewName === 'settings') renderSettings();
 }
 
+function syncCloudAndLocal() {
+  if (state.user) {
+    const exportData = {
+      subjects: state.subjects,
+      timetable: state.timetable,
+      attendanceData: state.attendanceData, // Full attendance state
+      periodAttendance: state.periodAttendanceRecords,
+      tasks: state.tasks,
+      labs: state.labs,
+      studyPlans: state.studyPlans,
+      studySessions: state.studySessions,
+      vaultFolders: state.vaultFolders,
+      vaultFiles: state.vaultFiles,
+      calendarEvents: state.calendarEvents
+    };
+    
+    if (window.FirebaseSync && window.FirebaseSync.isAvailable()) {
+      window.FirebaseSync.syncUserData(state.user.id, exportData);
+    }
+    
+    // Offline Local Storage Backup
+    localStorage.setItem(`college_os_backup_${state.user.email}`, JSON.stringify(exportData));
+  }
+}
+
 async function refreshAllData() {
   try {
     const [subRes, ttRes, attRes, periodRecRes, taskRes, labRes, planRes, studyRes, vaultFldRes, vaultFileRes, calRes, calPdfRes] = await Promise.all([
@@ -252,28 +277,7 @@ async function refreshAllData() {
     updateDayHolidayBadges();
 
     // Cloud & Offline Backup Sync
-    if (state.user) {
-      const exportData = {
-        subjects: state.subjects,
-        timetable: state.timetable,
-        attendanceData: state.attendanceData, // Full attendance state
-        periodAttendance: state.periodAttendanceRecords,
-        tasks: state.tasks,
-        labs: state.labs,
-        studyPlans: state.studyPlans,
-        studySessions: state.studySessions,
-        vaultFolders: state.vaultFolders,
-        vaultFiles: state.vaultFiles,
-        calendarEvents: state.calendarEvents
-      };
-      
-      if (window.FirebaseSync && window.FirebaseSync.isAvailable()) {
-        window.FirebaseSync.syncUserData(state.user.id, exportData);
-      }
-      
-      // Offline Local Storage Backup
-      localStorage.setItem(`college_os_backup_${state.user.email}`, JSON.stringify(exportData));
-    }
+    syncCloudAndLocal();
   } catch (err) {
     console.error('Error refreshing workspace data:', err);
   }
@@ -451,12 +455,15 @@ async function confirmClearTimetable() {
   await API.clearTimetableAll();
   state.timetable = [];
   state.periodAttendanceRecords = {};
-  state.attendanceData = await API.getAttendance();
+  const [attRes, subRes] = await Promise.all([API.getAttendance(), API.getSubjects()]);
+  state.attendanceData = attRes;
+  state.subjects = subRes.subjects || [];
   renderDailyAttendanceSheet();
   renderTimetableMatrix();
   renderAttendanceAnalytics();
   renderDashboard();
   alert('Timetable and period attendance cleared.');
+  syncCloudAndLocal();
 }
 
 function renderDailyAttendanceSheet() {
@@ -594,7 +601,15 @@ async function markPeriodStatus(subjectId, periodNumber, isPresent) {
   await API.markPeriod({ subjectId, date: dayKey, periodNumber, isPresent });
 
   // Refresh attendance statistics in real-time
-  state.attendanceData = await API.getAttendance();
+  const [attRes, subRes] = await Promise.all([
+    API.getAttendance(),
+    API.getSubjects()
+  ]);
+  state.attendanceData = attRes;
+  state.subjects = subRes.subjects || [];
+  
+  syncCloudAndLocal();
+
   renderDailyAttendanceSheet();
   renderDashboard();
 }
@@ -617,7 +632,15 @@ async function markAllPeriodsForDay(present) {
     }
   }
 
-  state.attendanceData = await API.getAttendance();
+  const [attRes, subRes] = await Promise.all([
+    API.getAttendance(),
+    API.getSubjects()
+  ]);
+  state.attendanceData = attRes;
+  state.subjects = subRes.subjects || [];
+
+  syncCloudAndLocal();
+
   renderDailyAttendanceSheet();
   renderDashboard();
 }
@@ -656,6 +679,7 @@ async function deleteTimetableSlot(id) {
   renderTimetableMatrix();
   renderDailyAttendanceSheet();
   renderDashboard();
+  syncCloudAndLocal();
 }
 
 function renderAttendanceAnalytics() {
@@ -723,7 +747,16 @@ async function updateSubjectTarget(subjectId) {
   if (!input) return;
   const newTarget = Number(input.value) || 75;
   await API.updateSubject(subjectId, { targetAttendance: newTarget });
-  state.attendanceData = await API.getAttendance();
+  
+  const [attRes, subRes] = await Promise.all([
+    API.getAttendance(),
+    API.getSubjects()
+  ]);
+  state.attendanceData = attRes;
+  state.subjects = subRes.subjects || [];
+  
+  syncCloudAndLocal();
+  
   renderAttendanceAnalytics();
   renderDashboard();
 }
@@ -791,7 +824,15 @@ async function openSubjectHistoryModal(subjectId) {
 
 async function toggleHistoryRecordStatus(recordId, newStatus, subjectId) {
   await API.updateHistoryRecord(recordId, newStatus);
-  state.attendanceData = await API.getAttendance();
+  const [attRes, subRes] = await Promise.all([
+    API.getAttendance(),
+    API.getSubjects()
+  ]);
+  state.attendanceData = attRes;
+  state.subjects = subRes.subjects || [];
+
+  syncCloudAndLocal();
+
   await openSubjectHistoryModal(subjectId);
   renderDailyAttendanceSheet();
   renderDashboard();
@@ -806,9 +847,17 @@ async function saveAttendanceTargetSettings() {
     customTargetsEnabled: customEnabled
   });
 
+  const [attRes, subRes] = await Promise.all([
+    API.getAttendance(),
+    API.getSubjects()
+  ]);
+  state.attendanceData = attRes;
+  state.subjects = subRes.subjects || [];
   state.defaultAttendanceTarget = globalTarget;
   state.customTargetsEnabled = customEnabled;
-  state.attendanceData = await API.getAttendance();
+  
+  syncCloudAndLocal();
+
   renderAttendanceAnalytics();
   renderDashboard();
   alert('Attendance target policy updated successfully.');
@@ -817,6 +866,16 @@ async function saveAttendanceTargetSettings() {
 async function toggleCustomTargetsSwitch(checked) {
   state.customTargetsEnabled = checked;
   await API.setAttendanceTargetSettings({ customTargetsEnabled: checked });
+  
+  const [attRes, subRes] = await Promise.all([
+    API.getAttendance(),
+    API.getSubjects()
+  ]);
+  state.attendanceData = attRes;
+  state.subjects = subRes.subjects || [];
+  
+  syncCloudAndLocal();
+  
   renderAttendanceAnalytics();
 }
 
@@ -900,6 +959,7 @@ async function toggleTaskStatus(id) {
   if (task) task.status = task.status === 'Completed' ? 'Pending' : 'Completed';
   renderTasks();
   renderDashboard();
+  syncCloudAndLocal();
 }
 
 async function deleteTask(id) {
@@ -908,6 +968,7 @@ async function deleteTask(id) {
   state.tasks = state.tasks.filter(t => t.id !== id);
   renderTasks();
   renderDashboard();
+  syncCloudAndLocal();
 }
 
 function renderLabs() {
@@ -946,6 +1007,7 @@ async function deleteLab(id) {
   await API.deleteLab(id);
   state.labs = state.labs.filter(l => l.id !== id);
   renderLabs();
+  syncCloudAndLocal();
 }
 
 function renderStudyPlanner() {
@@ -993,12 +1055,14 @@ async function deleteStudyPlan(id) {
   await API.deleteStudyPlan(id);
   state.studyPlans = state.studyPlans.filter(p => p.id !== id);
   renderStudyPlanner();
+  syncCloudAndLocal();
 }
 
 async function deleteStudySession(id) {
   await API.deleteStudySession(id);
   state.studySessions = state.studySessions.filter(s => s.id !== id);
   renderStudyPlanner();
+  syncCloudAndLocal();
 }
 
 async function clearAllStudyLogs() {
@@ -1006,6 +1070,7 @@ async function clearAllStudyLogs() {
   await API.clearAllStudySessions();
   state.studySessions = [];
   renderStudyPlanner();
+  syncCloudAndLocal();
 }
 
 // Fullscreen Focus Room Controller
@@ -1718,3 +1783,6 @@ async function handleProfileUpdate(e) {
   renderUserProfile(res.user);
   alert('Profile changes saved successfully!');
 }
+
+
+
