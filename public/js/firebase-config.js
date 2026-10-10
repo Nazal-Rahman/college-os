@@ -48,6 +48,21 @@ const FirebaseSync = {
     }
   },
 
+  async loadUserData(userId) {
+    if (!this.isAvailable() || !userId) return null;
+    try {
+      const doc = await firestoreDb.collection('students').doc(userId).get();
+      if (doc.exists) {
+        console.log('[Firebase Firestore] Cloud data restored.');
+        return doc.data();
+      }
+      return null;
+    } catch (err) {
+      console.warn('[Firebase Firestore] Load warning:', err.message);
+      return null;
+    }
+  },
+
   async loginWithGoogle() {
     if (!this.isAvailable()) throw new Error('Firebase Auth not available');
     const provider = new firebase.auth.GoogleAuthProvider();

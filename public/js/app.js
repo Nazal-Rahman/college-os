@@ -58,6 +58,30 @@ document.addEventListener('DOMContentLoaded', async () => {
     state.user = user;
     renderUserProfile(user);
 
+    // [Vercel Data Wipe Hydration]
+    // If Vercel wiped the backend store, the user's data will be empty.
+    // Try to load from Firebase Cloud or LocalStorage offline backup.
+    let backupData = null;
+    if (window.FirebaseSync && window.FirebaseSync.isAvailable()) {
+      try {
+        backupData = await window.FirebaseSync.loadUserData(user.id);
+      } catch (e) { console.warn('Cloud restore check failed:', e); }
+    }
+    if (!backupData) {
+      try {
+        const localCache = JSON.parse(localStorage.getItem(`college_os_backup_${user.email}`));
+        if (localCache) backupData = localCache;
+      } catch(e) {}
+    }
+
+    if (backupData && Object.keys(backupData).length > 0) {
+       const { subjects } = await API.getSubjects();
+       if (!subjects || subjects.length === 0) {
+          console.log('[Hydration] Backend appears empty (Vercel cold start). Restoring state...');
+          await API.restoreCloudData(backupData);
+       }
+    }
+
     // Initial load
     await refreshAllData();
 
@@ -228,14 +252,28 @@ async function refreshAllData() {
     updateDayHolidayBadges();
     renderCalendarPdfCard();
 
-    // Firebase Cloud Sync if configured
-    if (window.FirebaseSync && state.user) {
-      window.FirebaseSync.syncUserData(state.user.id, {
+    // Cloud & Offline Backup Sync
+    if (state.user) {
+      const exportData = {
         subjects: state.subjects,
-        attendance: state.attendanceData,
+        timetable: state.timetable,
+        attendanceData: state.attendanceData, // Full attendance state
+        periodAttendance: state.periodAttendanceRecords,
         tasks: state.tasks,
-        labs: state.labs
-      });
+        labs: state.labs,
+        studyPlans: state.studyPlans,
+        studySessions: state.studySessions,
+        vaultFolders: state.vaultFolders,
+        vaultFiles: state.vaultFiles,
+        calendarEvents: state.calendarEvents
+      };
+      
+      if (window.FirebaseSync && window.FirebaseSync.isAvailable()) {
+        window.FirebaseSync.syncUserData(state.user.id, exportData);
+      }
+      
+      // Offline Local Storage Backup
+      localStorage.setItem(`college_os_backup_${state.user.email}`, JSON.stringify(exportData));
     }
   } catch (err) {
     console.error('Error refreshing workspace data:', err);

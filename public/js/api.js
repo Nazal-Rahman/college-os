@@ -142,6 +142,13 @@ const API = {
     return res;
   },
 
+  async restoreCloudData(data) {
+    return this.request('/api/sync/restore', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  },
+
   // Subjects
   getSubjects() { return this.request('/api/subjects'); },
   createSubject(data) { return this.request('/api/subjects', { method: 'POST', body: JSON.stringify(data) }); },

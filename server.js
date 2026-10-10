@@ -215,6 +215,28 @@ app.post('/api/auth/factory-reset', authenticate, (req, res) => {
   }
 });
 
+// Sync Restore Endpoint (fixes Vercel stateless wipes)
+app.post('/api/sync/restore', authenticate, (req, res) => {
+  try {
+    store.updateUserData(req.user.id, (u) => {
+      const data = req.body;
+      if (data.subjects) u.subjects = data.subjects;
+      if (data.timetable) u.timetable = data.timetable;
+      if (data.attendanceData && data.attendanceData.history) u.attendanceHistory = data.attendanceData.history;
+      if (data.periodAttendance) u.periodAttendance = data.periodAttendance;
+      if (data.tasks) u.tasks = data.tasks;
+      if (data.labs) u.labs = data.labs;
+      if (data.studyPlans) u.studyPlans = data.studyPlans;
+      if (data.studySessions) u.studySessions = data.studySessions;
+      if (data.vaultFiles) u.vaultFiles = data.vaultFiles;
+      if (data.vaultFolders) u.vaultFolders = data.vaultFolders;
+    });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // -------------------------------------------------------------
 // 2. SUBJECT MANAGEMENT APIS
 // -------------------------------------------------------------

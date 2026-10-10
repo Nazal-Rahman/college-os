@@ -796,6 +796,77 @@
           "read": false
         }
       ]
+    },
+    "user_1791658950572_6e77qd": {
+      "id": "user_1791658950572_6e77qd",
+      "email": "nazal8071@gmail.com",
+      "password": "$2b$10$dzpPW3/MW8LFyT6mS2fY7e9nk5KotEn6n/GWdVW4NjYKkf/du1GLK",
+      "profile": {
+        "name": "iGshadoww",
+        "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=256&q=80",
+        "college": "Engineering College",
+        "studentId": "STU-2979",
+        "semester": "Semester 1",
+        "major": "General Studies",
+        "batch": "2026 - 2030",
+        "cgpa": 0,
+        "targetCgpa": 4,
+        "totalCredits": 0,
+        "bio": "Student at Engineering College"
+      },
+      "preferences": {
+        "theme": "light",
+        "defaultAttendanceTarget": 75,
+        "customSubjectTargetsEnabled": false,
+        "holidayDays": [
+          "Saturday",
+          "Sunday"
+        ],
+        "gradingScale": "10-point",
+        "notifications": {
+          "upcomingClasses": true,
+          "assignmentDeadlines": true,
+          "labReminders": true,
+          "attendanceWarnings": true,
+          "leadTimeMinutes": 30
+        }
+      },
+      "academicCalendarPdf": null,
+      "periodAttendance": {},
+      "subjects": [],
+      "timetable": [],
+      "attendanceHistory": [],
+      "tasks": [],
+      "labs": [],
+      "studyPlans": [],
+      "studySessions": [],
+      "gpaHistory": [],
+      "vaultFolders": [
+        {
+          "id": "fld_notes_user_1791658950572_6e77qd",
+          "name": "Lecture Notes",
+          "parentId": null,
+          "icon": "description"
+        },
+        {
+          "id": "fld_syllabus_user_1791658950572_6e77qd",
+          "name": "Syllabus & Calendars",
+          "parentId": null,
+          "icon": "book"
+        }
+      ],
+      "vaultFiles": [],
+      "notifications": [
+        {
+          "id": "notif_welcome_user_1791658950572_6e77qd",
+          "title": "Welcome to College OS!",
+          "message": "Your personal academic workspace is ready. Start by adding your courses and timetable slots.",
+          "type": "info",
+          "timestamp": "Just now",
+          "read": false
+        }
+      ],
+      "firebaseUid": "nIDOnZZgB7dkexYM9rvYzH8urCD2"
     }
   }
 }
