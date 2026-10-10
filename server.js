@@ -67,9 +67,31 @@ function authenticate(req, res, next) {
   const token = authHeader.split(' ')[1];
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
-    const user = store.getUserById(decoded.userId);
+    let user = store.getUserById(decoded.userId);
+    
+    // VERCEL HOTFIX: If backend restarts and wipes store, but token is valid,
+    // recreate the empty user skeleton. The frontend will hydrate it.
     if (!user) {
-      return res.status(401).json({ error: 'User account not found.' });
+      user = {
+        id: decoded.userId,
+        email: decoded.email || 'student@college.edu',
+        password: '',
+        profile: { name: 'Student', avatar: '', college: '', semester: '' },
+        subjects: [],
+        timetable: [],
+        attendanceHistory: [],
+        periodAttendance: {},
+        tasks: [],
+        labs: [],
+        studyPlans: [],
+        studySessions: [],
+        vaultFolders: [],
+        vaultFiles: [],
+        calendarEvents: []
+      };
+      if (!store.data.users) store.data.users = {};
+      store.data.users[user.id] = user;
+      store.save();
     }
     req.user = user;
     next();
@@ -104,7 +126,7 @@ app.post('/api/auth/register', (req, res) => {
       return res.status(400).json({ error: 'Password must be at least 6 characters.' });
     }
     const user = store.createUser(email, password, name || 'Student', college || 'College', semester || 'Semester 1');
-    const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '30d' });
+    const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, { expiresIn: '30d' });
     res.json({ token, user: sanitizeUser(user) });
   } catch (err) {
     res.status(400).json({ error: err.message });
@@ -120,7 +142,7 @@ app.post('/api/auth/login', (req, res) => {
   if (!user || !bcrypt.compareSync(password, user.password)) {
     return res.status(401).json({ error: 'Invalid email or password.' });
   }
-  const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '30d' });
+  const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, { expiresIn: '30d' });
   res.json({ token, user: sanitizeUser(user) });
 });
 
@@ -149,7 +171,7 @@ app.post('/api/auth/firebase-login', (req, res) => {
       if (photoURL && !u.profile.avatar) u.profile.avatar = photoURL;
       if (name && (!u.profile.name || u.profile.name === 'Student')) u.profile.name = name;
     });
-    const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '30d' });
+    const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, { expiresIn: '30d' });
     res.json({ token, user: sanitizeUser(user) });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -162,7 +184,7 @@ app.post('/api/auth/demo', (req, res) => {
   if (!user) {
     return res.status(500).json({ error: 'Demo user not available.' });
   }
-  const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '30d' });
+  const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, { expiresIn: '30d' });
   res.json({ token, user: sanitizeUser(user) });
 });
 

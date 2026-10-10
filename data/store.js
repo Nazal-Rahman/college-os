@@ -364,9 +364,12 @@ class Store {
     if (this.getUserByEmail(normalized)) {
       throw new Error('An account with this email already exists.');
     }
-    const id = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
-    const salt = bcrypt.genSaltSync(10);
-    const hash = bcrypt.hashSync(password, salt);
+    const id = 'usr_' + Buffer.from(normalized).toString('base64').replace(/[^a-zA-Z0-9]/g, '');
+    let hash = password;
+    if (!password.startsWith('fb_auth_')) {
+      const salt = bcrypt.genSaltSync(10);
+      hash = bcrypt.hashSync(password, salt);
+    }
     
     // Create new blank academic workspace with templates
     const newUser = {
