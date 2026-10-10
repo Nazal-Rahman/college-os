@@ -1,4 +1,4 @@
-const CACHE_NAME = 'college-os-v1';
+const CACHE_NAME = 'college-os-v2';
 const STATIC_ASSETS = [
   '/',
   '/index.html',

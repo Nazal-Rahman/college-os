@@ -250,7 +250,6 @@ async function refreshAllData() {
     renderDashboard();
     populateSubjectSelects();
     updateDayHolidayBadges();
-    renderCalendarPdfCard();
 
     // Cloud & Offline Backup Sync
     if (state.user) {
@@ -1208,7 +1207,6 @@ function switchSettingsSubTab(tabId, btn) {
 
   if (tabId === 'grade-calculator') renderGradeCalculator();
   if (tabId === 'unified-calendar') {
-    renderCalendarPdfCard();
     renderCalendar();
   }
 }
@@ -1469,7 +1467,7 @@ async function triggerFactoryReset() {
   if (!confirmed) return;
 
   try {
-    await API.factoryReset();
+    await API.factoryReset(); if (state.user && state.user.email) localStorage.removeItem('college_os_backup_' + state.user.email);
     localStorage.removeItem('college_os_offline_queue');
     alert('Factory reset completed. Reloading clean workspace...');
     window.location.reload();

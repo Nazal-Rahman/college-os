@@ -336,13 +336,8 @@ class Store {
   }
 
   seedDemo() {
-    const salt = bcrypt.genSaltSync(10);
-    const hash = bcrypt.hashSync('college123', salt);
-    const demo = createDemoStudent(hash);
     this.data = {
-      users: {
-        [demo.id]: demo
-      }
+      users: {}
     };
     this.save();
   }

@@ -21,7 +21,7 @@ const API = {
   },
   logout() {
     this.setToken(null);
-    this.setUser(null);
+    const user = this.getUser(); if(user && user.email) localStorage.removeItem('college_os_backup_' + user.email); this.setUser(null);
     window.location.href = '/';
   },
 
@@ -41,7 +41,7 @@ const API = {
         // Token expired or invalid
         if (window.location.pathname.startsWith('/app')) {
           this.setToken(null);
-          this.setUser(null);
+          const user = this.getUser(); if(user && user.email) localStorage.removeItem('college_os_backup_' + user.email); this.setUser(null);
           window.location.href = '/';
         }
         throw new Error('Unauthorized');
