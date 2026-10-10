@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>College OS — Personal Academic Workspace</title>
+  
+  <!-- PWA Meta Tags -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#070A11">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="College OS">
+  <link rel="apple-touch-icon" href="/icons/logo.jpg">
+  <link rel="icon" type="image/jpeg" href="/icons/logo.jpg">
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              obsidian: '#070A11',
+              dark: '#0D121F',
+              card: '#131A2B',
+              cardBorder: 'rgba(255, 255, 255, 0.08)',
+              blue: '#2563EB',
+              cobalt: '#3B82F6',
+              cyan: '#06B6D4',
+              emerald: '#10B981',
+              amber: '#F59E0B',
+              red: '#EF4444',
+              purple: '#8B5CF6'
+            }
+          },
+          fontFamily: {
+            manrope: ['Manrope', 'sans-serif'],
+            inter: ['Inter', 'sans-serif']
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body { font-family: 'Manrope', sans-serif; background-color: #070A11; color: #F8FAFC; }
+    .font-inter { font-family: 'Inter', sans-serif; }
+    .glow-radial {
+      background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(37, 99, 235, 0.25), transparent 70%);
+    }
+    .grid-lines {
+      background-size: 40px 40px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    }
+    .glass-card {
+      background: rgba(19, 26, 43, 0.75);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-card:hover {
+      border-color: rgba(59, 130, 246, 0.35);
+    }
+  </style>
+</head>
+<body class="bg-brand-obsidian text-slate-100 antialiased min-h-screen flex flex-col selection:bg-brand-cobalt selection:text-white">
+
+  <!-- Background Ambient Glow & Grid -->
+  <div class="fixed inset-0 pointer-events-none z-0 glow-radial"></div>
+  <div class="fixed inset-0 pointer-events-none z-0 grid-lines opacity-75"></div>
+
+  <!-- Navigation Bar -->
+  <nav class="sticky top-0 z-40 bg-brand-obsidian/85 backdrop-blur-xl border-b border-white/10 px-6 py-4 transition-all">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      
+      <!-- Brand Logo -->
+      <a href="/" class="flex items-center gap-3.5 group">
+        <img src="/icons/logo.jpg" alt="College OS" class="w-10 h-10 rounded-2xl object-cover ring-2 ring-blue-500/30 group-hover:ring-blue-400 transition shadow-lg shadow-blue-500/10">
+        <div class="flex flex-col">
+          <div class="flex items-center gap-2">
+            <span class="text-xl font-extrabold tracking-tight text-white">College OS</span>
+            <span class="text-[9px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30 font-inter">v2.5</span>
+          </div>
+          <span class="text-[10px] font-semibold tracking-wider text-slate-400 font-inter">Personal Student Workspace</span>
+        </div>
+      </a>
+
+      <!-- Desktop Nav Links -->
+      <div class="hidden lg:flex items-center gap-8 font-inter text-xs font-bold text-slate-300">
+        <a href="#pillars" class="hover:text-blue-400 transition flex items-center gap-1.5">
+          <span>5 Core Pillars</span>
+        </a>
+        <a href="#preview" class="hover:text-blue-400 transition">Interactive Sheet</a>
+        <a href="#pwa" class="hover:text-blue-400 transition">Native Install (PWA)</a>
+        <a href="#guide" class="hover:text-blue-400 transition">Student Privacy</a>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center gap-3">
+        <!-- Install PWA Button -->
+        <button onclick="triggerPwaInstall()" class="btn-install-pwa hidden sm:inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold border border-white/15 bg-white/5 hover:bg-white/10 text-white transition active:scale-95">
+          <span class="material-symbols-outlined text-[17px] text-cyan-400">install_mobile</span>
+          <span>Install App</span>
+        </button>
+
+        <!-- 1-Click Launch Button -->
+        <button onclick="quickDemoLogin()" class="px-5 py-2.5 rounded-xl text-xs font-extrabold bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white transition shadow-lg shadow-blue-600/25 active:scale-95 flex items-center gap-2">
+          <span>🚀 Launch Workspace</span>
+        </button>
+      </div>
+
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-6 py-20 md:py-28 max-w-5xl mx-auto">
+    
+    <!-- Student Ownership Security Badge -->
+    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-300 text-xs font-bold mb-8 shadow-sm">
+      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+      <span>100% Student-Owned • Zero Administrative Surveillance • Offline-First</span>
+    </div>
+
+    <!-- Monumental Headline -->
+    <h1 class="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-white leading-[1.1] mb-6">
+      Own Your Timetable.<br>
+      <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-300 to-purple-400">Master Your Attendance.</span><br>
+      Ace Every Semester.
+    </h1>
+
+    <!-- Subtitle -->
+    <p class="text-base sm:text-xl text-slate-300 font-inter max-w-2xl mx-auto font-normal leading-relaxed mb-10">
+      Built for engineering, university, and college students who despise clunky institutional portals. Manage hourly class schedules, period-by-period attendance risk margins, practical lab records, and fullscreen Pomodoro study rooms.
+    </p>
+
+    <!-- CTAs Group -->
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-md mx-auto mb-6">
+      <button onclick="quickDemoLogin()" class="w-full sm:w-1/2 py-4 px-6 rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-extrabold text-sm shadow-xl shadow-blue-600/30 transition active:scale-95 flex items-center justify-center gap-2">
+        <span>🚀 1-Click Launch</span>
+      </button>
+      <button onclick="openAuthModal()" class="w-full sm:w-1/2 py-4 px-6 rounded-2xl border border-white/20 bg-white/5 hover:bg-white/10 text-white font-bold text-sm transition active:scale-95 flex items-center justify-center gap-2">
+        <span>Sign In / Register</span>
+      </button>
+    </div>
+
+    <!-- PWA Install Direct Pill -->
+    <div class="flex items-center justify-center gap-2 text-xs text-slate-400 font-inter">
+      <button onclick="triggerPwaInstall()" class="hover:text-cyan-400 transition inline-flex items-center gap-1.5 underline underline-offset-4">
+        <span class="material-symbols-outlined text-[16px] text-cyan-400">download_for_offline</span>
+        <span>Install as Real Standalone App on Android / iOS Safari / Desktop</span>
+      </button>
+    </div>
+
+    <!-- Key Metrics Ribbon -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-4xl mx-auto mt-16 text-left">
+      <div class="glass-card p-5 rounded-2xl">
+        <span class="text-[11px] font-bold uppercase text-slate-400 font-inter block">Navigation Architecture</span>
+        <span class="text-2xl font-extrabold text-white mt-1 block">5 Unified Icons</span>
+        <span class="text-xs text-slate-400 font-inter mt-1 block">Every tool organized cleanly</span>
+      </div>
+      <div class="glass-card p-5 rounded-2xl">
+        <span class="text-[11px] font-bold uppercase text-slate-400 font-inter block">Attendance Engine</span>
+        <span class="text-2xl font-extrabold text-emerald-400 mt-1 block">Hourly Periods</span>
+        <span class="text-xs text-slate-400 font-inter mt-1 block">Chemistry 3 hrs: 1st [] 2nd [] 3rd []</span>
+      </div>
+      <div class="glass-card p-5 rounded-2xl">
+        <span class="text-[11px] font-bold uppercase text-slate-400 font-inter block">Deep Work Study Room</span>
+        <span class="text-2xl font-extrabold text-purple-400 mt-1 block">Fullscreen ESC</span>
+        <span class="text-xs text-slate-400 font-inter mt-1 block">Pomodoro with instant cross-exit</span>
+      </div>
+      <div class="glass-card p-5 rounded-2xl">
+        <span class="text-[11px] font-bold uppercase text-slate-400 font-inter block">Cloud & Local Storage</span>
+        <span class="text-2xl font-extrabold text-cyan-400 mt-1 block">100% Student-Owned</span>
+        <span class="text-xs text-slate-400 font-inter mt-1 block">Nuclear Factory Reset supported</span>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- THE 5 CORE PILLARS (FEATURING USER'S 5 CUSTOM ICONS)         -->
+  <!-- ============================================================ -->
+  <section id="pillars" class="relative z-10 py-20 px-6 max-w-7xl mx-auto border-t border-white/10">
+    
+    <div class="text-center max-w-2xl mx-auto mb-16">
+      <span class="text-xs font-extrabold uppercase tracking-widest text-cyan-400 bg-cyan-500/10 border border-cyan-500/20 px-3.5 py-1.5 rounded-full font-inter">
+        Complete Architecture
+      </span>
+      <h2 class="text-3xl md:text-5xl font-extrabold text-white mt-4">The 5 Core Navigation Pillars</h2>
+      <p class="text-sm md:text-base text-slate-400 font-inter mt-3 leading-relaxed">
+        Everything a student needs is grouped under these exactly 5 primary systems, featuring your custom icons.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+      <!-- Pillar 1: Dashboard / Home -->
+      <div class="glass-card p-7 rounded-3xl transition duration-300 hover:scale-[1.01] flex flex-col justify-between">
+        <div>
+          <div class="flex items-center gap-4 mb-5">
+            <img src="/icons/nav-dashboard.jpg" alt="Dashboard Icon" class="w-14 h-14 rounded-2xl object-cover ring-2 ring-blue-500/30 shadow-md">
+            <div>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-blue-400 font-inter">Pillar 01</span>
+              <h3 class="text-xl font-extrabold text-white">Dashboard / Home</h3>
+            </div>
+          </div>
+          <p class="text-xs text-slate-300 font-inter leading-relaxed">
+            Your real-time academic command center:
+          </p>
+          <ul class="mt-4 space-y-2 text-xs text-slate-400 font-inter">
+            <li class="flex items-start gap-2">
+              <span class="text-blue-400 font-bold">✓</span>
+              <span><strong>Next Class Countdown:</strong> Instant room number and instructor badge.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-blue-400 font-bold">✓</span>
+              <span><strong>Today's Hourly Schedule:</strong> Real-time class slots timeline.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-blue-400 font-bold">✓</span>
+              <span><strong>Urgent Deliverables:</strong> 7-day homework and lab deadlines.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-blue-400 font-bold">✓</span>
+              <span><strong>Quick Action Hub:</strong> One-tap launchers for common tasks.</span>
+            </li>
+          </ul>
+        </div>
+        <div class="mt-6 pt-4 border-t border-white/10">
+          <button onclick="quickDemoLogin()" class="text-xs font-bold text-blue-400 hover:text-blue-300 font-inter flex items-center gap-1">
+            <span>Explore Dashboard</span>
+            <span>→</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Pillar 2: Timetable & Attendance -->
+      <div class="glass-card p-7 rounded-3xl transition duration-300 hover:scale-[1.01] flex flex-col justify-between">
+        <div>
+          <div class="flex items-center gap-4 mb-5">
+            <img src="/icons/nav-timetable.jpg" alt="Timetable Icon" class="w-14 h-14 rounded-2xl object-cover ring-2 ring-emerald-500/30 shadow-md">
+            <div>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-400 font-inter">Pillar 02</span>
+              <h3 class="text-xl font-extrabold text-white">Timetable & Attendance</h3>
+            </div>
+          </div>
+          <p class="text-xs text-slate-300 font-inter leading-relaxed">
+            Synchronized hourly scheduling and predictive attendance:
+          </p>
+          <ul class="mt-4 space-y-2 text-xs text-slate-400 font-inter">
+            <li class="flex items-start gap-2">
+              <span class="text-emerald-400 font-bold">✓</span>
+              <span><strong>Period-by-Period Checkboxes:</strong> Monday Chemistry 3 hrs: 1st [] 2nd [] 3rd [].</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-emerald-400 font-bold">✓</span>
+              <span><strong>Predictive Safe-Skip Margin:</strong> Know exactly how many hours you can miss.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-emerald-400 font-bold">✓</span>
+              <span><strong>Risk Recovery Calculation:</strong> Minimum upcoming classes needed to reach target.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-emerald-400 font-bold">✓</span>
+              <span><strong>PDF Timetable Ingestion:</strong> Import official semester schedules.</span>
+            </li>
+          </ul>
+        </div>
+        <div class="mt-6 pt-4 border-t border-white/10">
+          <button onclick="quickDemoLogin()" class="text-xs font-bold text-emerald-400 hover:text-emerald-300 font-inter flex items-center gap-1">
+            <span>View Attendance Matrix</span>
+            <span>→</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Pillar 3: Labs & College Works -->
+      <div class="glass-card p-7 rounded-3xl transition duration-300 hover:scale-[1.01] flex flex-col justify-between">
+        <div>
+          <div class="flex items-center gap-4 mb-5">
+            <img src="/icons/nav-labs.jpg" alt="Labs Icon" class="w-14 h-14 rounded-2xl object-cover ring-2 ring-purple-500/30 shadow-md">
+            <div>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-purple-400 font-inter">Pillar 03</span>
+              <h3 class="text-xl font-extrabold text-white">Labs & College Works</h3>
+            </div>
+          </div>
+          <p class="text-xs text-slate-300 font-inter leading-relaxed">
+            Academic assignments, practical experiments, and deep work:
+          </p>
+          <ul class="mt-4 space-y-2 text-xs text-slate-400 font-inter">
+            <li class="flex items-start gap-2">
+              <span class="text-purple-400 font-bold">✓</span>
+              <span><strong>College Works Tracker:</strong> Homework, projects, and tasks with Delete support.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-purple-400 font-bold">✓</span>
+              <span><strong>Engineering Labs & Sign-offs:</strong> Practical records and instructor verification.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-purple-400 font-bold">✓</span>
+              <span><strong>Fullscreen Deep Work Room:</strong> Giant Pomodoro clock with ✕ and ESC keys.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-purple-400 font-bold">✓</span>
+              <span><strong>7-Day Auto-Cleared Logs:</strong> Automatic pruning of old study logs + manual delete.</span>
+            </li>
+          </ul>
+        </div>
+        <div class="mt-6 pt-4 border-t border-white/10">
+          <button onclick="quickDemoLogin()" class="text-xs font-bold text-purple-400 hover:text-purple-300 font-inter flex items-center gap-1">
+            <span>Manage Works & Labs</span>
+            <span>→</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Pillar 4: Document Vault -->
+      <div class="glass-card p-7 rounded-3xl transition duration-300 hover:scale-[1.01] flex flex-col justify-between">
+        <div>
+          <div class="flex items-center gap-4 mb-5">
+            <img src="/icons/nav-vault.jpg" alt="Vault Icon" class="w-14 h-14 rounded-2xl object-cover ring-2 ring-cyan-500/30 shadow-md">
+            <div>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-cyan-400 font-inter">Pillar 04</span>
+              <h3 class="text-xl font-extrabold text-white">Document Vault</h3>
+            </div>
+          </div>
+          <p class="text-xs text-slate-300 font-inter leading-relaxed">
+            Encrypted personal repository and device camera scanner:
+          </p>
+          <ul class="mt-4 space-y-2 text-xs text-slate-400 font-inter">
+            <li class="flex items-start gap-2">
+              <span class="text-cyan-400 font-bold">✓</span>
+              <span><strong>Pocket Scanner:</strong> Capture handwritten lecture notes and compile into PDF.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-cyan-400 font-bold">✓</span>
+              <span><strong>Categorized Folders:</strong> Syllabi, Lecture Transcripts, Lab Manuals, Question Banks.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-cyan-400 font-bold">✓</span>
+              <span><strong>Offline Caching:</strong> Access stored notes without campus Wi-Fi.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-cyan-400 font-bold">✓</span>
+              <span><strong>Trash Bin Protection:</strong> Restore mistakenly removed documents.</span>
+            </li>
+          </ul>
+        </div>
+        <div class="mt-6 pt-4 border-t border-white/10">
+          <button onclick="quickDemoLogin()" class="text-xs font-bold text-cyan-400 hover:text-cyan-300 font-inter flex items-center gap-1">
+            <span>Open Document Vault</span>
+            <span>→</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Pillar 5: Profile & Settings -->
+      <div class="glass-card p-7 rounded-3xl transition duration-300 hover:scale-[1.01] flex flex-col justify-between md:col-span-2 lg:col-span-2">
+        <div>
+          <div class="flex items-center gap-4 mb-5">
+            <img src="/icons/nav-settings.jpg" alt="Settings Icon" class="w-14 h-14 rounded-2xl object-cover ring-2 ring-amber-500/30 shadow-md">
+            <div>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-amber-400 font-inter">Pillar 05</span>
+              <h3 class="text-xl font-extrabold text-white">Profile, Settings & Data Sovereignty</h3>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <ul class="space-y-2 text-xs text-slate-400 font-inter">
+              <li class="flex items-start gap-2">
+                <span class="text-amber-400 font-bold">✓</span>
+                <span><strong>SGPA & CGPA Grade Engine:</strong> Credit-weighted projection supporting 10-pt and 4-pt scales.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-amber-400 font-bold">✓</span>
+                <span><strong>Unified Academic Calendar:</strong> Classes, exams, and practicals with PDF upload & event delete.</span>
+              </li>
+            </ul>
+            <ul class="space-y-2 text-xs text-slate-400 font-inter">
+              <li class="flex items-start gap-2">
+                <span class="text-amber-400 font-bold">✓</span>
+                <span><strong>High-Contrast Dark & White Mode:</strong> High contrast switch available in header and settings.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-red-400 font-bold">⚠️</span>
+                <span><strong>Nuclear Factory Reset:</strong> Instantly wipe both local offline data and Firestore cloud data.</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="mt-6 pt-4 border-t border-white/10 flex items-center justify-between">
+          <span class="text-xs text-slate-400 font-inter">100% Student-Managed & Private</span>
+          <button onclick="quickDemoLogin()" class="text-xs font-bold text-amber-400 hover:text-amber-300 font-inter flex items-center gap-1">
+            <span>Configure Preferences</span>
+            <span>→</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- INTERACTIVE PREVIEW: THE EXACT HOURLY PERIOD ATTENDANCE      -->
+  <!-- ============================================================ -->
+  <section id="preview" class="relative z-10 py-20 px-6 max-w-5xl mx-auto border-t border-white/10">
+    
+    <div class="text-center mb-12">
+      <span class="text-xs font-extrabold uppercase tracking-widest text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3.5 py-1.5 rounded-full font-inter">
+        Live Attendance Architecture
+      </span>
+      <h2 class="text-3xl md:text-4xl font-extrabold text-white mt-4">Hourly Period-by-Period Tracking</h2>
+      <p class="text-sm text-slate-400 font-inter mt-2">
+        See how College OS automatically groups multiple hours for a subject with interactive period checkboxes.
+      </p>
+    </div>
+
+    <!-- Interactive Mockup of Daily Attendance Sheet -->
+    <div class="glass-card rounded-3xl p-6 md:p-8 border border-white/15 shadow-2xl">
+      
+      <div class="flex items-center justify-between pb-4 border-b border-white/10 mb-6">
+        <div class="flex items-center gap-3">
+          <span class="px-3 py-1 rounded-xl bg-blue-600 text-white text-xs font-bold font-inter">Monday Daily Sheet</span>
+          <span class="text-xs text-slate-400 font-inter">Fall 2026 • 6 Hours Scheduled</span>
+        </div>
+        <span class="text-xs font-bold text-emerald-400 font-inter flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          Auto-Recalculating Stats
+        </span>
+      </div>
+
+      <div class="space-y-4 font-inter">
+        
+        <!-- Chemistry 3 Hours Row -->
+        <div class="p-4 rounded-2xl bg-white/5 border border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-blue-500"></span>
+              <span class="text-sm font-extrabold text-white">CHEM 101: Chemistry</span>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">3 Hours</span>
+            </div>
+            <span class="text-[11px] text-slate-400 block mt-1">Hall B-204 • Prof. Vance</span>
+          </div>
+          <!-- 3 Period Checkboxes: 1st [] 2nd [] 3rd [] -->
+          <div class="flex items-center gap-3">
+            <span class="text-xs font-bold text-slate-300">Mark Periods:</span>
+            <label class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-950/60 border border-emerald-500/50 text-emerald-300 text-xs font-bold cursor-pointer">
+              <input type="checkbox" checked class="w-4 h-4 accent-emerald-500">
+              <span>1st Hr</span>
+            </label>
+            <label class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-950/60 border border-emerald-500/50 text-emerald-300 text-xs font-bold cursor-pointer">
+              <input type="checkbox" checked class="w-4 h-4 accent-emerald-500">
+              <span>2nd Hr</span>
+            </label>
+            <label class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 border border-white/15 text-slate-300 text-xs font-bold cursor-pointer">
+              <input type="checkbox" class="w-4 h-4 accent-blue-600">
+              <span>3rd Hr</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Electronics 1 Hour Row -->
+        <div class="p-4 rounded-2xl bg-white/5 border border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+              <span class="text-sm font-extrabold text-white">EC 102: Electronics</span>
+              <span class="text-[10px] font-medium text-slate-400">1 hr slot</span>
+            </div>
+            <span class="text-[11px] text-slate-400 block mt-1">Hall C-102 • Prof. Marcus Chen</span>
+          </div>
+          <label class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-emerald-950/60 border border-emerald-500/50 text-emerald-300 text-xs font-bold cursor-pointer">
+            <input type="checkbox" checked class="w-4 h-4 accent-emerald-500">
+            <span>Present [✓]</span>
+          </label>
+        </div>
+
+        <!-- Electrical 1 Hour Row -->
+        <div class="p-4 rounded-2xl bg-white/5 border border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+              <span class="text-sm font-extrabold text-white">EE 103: Electrical</span>
+              <span class="text-[10px] font-medium text-slate-400">1 hr slot</span>
+            </div>
+            <span class="text-[11px] text-slate-400 block mt-1">Auditorium 2 • Prof. Sarah Jenkins</span>
+          </div>
+          <label class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white/5 border border-white/15 text-slate-300 text-xs font-bold cursor-pointer">
+            <input type="checkbox" class="w-4 h-4 accent-blue-600">
+            <span>Mark Present []</span>
+          </label>
+        </div>
+
+        <!-- Graphics 1 Hour Row -->
+        <div class="p-4 rounded-2xl bg-white/5 border border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-purple-500"></span>
+              <span class="text-sm font-extrabold text-white">ME 104: Graphics</span>
+              <span class="text-[10px] font-medium text-slate-400">1 hr slot</span>
+            </div>
+            <span class="text-[11px] text-slate-400 block mt-1">CAD Studio 4 • Prof. Robert Miller</span>
+          </div>
+          <label class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-emerald-950/60 border border-emerald-500/50 text-emerald-300 text-xs font-bold cursor-pointer">
+            <input type="checkbox" checked class="w-4 h-4 accent-emerald-500">
+            <span>Present [✓]</span>
+          </label>
+        </div>
+
+        <!-- Python 1 Hour Row -->
+        <div class="p-4 rounded-2xl bg-white/5 border border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-cyan-500"></span>
+              <span class="text-sm font-extrabold text-white">CS 105: Python</span>
+              <span class="text-[10px] font-medium text-slate-400">1 hr slot</span>
+            </div>
+            <span class="text-[11px] text-slate-400 block mt-1">Comp Lab 1 • Dr. Alistair Ross</span>
+          </div>
+          <label class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-emerald-950/60 border border-emerald-500/50 text-emerald-300 text-xs font-bold cursor-pointer">
+            <input type="checkbox" checked class="w-4 h-4 accent-emerald-500">
+            <span>Present [✓]</span>
+          </label>
+        </div>
+
+      </div>
+
+      <div class="mt-6 pt-5 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <span class="text-xs text-slate-400 font-inter">
+          Toggling any period recalculates Safe-to-Skip margins & subject risk in real time.
+        </span>
+        <button onclick="quickDemoLogin()" class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-md transition active:scale-95">
+          Try Live in Workspace ↗
+        </button>
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- PWA & Mobile Installation Section -->
+  <section id="pwa" class="relative z-10 py-16 px-6 max-w-6xl mx-auto border-t border-white/10">
+    <div class="glass-card rounded-3xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8 border border-white/15">
+      <div class="max-w-xl">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 mb-4">
+          📱 Progressive Web App (PWA)
+        </div>
+        <h2 class="text-2xl md:text-4xl font-extrabold text-white">Real Native App on Your Device</h2>
+        <p class="text-sm text-slate-300 font-inter mt-3 leading-relaxed">
+          Install College OS directly on your home screen or desktop. It runs in <strong>full-screen standalone mode without browser URL bars</strong>, works completely offline, and caches your timetable and vault files locally.
+        </p>
+        <div class="mt-6 flex flex-wrap gap-3 font-inter text-xs">
+          <span class="bg-white/5 border border-white/10 px-3 py-1.5 rounded-xl">🤖 Android: 1-Click Install</span>
+          <span class="bg-white/5 border border-white/10 px-3 py-1.5 rounded-xl">🍎 iOS: Share ➔ Add to Home Screen</span>
+          <span class="bg-white/5 border border-white/10 px-3 py-1.5 rounded-xl">💻 Windows/Mac: Chrome/Edge Address Bar</span>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-3 w-full sm:w-auto">
+        <button onclick="triggerPwaInstall()" class="btn-install-pwa px-6 py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-extrabold text-sm shadow-xl flex items-center justify-center gap-2 transition active:scale-95">
+          <span class="material-symbols-outlined text-[20px]">download</span>
+          <span>Install Native App</span>
+        </button>
+        <button onclick="quickDemoLogin()" class="px-6 py-3.5 rounded-2xl border border-white/20 bg-white/5 hover:bg-white/10 text-white font-bold text-xs flex items-center justify-center gap-2 transition">
+          <span>Open in Browser</span>
+          <span>↗</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Student Privacy & User Guide -->
+  <section id="guide" class="relative z-10 py-16 px-6 max-w-4xl mx-auto border-t border-white/10">
+    <div class="text-center mb-10">
+      <h2 class="text-2xl md:text-3xl font-extrabold text-white">Student Sovereignty & Privacy FAQ</h2>
+      <p class="text-xs text-slate-400 font-inter mt-1.5">How your academic data remains exclusively yours</p>
+    </div>
+
+    <div class="space-y-4 font-inter text-xs">
+      <details class="glass-card p-5 rounded-2xl border border-white/10 cursor-pointer">
+        <summary class="font-bold text-white text-sm flex items-center justify-between">
+          <span>Can college administrators or professors view my attendance or notes?</span>
+          <span class="material-symbols-outlined text-slate-400">expand_more</span>
+        </summary>
+        <p class="text-slate-300 mt-3 leading-relaxed">
+          No. There is zero administrative access. College OS is completely independent and owned exclusively by you. All attendance records, grade simulations, and vault files remain strictly within your authenticated account.
+        </p>
+      </details>
+
+      <details class="glass-card p-5 rounded-2xl border border-white/10 cursor-pointer">
+        <summary class="font-bold text-white text-sm flex items-center justify-between">
+          <span>How does the Nuclear Factory Reset work?</span>
+          <span class="material-symbols-outlined text-slate-400">expand_more</span>
+        </summary>
+        <p class="text-slate-300 mt-3 leading-relaxed">
+          Under Profile & Settings ➔ Preferences, clicking Factory Reset wipes all your saved academic records (subjects, timetable slots, attendance marks, homework, and vault files) on both your current device cache and on the Firestore cloud, restoring a pristine default workspace.
+        </p>
+      </details>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="relative z-10 bg-brand-dark text-slate-400 py-12 px-6 border-t border-white/10 mt-auto">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 font-inter text-xs">
+      <div class="flex items-center gap-3">
+        <img src="/icons/logo.jpg" alt="Logo" class="w-7 h-7 rounded-lg object-cover ring-1 ring-white/20">
+        <span class="font-extrabold text-white">College OS</span>
+        <span>• Student Academic Workspace</span>
+      </div>
+      <div class="flex items-center gap-6">
+        <a href="#pillars" class="hover:text-white transition">5 Pillars</a>
+        <a href="#pwa" class="hover:text-white transition">Install App</a>
+        <button onclick="openAuthModal()" class="hover:text-white transition">Sign In</button>
+      </div>
+      <div>
+        <span>Firebase & Offline Sync Enabled</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- AUTHENTICATION MODAL -->
+  <div id="auth-modal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="glass-card w-full max-w-md rounded-3xl p-6 sm:p-8 shadow-2xl border border-white/20 relative">
+      
+      <!-- Close Button -->
+      <button onclick="closeAuthModal()" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-slate-300 flex items-center justify-center transition">
+        ✕
+      </button>
+
+      <!-- Modal Header -->
+      <div class="text-center mb-6">
+        <img src="/icons/logo.jpg" alt="Logo" class="w-12 h-12 rounded-2xl object-cover ring-2 ring-blue-500/40 mx-auto mb-3 shadow-lg">
+        <h3 id="modal-title" class="text-xl font-extrabold text-white">Sign In to College OS</h3>
+        <p class="text-xs text-slate-400 font-inter mt-1">Access your private student workspace</p>
+      </div>
+
+      <!-- Google Sign In Button -->
+      <button type="button" onclick="handleGoogleSignIn()" class="w-full py-2.5 px-4 rounded-xl bg-white text-slate-800 hover:bg-slate-100 text-xs font-bold transition shadow-md flex items-center justify-center gap-2 mb-3 active:scale-95">
+        <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+        <span>Continue with Google</span>
+      </button>
+
+      <!-- Quick 1-Click Demo Shortcut -->
+      <div class="mb-4 p-3 rounded-2xl bg-blue-500/10 border border-blue-500/30 text-center">
+        <span class="text-[11px] font-semibold text-blue-300 block mb-1">Fastest Way to Explore:</span>
+        <button onclick="quickDemoLogin()" class="w-full py-2 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition shadow-md flex items-center justify-center gap-1.5 active:scale-95">
+          <span>🚀 1-Click Launch as Elena (Demo Student)</span>
+        </button>
+      </div>
+
+      <div class="relative flex items-center justify-center my-4">
+        <div class="border-t border-white/10 w-full"></div>
+        <span class="bg-brand-card px-3 text-[10px] text-slate-400 font-inter uppercase font-semibold">or email & password</span>
+        <div class="border-t border-white/10 w-full"></div>
+      </div>
+
+      <!-- Auth Form -->
+      <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="space-y-3 font-inter text-xs">
+        
+        <div id="field-name" class="hidden">
+          <label class="block font-semibold text-slate-300 mb-1">Full Name</label>
+          <input type="text" id="input-name" placeholder="e.g. Alex Morgan" class="w-full h-10 px-3 rounded-xl bg-white/5 border border-white/15 focus:border-blue-500 text-white outline-none">
+        </div>
+
+        <div id="field-college" class="hidden">
+          <label class="block font-semibold text-slate-300 mb-1">College / University</label>
+          <input type="text" id="input-college" placeholder="e.g. State Tech University" class="w-full h-10 px-3 rounded-xl bg-white/5 border border-white/15 focus:border-blue-500 text-white outline-none">
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Student Email</label>
+          <input type="email" id="input-email" required placeholder="you@college.edu" class="w-full h-10 px-3 rounded-xl bg-white/5 border border-white/15 focus:border-blue-500 text-white outline-none">
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Password</label>
+          <input type="password" id="input-password" required placeholder="••••••••" class="w-full h-10 px-3 rounded-xl bg-white/5 border border-white/15 focus:border-blue-500 text-white outline-none">
+        </div>
+
+        <div id="auth-error" class="hidden p-2 rounded-lg bg-red-900/40 text-red-300 text-[11px] font-medium border border-red-500/30"></div>
+
+        <button type="submit" id="btn-submit-auth" class="w-full py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-extrabold text-xs transition shadow-md mt-2">
+          Sign In
+        </button>
+      </form>
+
+      <!-- Toggle Mode -->
+      <div class="mt-4 text-center font-inter text-xs text-slate-400">
+        <span id="auth-toggle-prompt">Don't have an account?</span>
+        <button onclick="toggleAuthMode()" id="auth-toggle-btn" class="font-bold text-cyan-400 hover:underline ml-1">
+          Create Account
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Firebase Compat Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="/js/firebase-config.js"></script>
+
+  <!-- Scripts -->
+  <script src="/js/api.js"></script>
+  <script src="/js/pwa.js"></script>
+  <script>
+    let isRegisterMode = false;
+
+    function openAuthModal() {
+      if (API.getToken()) {
+        window.location.href = '/app';
+        return;
+      }
+      document.getElementById('auth-modal').classList.remove('hidden');
+    }
+
+    function closeAuthModal() {
+      document.getElementById('auth-modal').classList.add('hidden');
+      document.getElementById('auth-error').classList.add('hidden');
+    }
+
+    function toggleAuthMode() {
+      isRegisterMode = !isRegisterMode;
+      document.getElementById('field-name').classList.toggle('hidden', !isRegisterMode);
+      document.getElementById('field-college').classList.toggle('hidden', !isRegisterMode);
+      document.getElementById('modal-title').textContent = isRegisterMode ? 'Create Student Workspace' : 'Sign In to College OS';
+      document.getElementById('btn-submit-auth').textContent = isRegisterMode ? 'Create Account & Launch' : 'Sign In';
+      document.getElementById('auth-toggle-prompt').textContent = isRegisterMode ? 'Already have an account?' : "Don't have an account?";
+      document.getElementById('auth-toggle-btn').textContent = isRegisterMode ? 'Sign In' : 'Create Account';
+      document.getElementById('auth-error').classList.add('hidden');
+    }
+
+    async function handleGoogleSignIn() {
+      const errBox = document.getElementById('auth-error');
+      errBox.classList.add('hidden');
+      try {
+        if (!window.FirebaseSync || !window.FirebaseSync.isAvailable()) {
+          throw new Error('Firebase Auth is initializing or network restricted. Try 1-Click Launch.');
+        }
+        const user = await window.FirebaseSync.loginWithGoogle();
+        await API.firebaseLogin(user);
+        window.location.href = '/app';
+      } catch (err) {
+        console.warn('Google sign-in notice:', err);
+        errBox.textContent = err.message || 'Google Sign-in failed. Please try again.';
+        errBox.classList.remove('hidden');
+      }
+    }
+
+    async function handleAuthSubmit(e) {
+      e.preventDefault();
+      const errBox = document.getElementById('auth-error');
+      errBox.classList.add('hidden');
+
+      const email = document.getElementById('input-email').value;
+      const password = document.getElementById('input-password').value;
+      const name = document.getElementById('input-name').value;
+      const college = document.getElementById('input-college').value;
+
+      try {
+        let fbUser = null;
+        if (typeof firebase !== 'undefined' && firebase.auth) {
+          try {
+            if (isRegisterMode) {
+              const cred = await firebase.auth().createUserWithEmailAndPassword(email, password);
+              if (name && cred.user) await cred.user.updateProfile({ displayName: name });
+              fbUser = cred.user;
+            } else {
+              const cred = await firebase.auth().signInWithEmailAndPassword(email, password);
+              fbUser = cred.user;
+            }
+          } catch (fbErr) {
+            console.warn('[Firebase Auth Note]', fbErr.message, '- falling back to workspace auth');
+          }
+        }
+
+        if (fbUser) {
+          await API.firebaseLogin(fbUser);
+        } else {
+          if (isRegisterMode) {
+            await API.register({ email, password, name, college, semester: 'Semester 1' });
+          } else {
+            await API.login(email, password);
+          }
+        }
+        window.location.href = '/app';
+      } catch (err) {
+        errBox.textContent = err.message || 'Authentication failed. Please check credentials.';
+        errBox.classList.remove('hidden');
+      }
+    }
+
+    async function quickDemoLogin() {
+      try {
+        await API.demoLogin();
+        window.location.href = '/app';
+      } catch (e) {
+        alert('Could not start demo: ' + e.message);
+      }
+    }
+  </script>
+</body>
+</html>

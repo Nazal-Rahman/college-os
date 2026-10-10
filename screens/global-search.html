@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "surface": "#f9f9ff", "secondary-container": "#3b6ceb", "tertiary-fixed-dim": "#d3bbff", "on-secondary-container": "#fefcff", "surface-container-highest": "#d9e2fc", "surface-dim": "#d1daf4", "background": "#f9f9ff", "on-secondary-fixed": "#00174c", "surface-container-lowest": "#ffffff", "on-tertiary-fixed-variant": "#5729a3", "on-tertiary": "#ffffff", "on-secondary-fixed-variant": "#003daa", "on-secondary": "#ffffff", "tertiary-container": "#260059", "on-primary-container": "#7c8498", "error-container": "#ffdad6", "surface-container": "#e9edff", "on-tertiary-container": "#966ce6", "outline": "#76777d", "secondary": "#1451d1", "primary-fixed": "#dbe2f9", "surface-container-high": "#e1e8ff", "on-surface": "#121b2e", "on-tertiary-fixed": "#260059", "surface-container-low": "#f1f3ff", "error": "#ba1a1a", "primary": "#000000", "surface-bright": "#f9f9ff", "on-primary-fixed": "#141b2c", "tertiary-fixed": "#ebddff", "inverse-primary": "#bfc6dc", "on-primary-fixed-variant": "#3f4759", "outline-variant": "#c6c6cd", "tertiary": "#000000", "on-primary": "#ffffff", "on-surface-variant": "#45474c", "secondary-fixed-dim": "#b4c4ff", "primary-fixed-dim": "#bfc6dc", "on-background": "#121b2e", "surface-tint": "#565e71", "inverse-on-surface": "#edf0ff", "primary-container": "#141b2c", "secondary-fixed": "#dbe1ff", "inverse-surface": "#273044", "on-error-container": "#93000a", "surface-variant": "#d9e2fc", "on-error": "#ffffff" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "margin-lg": "3rem", "gutter": "1.5rem", "margin-sm": "1rem", "space-lg": "1.5rem", "space-xs": "0.25rem", "space-sm": "0.5rem", "space-md": "1rem", "space-xl": "2.5rem", "margin": "2rem", "gutter-sm": "1rem", "gutter-lg": "2rem" }, "fontFamily": { "headline-xl": [ "Manrope" ], "data-tabular": [ "Inter" ], "title-sm": [ "Manrope" ], "headline-lg-mobile": [ "Manrope" ], "headline-xl-mobile": [ "Manrope" ], "body-sm": [ "Manrope" ], "title-md": [ "Manrope" ], "label-md": [ "Inter" ], "headline-lg": [ "Manrope" ], "headline-md": [ "Manrope" ], "headline-sm": [ "Manrope" ], "label-sm": [ "Inter" ], "body-lg": [ "Manrope" ], "body-md": [ "Manrope" ] }, "fontSize": { "headline-xl": [ "40px", { "lineHeight": "48px", "letterSpacing": "-0.03em", "fontWeight": "700" } ], "data-tabular": [ "14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "500" } ], "title-sm": [ "14px", { "lineHeight": "20px", "letterSpacing": "-0.005em", "fontWeight": "600" } ], "headline-lg-mobile": [ "24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" } ], "headline-xl-mobile": [ "30px", { "lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "700" } ], "body-sm": [ "13px", { "lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400" } ], "title-md": [ "16px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" } ], "label-md": [ "12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" } ], "headline-lg": [ "32px", { "lineHeight": "40px", "letterSpacing": "-0.025em", "fontWeight": "700" } ], "headline-md": [ "24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600" } ], "headline-sm": [ "20px", { "lineHeight": "28px", "letterSpacing": "-0.015em", "fontWeight": "600" } ], "label-sm": [ "11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "600" } ], "body-lg": [ "16px", { "lineHeight": "26px", "letterSpacing": "-0.01em", "fontWeight": "400" } ], "body-md": [ "14px", { "lineHeight": "22px", "letterSpacing": "0em", "fontWeight": "400" } ] } } } };</script></head><body class="bg-surface font-body-md text-on-surface antialiased"><aside class="hidden lg:flex fixed left-0 top-0 bottom-0 w-[250px] bg-surface-container-lowest z-50 flex-col shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-space-md flex items-center justify-between"><div class="flex items-center gap-space-sm"><img alt="College OS Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1VApClFyJmXRwjWaHWiTqb1HRBaT4vjBDV_O0iJIqHGpaYBYiedW7A4MSnSY0BFaMnMu12_EvM-9WPtGjcLNMbDeMAGM18lonCpSAN2L1CCfZpHRyo_39VEOdOFw9nxgj-flGtcUCGUgsvQIxLq9PrCrMdcePTBSGUv3zG6ppNcqZ8zHpxXmHdB21QtJO8xIrfey2F2IL-idg29Q3d7yJOwGgJXga0Sp_ewD9Wc5zOmd78jMyUH0mwws4U"/><div class="flex flex-col"><span class="font-headline-sm text-title-sm text-on-surface leading-tight font-bold">College OS</span><span class="font-label-sm text-label-sm text-on-surface-variant">Student OS</span></div></div><span class="font-label-sm text-label-sm bg-surface-container text-secondary px-2 py-0.5 rounded-full font-medium">v2.4</span></div><div class="px-space-md py-space-xs"><div class="px-space-sm py-1 bg-surface-container-low rounded-lg flex items-center justify-between"><span class="font-label-sm text-label-sm text-on-surface-variant font-medium">Fall '26 Session</span><span class="h-1.5 w-1.5 rounded-full bg-secondary"></span></div></div><nav class="flex-1 px-space-sm py-space-sm space-y-1 overflow-y-auto" data-active-classes="bg-secondary text-on-secondary shadow-sm font-semibold"><a class="flex items-center gap-space-sm px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-body-md text-body-md" data-path="dashboard" href="#"><span class="material-symbols-outlined text-[20px]">grid_view</span><span>Dashboard</span></a><a class="flex items-center gap-space-sm px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-body-md text-body-md" data-path="timetable" href="#"><span class="material-symbols-outlined text-[20px]">calendar_today</span><span>Timetable</span></a><a class="flex items-center gap-space-sm px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-body-md text-body-md" data-path="attendance" href="#"><span class="material-symbols-outlined text-[20px]">verified</span><span>Attendance</span></a><a class="flex items-center gap-space-sm px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-body-md text-body-md" data-path="tasks" href="#"><span class="material-symbols-outlined text-[20px]">assignment_turned_in</span><span>Tasks</span></a><a class="flex items-center gap-space-sm px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-body-md text-body-md" data-path="study-planner" href="#"><span class="material-symbols-outlined text-[20px]">timer</span><span>Study Planner</span></a><a class="flex items-center gap-space-sm px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-body-md text-body-md" data-path="grade-calculator" href="#"><span class="material-symbols-outlined text-[20px]">calculate</span><span>Grade Calculator</span></a><a class="flex items-center gap-space-sm px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-body-md text-body-md" data-path="document-scanner" href="#"><span class="material-symbols-outlined text-[20px]">document_scanner</span><span>Document Scanner</span></a><a class="flex items-center gap-space-sm px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-body-md text-body-md" data-path="data-vault" href="#"><span class="material-symbols-outlined text-[20px]">folder_shared</span><span>Data Vault</span></a><div class="pt-space-sm pb-space-xs"><div class="h-[1px] bg-surface-container-high mx-2"></div></div><a class="flex items-center gap-space-sm px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-body-md text-body-md" data-path="notifications" href="#"><span class="material-symbols-outlined text-[20px]">notifications</span><span>Notifications</span></a><a class="flex items-center gap-space-sm px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-body-md text-body-md" data-path="settings" href="#"><span class="material-symbols-outlined text-[20px]">tune</span><span>Settings</span></a></nav><div class="p-space-sm"><div class="p-space-sm rounded-xl bg-surface-container flex items-center justify-between"><div class="flex items-center gap-2"><span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-secondary"></span></span><span class="font-label-sm text-label-sm text-on-surface-variant">Cloud Firestore</span></div><span class="font-label-sm text-label-sm text-secondary font-semibold">Ready</span></div></div></aside><div class="lg:pl-[250px] min-h-screen flex flex-col"><header class="fixed top-0 left-0 lg:left-[250px] right-0 h-16 bg-surface-container-lowest/90 backdrop-blur-xl z-40 shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 w-full px-space-md lg:px-space-lg flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-md flex-1"><div class="flex items-center gap-2 lg:hidden"><img alt="College OS Logo" class="h-7 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1VApClFyJmXRwjWaHWiTqb1HRBaT4vjBDV_O0iJIqHGpaYBYiedW7A4MSnSY0BFaMnMu12_EvM-9WPtGjcLNMbDeMAGM18lonCpSAN2L1CCfZpHRyo_39VEOdOFw9nxgj-flGtcUCGUgsvQIxLq9PrCrMdcePTBSGUv3zG6ppNcqZ8zHpxXmHdB21QtJO8xIrfey2F2IL-idg29Q3d7yJOwGgJXga0Sp_ewD9Wc5zOmd78jMyUH0mwws4U"/><span class="font-headline-sm text-title-sm text-on-surface font-bold">College OS</span></div><div class="hidden sm:flex items-center gap-2 bg-surface-container px-3 py-1.5 rounded-full text-on-surface"><span class="material-symbols-outlined text-secondary text-[18px]">school</span><span class="font-label-md text-label-md font-semibold text-on-surface">Semester 5</span><span class="text-outline-variant font-label-md">•</span><span class="font-body-sm text-body-sm text-on-surface-variant">Computer Science &amp; Eng</span><span class="material-symbols-outlined text-on-surface-variant text-[16px]">expand_more</span></div><div class="hidden md:flex items-center flex-1 max-w-sm"><div class="relative w-full"><span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span><input class="w-full h-9 pl-9 pr-14 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-secondary/20 transition-all" placeholder="Search courses, notes, tasks..." type="text"/><kbd class="absolute right-2 top-1/2 -translate-y-1/2 px-1.5 py-0.5 text-[10px] font-label-sm font-semibold text-on-surface-variant bg-surface-container rounded">⌘K</kbd></div></div></div><div class="flex items-center gap-space-sm"><div class="hidden xl:flex items-center gap-2 px-3 py-1 bg-surface-container rounded-full"><span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-secondary"></span></span><span class="font-label-sm text-label-sm text-on-surface-variant font-medium">Synced • Just now</span></div><button class="h-9 px-3 bg-secondary hover:bg-secondary-container text-on-secondary rounded-lg font-title-sm text-title-sm flex items-center gap-1.5 transition-colors shadow-sm" type="button"><span class="material-symbols-outlined text-[18px]">add</span><span class="hidden sm:inline font-medium">New</span></button><a class="relative h-9 w-9 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="notifications" href="#"><span class="material-symbols-outlined text-[20px]">notifications</span><span class="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-error ring-2 ring-surface-container-lowest"></span></a><div class="h-6 w-[1px] bg-surface-container-high hidden sm:block"></div><div class="flex items-center gap-space-sm pl-1"><div class="hidden md:flex flex-col text-right"><span class="font-title-sm text-title-sm text-on-surface leading-tight font-semibold">Elena Rostova</span><span class="font-label-sm text-label-sm text-on-surface-variant">Junior • 3.84 GPA</span></div><img alt="Profile" class="w-8 h-8 rounded-full object-cover ring-2 ring-surface-container-high" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjsb3KOTotApe3WDCnzHHicXTnL8X-L3VDv3rXc249vSwGEnLEB3S-nx6NqZIZzrgE9O2KLiYAatDVwsiqTyO9leysz8DVuaufeLpUHkynPQ3zHzau-X5BAxSm_3xh039puaeUm9RnvuBZY_nmHo2cP-ycNWjRSPAQEPoS3X9nBEjjh9DsmGn9yu5u7MkXSA7Z12vPdwlZeMIZd5E8PDWcu7lcBAfSG4D5G3W-JNuu1kxpVRvDREO5"/></div></div></div></header><main class="w-full pt-16 pb-20 lg:pb-space-lg px-space-md lg:px-space-lg flex-1"><div class="flex flex-col w-full relative">
+<!-- Dimmed Workspace Backdrop Layer (Simulating active College OS canvas underneath) -->
+<div class="w-full pointer-events-none select-none opacity-40 blur-[2px] transition-all duration-300 space-y-space-lg">
+<!-- Mock Academic Shell Stats & Cards -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-space-md">
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm">
+<span class="font-label-sm text-label-sm text-on-surface-variant block mb-1">CUMULATIVE GPA</span>
+<div class="font-headline-lg text-headline-lg text-on-surface font-bold">3.84</div>
+<span class="font-label-sm text-label-sm text-secondary font-medium">Top 4% in Faculty</span>
+</div>
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm">
+<span class="font-label-sm text-label-sm text-on-surface-variant block mb-1">ACTIVE CREDITS</span>
+<div class="font-headline-lg text-headline-lg text-on-surface font-bold">21.5</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">6 Enrolled Courses</span>
+</div>
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm">
+<span class="font-label-sm text-label-sm text-on-surface-variant block mb-1">ATTENDANCE HEALTH</span>
+<div class="font-headline-lg text-headline-lg text-on-surface font-bold">89.2%</div>
+<span class="font-label-sm text-label-sm text-secondary font-medium">+1.4% vs midterm target</span>
+</div>
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm">
+<span class="font-label-sm text-label-sm text-on-surface-variant block mb-1">PENDING DELIVERABLES</span>
+<div class="font-headline-lg text-headline-lg text-on-surface font-bold">4 Due</div>
+<span class="font-label-sm text-label-sm text-error font-medium">Next in 18 hrs</span>
+</div>
+</div>
+<!-- Mock Timetable Grid Underlay -->
+<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm space-y-space-md">
+<div class="flex items-center justify-between">
+<span class="font-title-md text-title-md text-on-surface font-bold">Weekly Academic Grid — Thursday</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Week 8 • Fall Session</span>
+</div>
+<div class="h-44 rounded-lg bg-surface-container-low flex items-center justify-center">
+<span class="font-body-sm text-body-sm text-outline">Timetable Schedule View Underlay</span>
+</div>
+</div>
+</div>
+<!-- Global Command Palette Spotlight Dialog Backdrop -->
+<div class="fixed inset-0 z-50 flex items-start justify-center pt-8 sm:pt-14 md:pt-20 px-3 sm:px-4 md:px-6 bg-primary/45 backdrop-blur-md overflow-y-auto" id="command-modal-root">
+<!-- Central Command Console Window -->
+<div class="relative w-full max-w-4xl bg-surface-container-lowest rounded-xl shadow-xl overflow-hidden flex flex-col mb-12 sm:mb-16 transform transition-all duration-200">
+<!-- Upper Search Bar Zone -->
+<div class="p-space-md sm:p-space-lg bg-surface-container-lowest flex flex-col gap-space-sm">
+<div class="flex items-center gap-space-sm">
+<div class="w-10 h-10 rounded-lg bg-surface-container-low flex items-center justify-center flex-shrink-0 text-secondary">
+<span class="material-symbols-outlined text-[24px]">travel_explore</span>
+</div>
+<div class="relative flex-1">
+<input autocomplete="off" class="w-full h-12 bg-transparent text-on-surface font-title-md text-title-md placeholder:text-outline focus:outline-none pr-10" id="spotlight-input" placeholder="Search courses, timetable slots, tasks, vault documents, or type a command..." spellcheck="false" type="text" value="CS341"/>
+<button class="absolute right-0 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg flex items-center justify-center text-outline hover:text-on-surface hover:bg-surface-container-low transition-colors" id="clear-search-btn">
+<span class="material-symbols-outlined text-[18px]">cancel</span>
+</button>
+</div>
+<!-- Dismiss & Quick Hotkey Hint -->
+<button class="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-surface-container-low hover:bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm transition-colors" id="close-modal-trigger">
+<kbd class="font-data-tabular">ESC</kbd>
+<span>Close</span>
+</button>
+</div>
+<!-- Filter Scope Chips Row -->
+<div class="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pt-1 pb-1">
+<button class="filter-tab px-3 py-1 rounded-full bg-secondary text-on-secondary font-label-sm text-label-sm flex items-center gap-1.5 flex-shrink-0 transition-colors shadow-sm" data-filter="all">
+<span class="material-symbols-outlined text-[14px]">grid_guides</span>
+<span>All Entities</span>
+<span class="bg-secondary-container text-on-secondary-container px-1.5 py-0.2 rounded-full text-[10px]">9</span>
+</button>
+<button class="filter-tab px-3 py-1 rounded-full bg-surface-container text-on-surface-variant hover:text-on-surface font-label-sm text-label-sm flex items-center gap-1.5 flex-shrink-0 transition-colors" data-filter="courses">
+<span class="material-symbols-outlined text-[14px]">school</span>
+<span>Courses</span>
+<span class="bg-surface-container-high px-1.5 py-0.2 rounded-full text-[10px]">2</span>
+</button>
+<button class="filter-tab px-3 py-1 rounded-full bg-surface-container text-on-surface-variant hover:text-on-surface font-label-sm text-label-sm flex items-center gap-1.5 flex-shrink-0 transition-colors" data-filter="timetable">
+<span class="material-symbols-outlined text-[14px]">calendar_clock</span>
+<span>Timetable</span>
+<span class="bg-surface-container-high px-1.5 py-0.2 rounded-full text-[10px]">2</span>
+</button>
+<button class="filter-tab px-3 py-1 rounded-full bg-surface-container text-on-surface-variant hover:text-on-surface font-label-sm text-label-sm flex items-center gap-1.5 flex-shrink-0 transition-colors" data-filter="tasks">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+<span>Tasks</span>
+<span class="bg-surface-container-high px-1.5 py-0.2 rounded-full text-[10px]">2</span>
+</button>
+<button class="filter-tab px-3 py-1 rounded-full bg-surface-container text-on-surface-variant hover:text-on-surface font-label-sm text-label-sm flex items-center gap-1.5 flex-shrink-0 transition-colors" data-filter="vault">
+<span class="material-symbols-outlined text-[14px]">folder_special</span>
+<span>Vault Docs</span>
+<span class="bg-surface-container-high px-1.5 py-0.2 rounded-full text-[10px]">2</span>
+</button>
+<button class="filter-tab px-3 py-1 rounded-full bg-surface-container text-on-surface-variant hover:text-on-surface font-label-sm text-label-sm flex items-center gap-1.5 flex-shrink-0 transition-colors" data-filter="actions">
+<span class="material-symbols-outlined text-[14px]">bolt</span>
+<span>Quick Actions</span>
+<span class="bg-surface-container-high px-1.5 py-0.2 rounded-full text-[10px]">5</span>
+</button>
+</div>
+</div>
+<!-- Quick Contextual Action Launchers Bar -->
+<div class="px-space-md sm:px-space-lg py-space-sm bg-surface-container-low flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-secondary text-[16px]">bolt</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">Immediate Operational Shortcuts</span>
+</div>
+<span class="font-label-sm text-label-sm text-outline">Press ⌥ + 1-5</span>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+<button class="action-btn text-left p-2.5 rounded-lg bg-surface-container-lowest hover:bg-surface-container-high transition-colors group flex flex-col gap-1 shadow-sm">
+<div class="flex items-center justify-between">
+<span class="material-symbols-outlined text-secondary text-[18px] group-hover:scale-110 transition-transform">event_repeat</span>
+<kbd class="font-data-tabular text-[10px] bg-surface-container px-1 rounded text-on-surface-variant">⌥1</kbd>
+</div>
+<span class="font-title-sm text-title-sm text-on-surface font-semibold leading-tight">+ Class/Event</span>
+<span class="font-label-sm text-[11px] text-on-surface-variant line-clamp-1">Add to timetable</span>
+</button>
+<button class="action-btn text-left p-2.5 rounded-lg bg-surface-container-lowest hover:bg-surface-container-high transition-colors group flex flex-col gap-1 shadow-sm">
+<div class="flex items-center justify-between">
+<span class="material-symbols-outlined text-secondary text-[18px] group-hover:scale-110 transition-transform">add_task</span>
+<kbd class="font-data-tabular text-[10px] bg-surface-container px-1 rounded text-on-surface-variant">⌥2</kbd>
+</div>
+<span class="font-title-sm text-title-sm text-on-surface font-semibold leading-tight">+ Task/Assign</span>
+<span class="font-label-sm text-[11px] text-on-surface-variant line-clamp-1">Set due dates &amp; priority</span>
+</button>
+<button class="action-btn text-left p-2.5 rounded-lg bg-surface-container-lowest hover:bg-surface-container-high transition-colors group flex flex-col gap-1 shadow-sm">
+<div class="flex items-center justify-between">
+<span class="material-symbols-outlined text-secondary text-[18px] group-hover:scale-110 transition-transform">how_to_reg</span>
+<kbd class="font-data-tabular text-[10px] bg-surface-container px-1 rounded text-on-surface-variant">⌥3</kbd>
+</div>
+<span class="font-title-sm text-title-sm text-on-surface font-semibold leading-tight">Quick Attendance</span>
+<span class="font-label-sm text-[11px] text-on-surface-variant line-clamp-1">Log present in 1-click</span>
+</button>
+<button class="action-btn text-left p-2.5 rounded-lg bg-surface-container-lowest hover:bg-surface-container-high transition-colors group flex flex-col gap-1 shadow-sm">
+<div class="flex items-center justify-between">
+<span class="material-symbols-outlined text-secondary text-[18px] group-hover:scale-110 transition-transform">timer</span>
+<kbd class="font-data-tabular text-[10px] bg-surface-container px-1 rounded text-on-surface-variant">⌥4</kbd>
+</div>
+<span class="font-title-sm text-title-sm text-on-surface font-semibold leading-tight">25m Focus Timer</span>
+<span class="font-label-sm text-[11px] text-on-surface-variant line-clamp-1">Pomodoro session</span>
+</button>
+<button class="action-btn text-left p-2.5 rounded-lg bg-surface-container-lowest hover:bg-surface-container-high transition-colors group flex flex-col gap-1 col-span-2 sm:col-span-1 shadow-sm">
+<div class="flex items-center justify-between">
+<span class="material-symbols-outlined text-secondary text-[18px] group-hover:scale-110 transition-transform">upload_file</span>
+<kbd class="font-data-tabular text-[10px] bg-surface-container px-1 rounded text-on-surface-variant">⌥5</kbd>
+</div>
+<span class="font-title-sm text-title-sm text-on-surface font-semibold leading-tight">Upload Syllabus</span>
+<span class="font-label-sm text-[11px] text-on-surface-variant line-clamp-1">OCR Parser sync</span>
+</button>
+</div>
+</div>
+<!-- Results Body Viewport (Keyboard-navigable list) -->
+<div class="max-h-[532px] overflow-y-auto px-space-md sm:px-space-lg py-space-md space-y-space-md bg-surface-container-lowest" id="results-container">
+<!-- SECTION 1: Enrolled Courses & Modules -->
+<div class="result-section flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-outline text-[16px]">menu_book</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">Enrolled Courses &amp; Modules</span>
+</div>
+<span class="font-label-sm text-label-sm text-outline">2 Matches</span>
+</div>
+<!-- Highlighted Selected Item (Default Focus) -->
+<div class="search-result-row selected group p-space-md rounded-xl bg-surface-container-high transition-all cursor-pointer flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm" data-index="0">
+<div class="flex items-start sm:items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-secondary text-on-secondary flex items-center justify-center font-title-sm text-title-sm font-bold flex-shrink-0">
+                CS
+              </div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2 flex-wrap">
+<span class="font-title-md text-title-md text-on-surface font-bold">CS341 Distributed Systems</span>
+<span class="bg-surface-container-highest text-secondary px-2 py-0.5 rounded-full font-label-sm text-label-sm font-semibold">Core Dept</span>
+<span class="bg-surface-container-highest text-on-surface-variant px-2 py-0.5 rounded-full font-label-sm text-label-sm">4.0 Credits</span>
+</div>
+<div class="flex items-center gap-3 font-body-sm text-body-sm text-on-surface-variant mt-0.5 flex-wrap">
+<span class="flex items-center gap-1 text-secondary font-medium">
+<span class="material-symbols-outlined text-[15px]">schedule</span> Next class in 35 mins
+                  </span>
+<span>•</span>
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px]">location_on</span> CC Lab 304 (B-Wing)
+                  </span>
+<span>•</span>
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px]">person</span> Prof. Dr. Aris Thorne
+                  </span>
+</div>
+</div>
+</div>
+<!-- Attendance Circular Visual Dial Indicator -->
+<div class="flex items-center gap-3 self-end sm:self-auto bg-surface-container-lowest px-3 py-1.5 rounded-lg flex-shrink-0">
+<div class="relative w-7 h-7 flex items-center justify-center">
+<svg class="w-full h-full transform -rotate-90" viewbox="0 0 36 36">
+<path class="text-surface-container-highest" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3.5"></path>
+<path class="text-secondary" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="78.6, 100" stroke-linecap="round" stroke-width="3.5"></path>
+</svg>
+</div>
+<div class="flex flex-col text-right">
+<span class="font-data-tabular text-data-tabular text-on-surface font-bold leading-tight">78.6%</span>
+<span class="font-label-sm text-[10px] text-on-surface-variant font-medium">Attendance Safe</span>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-secondary group-hover:translate-x-1 transition-all text-[18px]">arrow_forward</span>
+</div>
+</div>
+<!-- Secondary Result Item -->
+<div class="search-result-row group p-space-md rounded-xl bg-surface-container-low hover:bg-surface-container transition-all cursor-pointer flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3" data-index="1">
+<div class="flex items-start sm:items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-surface-container-high text-on-surface font-title-sm text-title-sm font-bold flex items-center justify-center flex-shrink-0">
+                DB
+              </div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2 flex-wrap">
+<span class="font-title-md text-title-md text-on-surface font-semibold">CS301 Database Systems</span>
+<span class="bg-surface-container-highest text-on-surface-variant px-2 py-0.5 rounded-full font-label-sm text-label-sm">Prerequisite for CS341</span>
+</div>
+<div class="flex items-center gap-3 font-body-sm text-body-sm text-on-surface-variant mt-0.5 flex-wrap">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px]">event</span> Tuesdays &amp; Thursdays 10:00 AM
+                  </span>
+<span>•</span>
+<span>Hall 201</span>
+<span>•</span>
+<span class="text-secondary font-medium">Archived Notes Available (14)</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2 self-end sm:self-auto">
+<span class="font-label-sm text-label-sm bg-surface-container-highest text-on-surface-variant px-2.5 py-1 rounded-full font-medium">Grade A- (3.7)</span>
+<span class="material-symbols-outlined text-outline group-hover:text-secondary group-hover:translate-x-1 transition-all text-[18px]">arrow_forward</span>
+</div>
+</div>
+</div>
+<!-- SECTION 2: Upcoming Tasks & Milestones -->
+<div class="result-section flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-outline text-[16px]">task_alt</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">Upcoming Tasks &amp; Milestones</span>
+</div>
+<span class="font-label-sm text-label-sm text-outline">2 Matches</span>
+</div>
+<!-- Task 1: High Priority Deadline -->
+<div class="search-result-row group p-space-md rounded-xl bg-surface-container-low hover:bg-surface-container transition-all cursor-pointer flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3" data-index="2">
+<div class="flex items-start gap-3">
+<div class="mt-0.5">
+<div class="w-5 h-5 rounded bg-surface-container-highest group-hover:bg-secondary flex items-center justify-center transition-colors">
+<span class="material-symbols-outlined text-surface-container-lowest text-[14px]">done</span>
+</div>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2 flex-wrap">
+<span class="font-title-sm text-title-sm text-on-surface font-semibold">Distributed Consensus Raft Paper Implementation</span>
+<span class="bg-error-container text-on-error-container px-2 py-0.5 rounded-full font-label-sm text-label-sm font-semibold">High Priority</span>
+<span class="bg-surface-container text-on-surface-variant px-2 py-0.5 rounded-full font-label-sm text-label-sm">Lab Deliverable 3</span>
+</div>
+<div class="flex items-center gap-3 font-body-sm text-body-sm text-on-surface-variant mt-1 flex-wrap">
+<span class="flex items-center gap-1 text-error font-medium">
+<span class="material-symbols-outlined text-[15px]">notification_important</span> Due Tomorrow, 11:59 PM
+                  </span>
+<span>•</span>
+<span>CS341 Distributed Systems</span>
+<span>•</span>
+<span>Weight: 15% Total Grade</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2 self-end sm:self-auto flex-shrink-0">
+<button class="px-2.5 py-1 rounded-lg bg-surface-container hover:bg-secondary hover:text-on-secondary font-label-sm text-label-sm text-on-surface transition-colors">Submit Link</button>
+<span class="material-symbols-outlined text-outline group-hover:text-secondary text-[18px]">arrow_forward</span>
+</div>
+</div>
+<!-- Task 2: Completed Milestone -->
+<div class="search-result-row group p-space-md rounded-xl bg-surface-container-low hover:bg-surface-container transition-all cursor-pointer flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3" data-index="3">
+<div class="flex items-start gap-3">
+<div class="mt-0.5">
+<div class="w-5 h-5 rounded bg-secondary text-on-secondary flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px]">check</span>
+</div>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2 flex-wrap">
+<span class="font-title-sm text-title-sm text-outline line-through font-medium">CS341: RPC Protocol Buffers Compilation Benchmark</span>
+<span class="bg-surface-container-highest text-secondary px-2 py-0.5 rounded-full font-label-sm text-label-sm font-semibold">Graded (100/100)</span>
+</div>
+<div class="flex items-center gap-2 font-body-sm text-body-sm text-outline mt-0.5">
+<span>Completed on Oct 14</span>
+<span>•</span>
+<span>Feedback: "Exceptional latency test suite"</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2 self-end sm:self-auto flex-shrink-0">
+<span class="font-label-sm text-label-sm text-outline">View Feedback</span>
+<span class="material-symbols-outlined text-outline group-hover:text-secondary text-[18px]">open_in_new</span>
+</div>
+</div>
+</div>
+<!-- SECTION 3: Timetable & Calendar Events -->
+<div class="result-section flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-outline text-[16px]">calendar_month</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">Timetable &amp; Calendar Schedule</span>
+</div>
+<span class="font-label-sm text-label-sm text-outline">2 Matches</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+<!-- Timetable Event 1 -->
+<div class="search-result-row group p-space-md rounded-xl bg-surface-container-low hover:bg-surface-container transition-all cursor-pointer flex items-start gap-3" data-index="4">
+<div class="w-2 self-stretch rounded-full bg-secondary flex-shrink-0"></div>
+<div class="flex flex-col flex-1">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-secondary font-semibold">Today (Thursday)</span>
+<span class="font-data-tabular text-data-tabular text-on-surface font-semibold">03:30 PM – 05:20 PM</span>
+</div>
+<span class="font-title-sm text-title-sm text-on-surface font-bold mt-0.5">CS341 Distributed Systems Lab</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Cluster Deployment &amp; Leader Election testing</span>
+<div class="flex items-center gap-2 mt-2 pt-2 bg-surface-container-lowest px-2 py-1 rounded">
+<span class="material-symbols-outlined text-outline text-[14px]">door_front</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Computer Science Building • CC Lab 304</span>
+</div>
+</div>
+</div>
+<!-- Timetable Event 2 -->
+<div class="search-result-row group p-space-md rounded-xl bg-surface-container-low hover:bg-surface-container transition-all cursor-pointer flex items-start gap-3" data-index="5">
+<div class="w-2 self-stretch rounded-full bg-surface-tint flex-shrink-0"></div>
+<div class="flex flex-col flex-1">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-outline font-semibold">Tomorrow (Friday)</span>
+<span class="font-data-tabular text-data-tabular text-on-surface font-semibold">11:00 AM – 12:30 PM</span>
+</div>
+<span class="font-title-sm text-title-sm text-on-surface font-bold mt-0.5">CS341 Office Hours with TA Marcus</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Drop-in debugging for Raft RPC log replays</span>
+<div class="flex items-center gap-2 mt-2 pt-2 bg-surface-container-lowest px-2 py-1 rounded">
+<span class="material-symbols-outlined text-outline text-[14px]">videocam</span>
+<span class="font-label-sm text-label-sm text-secondary font-medium">Join Campus Zoom Link</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- SECTION 4: Cloud Data Vault Documents -->
+<div class="result-section flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-outline text-[16px]">folder_shared</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">Cloud Data Vault Documents</span>
+</div>
+<span class="font-label-sm text-label-sm text-outline">2 Matches</span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+<!-- Document 1 -->
+<div class="search-result-row group p-3 rounded-xl bg-surface-container-low hover:bg-surface-container transition-all cursor-pointer flex items-center justify-between" data-index="6">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-9 h-9 rounded-lg bg-error-container text-on-error-container flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[20px]">picture_as_pdf</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-title-sm text-title-sm text-on-surface font-bold truncate">Lab3_Specification_v2.pdf</span>
+<div class="flex items-center gap-2 text-outline font-label-sm text-label-sm">
+<span class="font-data-tabular">1.8 MB</span>
+<span>•</span>
+<span class="flex items-center gap-0.5 text-secondary">
+<span class="material-symbols-outlined text-[13px]">lock</span> Encrypted Vault
+                    </span>
+</div>
+</div>
+</div>
+<button class="p-1.5 rounded-lg text-outline hover:text-on-surface hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[18px]">download</span>
+</button>
+</div>
+<!-- Document 2 -->
+<div class="search-result-row group p-3 rounded-xl bg-surface-container-low hover:bg-surface-container transition-all cursor-pointer flex items-center justify-between" data-index="7">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-9 h-9 rounded-lg bg-surface-container-high text-secondary flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[20px]">folder_zip</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-title-sm text-title-sm text-on-surface font-bold truncate">Raft_StarterFramework.tar.gz</span>
+<div class="flex items-center gap-2 text-outline font-label-sm text-label-sm">
+<span class="font-data-tabular">24.2 MB</span>
+<span>•</span>
+<span class="flex items-center gap-0.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-[13px]">code</span> Git LFS Linked
+                    </span>
+</div>
+</div>
+</div>
+<button class="p-1.5 rounded-lg text-outline hover:text-on-surface hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[18px]">terminal</span>
+</button>
+</div>
+</div>
+</div>
+<!-- SECTION 5: Recent Searches & History -->
+<div class="pt-2 border-t border-surface-container-high flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider font-semibold">Recent Query History</span>
+<button class="font-label-sm text-label-sm text-outline hover:text-error transition-colors flex items-center gap-1" id="clear-history-btn">
+<span class="material-symbols-outlined text-[14px]">delete_sweep</span>
+<span>Clear History</span>
+</button>
+</div>
+<div class="flex items-center gap-2 flex-wrap">
+<button class="history-chip px-3 py-1 rounded-lg bg-surface-container-low hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface font-body-sm text-body-sm flex items-center gap-1.5 transition-colors">
+<span class="material-symbols-outlined text-[15px] text-outline">history</span>
+<span>attendance warning</span>
+</button>
+<button class="history-chip px-3 py-1 rounded-lg bg-surface-container-low hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface font-body-sm text-body-sm flex items-center gap-1.5 transition-colors">
+<span class="material-symbols-outlined text-[15px] text-outline">history</span>
+<span>midterm study guide</span>
+</button>
+<button class="history-chip px-3 py-1 rounded-lg bg-surface-container-low hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface font-body-sm text-body-sm flex items-center gap-1.5 transition-colors">
+<span class="material-symbols-outlined text-[15px] text-outline">history</span>
+<span>prof. vance office hours</span>
+</button>
+<button class="history-chip px-3 py-1 rounded-lg bg-surface-container-low hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface font-body-sm text-body-sm flex items-center gap-1.5 transition-colors">
+<span class="material-symbols-outlined text-[15px] text-outline">history</span>
+<span>calculus syllabus</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Command Palette Bottom Status & Navigation Footer -->
+<div class="px-space-md sm:px-space-lg py-3 bg-surface-container-low flex flex-col sm:flex-row items-center justify-between gap-2">
+<!-- Online / Offline Cache Indicator -->
+<div class="flex items-center gap-2">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-secondary"></span>
+</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">
+            Showing hybrid results <span class="font-semibold text-on-surface">(Cloud Firestore</span> + <span class="text-secondary font-semibold">3 offline cached items</span>)
+          </span>
+</div>
+<!-- Keyboard Key Helpers -->
+<div class="flex items-center gap-3 text-outline font-label-sm text-label-sm flex-wrap justify-end">
+<div class="flex items-center gap-1">
+<kbd class="px-1.5 py-0.5 bg-surface-container-lowest rounded font-data-tabular shadow-sm">↑</kbd>
+<kbd class="px-1.5 py-0.5 bg-surface-container-lowest rounded font-data-tabular shadow-sm">↓</kbd>
+<span class="text-[11px]">Navigate</span>
+</div>
+<div class="flex items-center gap-1">
+<kbd class="px-1.5 py-0.5 bg-surface-container-lowest rounded font-data-tabular shadow-sm">↵</kbd>
+<span class="text-[11px]">Select</span>
+</div>
+<div class="flex items-center gap-1">
+<kbd class="px-1.5 py-0.5 bg-surface-container-lowest rounded font-data-tabular shadow-sm">ESC</kbd>
+<span class="text-[11px]">Dismiss</span>
+</div>
+<div class="flex items-center gap-1">
+<kbd class="px-1.5 py-0.5 bg-surface-container-lowest rounded font-data-tabular shadow-sm">⌘K</kbd>
+<span class="text-[11px]">Toggle</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+  (function initSpotlightPalette() {
+    const input = document.getElementById('spotlight-input');
+    const clearBtn = document.getElementById('clear-search-btn');
+    const modalRoot = document.getElementById('command-modal-root');
+    const closeTrigger = document.getElementById('close-modal-trigger');
+    const clearHistoryBtn = document.getElementById('clear-history-btn');
+    const rows = Array.from(document.querySelectorAll('.search-result-row'));
+    const filterTabs = Array.from(document.querySelectorAll('.filter-tab'));
+    const historyChips = Array.from(document.querySelectorAll('.history-chip'));
+
+    let currentIndex = 0;
+
+    function updateSelection(newIdx) {
+      if (rows.length === 0) return;
+      rows.forEach((r, idx) => {
+        if (idx === newIdx) {
+          r.classList.add('bg-surface-container-high', 'selected');
+          r.classList.remove('bg-surface-container-low');
+          r.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        } else {
+          r.classList.remove('bg-surface-container-high', 'selected');
+          if (!r.classList.contains('bg-surface-container-lowest')) {
+            r.classList.add('bg-surface-container-low');
+          }
+        }
+      });
+      currentIndex = newIdx;
+    }
+
+    // Keyboard Navigation across search items
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        const next = (currentIndex + 1) % rows.length;
+        updateSelection(next);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        const prev = (currentIndex - 1 + rows.length) % rows.length;
+        updateSelection(prev);
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        modalRoot.classList.add('opacity-0', 'pointer-events-none');
+      } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        modalRoot.classList.toggle('opacity-0');
+        modalRoot.classList.toggle('pointer-events-none');
+        if (!modalRoot.classList.contains('opacity-0')) {
+          input.focus();
+          input.select();
+        }
+      }
+    });
+
+    // Clear Search Input Button
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
+        input.value = '';
+        input.focus();
+      });
+    }
+
+    // Close Modal Button
+    if (closeTrigger) {
+      closeTrigger.addEventListener('click', () => {
+        modalRoot.classList.add('opacity-0', 'pointer-events-none');
+      });
+    }
+
+    // Clear History Action
+    if (clearHistoryBtn) {
+      clearHistoryBtn.addEventListener('click', () => {
+        historyChips.forEach(chip => chip.remove());
+        clearHistoryBtn.parentElement.parentElement.remove();
+      });
+    }
+
+    // Chip Click sets Query
+    historyChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        const text = chip.querySelector('span:last-child')?.innerText || '';
+        input.value = text;
+        input.focus();
+      });
+    });
+
+    // Scope Tabs Interactivity
+    filterTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        filterTabs.forEach(t => {
+          t.classList.remove('bg-secondary', 'text-on-secondary');
+          t.classList.add('bg-surface-container', 'text-on-surface-variant');
+        });
+        tab.classList.remove('bg-surface-container', 'text-on-surface-variant');
+        tab.classList.add('bg-secondary', 'text-on-secondary');
+      });
+    });
+
+    // Row Hover Focus
+    rows.forEach((row, i) => {
+      row.addEventListener('mouseenter', () => {
+        updateSelection(i);
+      });
+    });
+
+    // Initial Focus
+    if (input) {
+      input.focus();
+    }
+  })();
+</script></main></div><nav class="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-surface-container-lowest/95 backdrop-blur-xl shadow-[0_-1px_8px_rgba(0,0,0,0.04)] z-50 px-space-sm flex items-center justify-around" data-active-classes="text-secondary font-semibold"><a class="flex flex-col items-center gap-0.5 text-on-surface-variant hover:text-on-surface py-1" data-path="dashboard" href="#"><span class="material-symbols-outlined text-[22px]">grid_view</span><span class="font-label-sm text-[10px]">Home</span></a><a class="flex flex-col items-center gap-0.5 text-on-surface-variant hover:text-on-surface py-1" data-path="timetable" href="#"><span class="material-symbols-outlined text-[22px]">calendar_today</span><span class="font-label-sm text-[10px]">Timetable</span></a><a class="flex flex-col items-center gap-0.5 text-on-surface-variant hover:text-on-surface py-1" data-path="tasks" href="#"><span class="material-symbols-outlined text-[22px]">assignment_turned_in</span><span class="font-label-sm text-[10px]">Tasks</span></a><a class="flex flex-col items-center gap-0.5 text-on-surface-variant hover:text-on-surface py-1" data-path="data-vault" href="#"><span class="material-symbols-outlined text-[22px]">folder_shared</span><span class="font-label-sm text-[10px]">Vault</span></a><a class="flex flex-col items-center gap-0.5 text-on-surface-variant hover:text-on-surface py-1" data-path="settings" href="#"><span class="material-symbols-outlined text-[22px]">person</span><span class="font-label-sm text-[10px]">Profile</span></a></nav></body></html>

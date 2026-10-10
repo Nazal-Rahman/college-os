@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>College OS — Personal Student Workspace</title>
+
+  <!-- PWA Meta Tags -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#101828">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="College OS">
+  <link rel="apple-touch-icon" href="/icons/logo.jpg">
+  <link rel="icon" type="image/jpeg" href="/icons/logo.jpg">
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  
+  <link rel="stylesheet" href="/css/app.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              navy: '#0F172A',
+              card: '#FFFFFF',
+              border: '#E2E8F0',
+              accent: '#1D4ED8',
+              emerald: '#059669',
+              amber: '#D97706',
+              red: '#DC2626',
+              purple: '#7C3AED'
+            }
+          },
+          fontFamily: {
+            manrope: ["Manrope", "sans-serif"],
+            inter: ["Inter", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="font-manrope antialiased min-h-screen flex flex-col transition-colors duration-200">
+
+  <!-- Offline Status Banner -->
+  <div id="offline-banner" class="hidden bg-amber-600 text-white px-4 py-2 text-xs font-semibold flex items-center justify-center gap-2 sticky top-0 z-50 shadow-md">
+    <span class="material-symbols-outlined text-[18px]">wifi_off</span>
+    <span>Offline Mode Active • Local changes are saved and will automatically sync when connection returns.</span>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- 5-ITEM DESKTOP & TABLET SIDEBAR NAVIGATION               -->
+  <!-- ======================================================== -->
+  <aside class="hidden lg:flex fixed left-0 top-0 bottom-0 w-[270px] theme-card border-r z-40 flex-col shadow-sm">
+    
+    <!-- Sidebar Header with User's College OS Logo -->
+    <div class="h-18 px-5 py-4 flex items-center justify-between border-b theme-border">
+      <a href="/" class="flex items-center gap-3">
+        <img src="/icons/logo.jpg" alt="College OS Logo" class="w-9 h-9 rounded-xl object-cover shadow-sm ring-1 ring-slate-300 dark:ring-slate-700">
+        <div class="flex flex-col">
+          <span class="text-base font-extrabold tracking-tight leading-tight">College OS</span>
+          <span class="text-[10px] font-semibold text-slate-500 font-inter">Student Workspace</span>
+        </div>
+      </a>
+      <span class="text-[10px] bg-blue-100 text-blue-800 dark:bg-blue-900/60 dark:text-blue-200 px-2 py-0.5 rounded-full font-extrabold font-inter">v2.5</span>
+    </div>
+
+    <!-- Active Semester Indicator -->
+    <div class="px-4 py-3">
+      <div class="px-3.5 py-2 theme-subtle rounded-xl flex items-center justify-between border theme-border">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span id="sidebar-semester-label" class="text-xs font-bold font-inter">Semester 5 (Active)</span>
+        </div>
+        <span class="text-[10px] font-semibold text-slate-500 font-inter">Fall '26</span>
+      </div>
+    </div>
+
+    <!-- The 5 Primary Navigation Items -->
+    <nav class="flex-1 px-3 py-2 space-y-1.5 overflow-y-auto font-inter text-xs font-bold">
+      
+      <!-- Nav 1: Dashboard / Home -->
+      <button onclick="navigateTo('dashboard')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl transition bg-blue-600 text-white shadow-sm" data-view="dashboard">
+        <img src="/icons/nav-dashboard.jpg" alt="Dashboard" class="w-7 h-7 rounded-lg object-cover shadow-xs border border-white/20">
+        <span class="text-[13px]">Dashboard / Home</span>
+      </button>
+
+      <!-- Nav 2: Timetable & Attendance -->
+      <button onclick="navigateTo('timetable')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl transition hover:bg-slate-100 dark:hover:bg-slate-800/60" data-view="timetable">
+        <img src="/icons/nav-timetable.jpg" alt="Timetable" class="w-7 h-7 rounded-lg object-cover shadow-xs border border-slate-300 dark:border-slate-700">
+        <span class="text-[13px]">Timetable & Attendance</span>
+      </button>
+
+      <!-- Nav 3: Labs & College Works -->
+      <button onclick="navigateTo('labs')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl transition hover:bg-slate-100 dark:hover:bg-slate-800/60" data-view="labs">
+        <img src="/icons/nav-labs.jpg" alt="Labs & Works" class="w-7 h-7 rounded-lg object-cover shadow-xs border border-slate-300 dark:border-slate-700">
+        <span class="text-[13px]">Labs & College Works</span>
+      </button>
+
+      <!-- Nav 4: Vault -->
+      <button onclick="navigateTo('vault')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl transition hover:bg-slate-100 dark:hover:bg-slate-800/60" data-view="vault">
+        <img src="/icons/nav-vault.jpg" alt="Vault" class="w-7 h-7 rounded-lg object-cover shadow-xs border border-slate-300 dark:border-slate-700">
+        <span class="text-[13px]">Document Vault</span>
+      </button>
+
+      <!-- Nav 5: Profile & Settings -->
+      <button onclick="navigateTo('settings')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl transition hover:bg-slate-100 dark:hover:bg-slate-800/60" data-view="settings">
+        <img src="/icons/nav-settings.jpg" alt="Profile" class="w-7 h-7 rounded-lg object-cover shadow-xs border border-slate-300 dark:border-slate-700">
+        <span class="text-[13px]">Profile & Settings</span>
+      </button>
+
+    </nav>
+
+    <!-- Cloud Sync & Theme Switcher in Sidebar Footer -->
+    <div class="p-4 border-t theme-border space-y-3">
+      <!-- Dark / White Mode Quick Toggle -->
+      <button onclick="toggleThemeMode()" class="w-full py-2 px-3 rounded-xl border theme-border theme-subtle flex items-center justify-between text-xs font-semibold font-inter hover:opacity-90 transition">
+        <span class="flex items-center gap-2">
+          <span id="theme-btn-icon" class="text-base">🌙</span>
+          <span id="theme-btn-text">Dark Mode</span>
+        </span>
+        <span class="text-[10px] bg-slate-200 dark:bg-slate-700 px-2 py-0.5 rounded-md font-mono">Toggle</span>
+      </button>
+
+      <!-- Firestore Status -->
+      <div class="p-2.5 rounded-xl theme-subtle border theme-border flex items-center justify-between font-inter text-xs">
+        <div class="flex items-center gap-2">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-500 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+          </span>
+          <span class="text-slate-500 text-[11px] font-medium">Firestore & Cloud</span>
+        </div>
+        <span class="text-blue-600 dark:text-blue-400 font-bold text-[11px]">Synced</span>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- ======================================================== -->
+  <!-- MAIN APPLICATION CONTENT                                 -->
+  <!-- ======================================================== -->
+  <div class="lg:pl-[270px] min-h-screen flex flex-col">
+
+    <!-- Top Navigation Header -->
+    <header class="fixed top-0 left-0 lg:left-[270px] right-0 h-16 theme-card/90 backdrop-blur-md z-30 border-b theme-border px-4 lg:px-6 flex items-center justify-between gap-4">
+      
+      <!-- Mobile Brand Display -->
+      <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2 lg:hidden">
+          <img src="/icons/logo.jpg" alt="Logo" class="w-8 h-8 rounded-xl object-cover ring-1 ring-slate-300">
+          <span class="text-base font-extrabold tracking-tight">College OS</span>
+        </div>
+
+        <div class="hidden sm:flex items-center gap-2 theme-subtle border theme-border px-3 py-1.5 rounded-xl text-xs font-bold">
+          <span class="material-symbols-outlined text-blue-600 text-[18px]">school</span>
+          <span id="top-semester-text">Semester 5 • Computer Science</span>
+        </div>
+      </div>
+
+      <!-- Center: Global Search Command Palette (CMD+K) -->
+      <div class="flex-1 max-w-md hidden md:block">
+        <div class="relative cursor-pointer" onclick="openSearchModal()">
+          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
+          <input readonly class="w-full h-9 pl-9 pr-14 theme-subtle border theme-border rounded-xl font-inter text-xs placeholder:text-slate-400 focus:outline-none cursor-pointer" placeholder="Search courses, homework, labs, files..."/>
+          <kbd class="absolute right-2.5 top-1/2 -translate-y-1/2 px-1.5 py-0.5 text-[10px] font-inter font-bold text-slate-500 theme-card border theme-border rounded-md">⌘K</kbd>
+        </div>
+      </div>
+
+      <!-- Right: Action Buttons, Theme Switcher & Profile -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        
+        <!-- Dark / White Mode Switcher in Header -->
+        <button onclick="toggleThemeMode()" title="Switch Light/Dark Mode" class="h-9 w-9 rounded-xl theme-subtle border theme-border flex items-center justify-center text-base hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+          <span id="header-theme-icon">🌙</span>
+        </button>
+
+        <!-- PWA Install Button -->
+        <button onclick="triggerPwaInstall()" class="btn-install-pwa hidden sm:inline-flex items-center gap-1.5 h-9 px-3.5 theme-card border theme-border hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl font-inter text-xs font-bold transition shadow-xs">
+          <span class="material-symbols-outlined text-[16px] text-blue-600">install_mobile</span>
+          <span>Install App</span>
+        </button>
+
+        <!-- New Item Quick Action Button -->
+        <button onclick="openQuickActionModal()" class="h-9 px-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-inter text-xs font-bold flex items-center gap-1.5 transition shadow-xs active:scale-95">
+          <span class="material-symbols-outlined text-[18px]">add</span>
+          <span>New</span>
+        </button>
+
+        <div class="h-6 w-[1px] bg-slate-300 dark:bg-slate-700 hidden sm:block"></div>
+
+        <!-- Student Profile Avatar -->
+        <div class="flex items-center gap-2 pl-1 cursor-pointer" onclick="navigateTo('settings')">
+          <div class="hidden md:flex flex-col text-right">
+            <span id="top-student-name" class="text-xs font-bold leading-tight">Elena Rostova</span>
+            <span id="top-student-gpa" class="text-[11px] font-inter text-slate-500">3.84 CGPA</span>
+          </div>
+          <img id="top-student-avatar" alt="Profile" class="w-8 h-8 rounded-xl object-cover ring-2 ring-blue-500/30" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80"/>
+        </div>
+
+      </div>
+
+    </header>
+
+    <!-- Main Views Area -->
+    <main class="w-full pt-20 pb-28 lg:pb-12 px-4 lg:px-8 flex-1">
+
+      <!-- ======================================================== -->
+      <!-- VIEW 1: DASHBOARD / HOME                                 -->
+      <!-- ======================================================== -->
+      <section id="view-dashboard" class="view-panel space-y-6">
+        
+        <!-- Welcome Banner & Upcoming Class Countdown -->
+        <div class="relative overflow-hidden rounded-3xl theme-card p-6 border theme-border shadow-xs">
+          <div class="relative flex flex-col xl:flex-row xl:items-center justify-between gap-6">
+            <div class="space-y-2">
+              <div class="flex flex-wrap items-center gap-2 font-inter text-xs">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/60 dark:text-blue-200 font-bold">
+                  <span class="h-2 w-2 rounded-full bg-blue-600 animate-pulse"></span>
+                  Fall 2026 Session • Week 8
+                </span>
+                <span id="dash-date-str" class="text-slate-500">Thursday, Oct 15</span>
+              </div>
+              <h1 id="dash-welcome-text" class="text-3xl font-extrabold tracking-tight">Good day, Elena 👋</h1>
+              <p class="text-sm text-slate-500 font-inter">Your academic schedule and attendance tracking are synchronized in real time.</p>
+              
+              <!-- Next Class Pill -->
+              <div id="dash-next-class-pill" class="pt-2 flex flex-wrap items-center gap-2">
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl theme-subtle border theme-border text-xs font-bold">
+                  <span class="material-symbols-outlined text-blue-600 text-[18px]">timer</span>
+                  <span>Next Class: <strong id="next-class-name" class="text-blue-600 font-extrabold">Chemistry</strong></span>
+                  <span class="text-slate-500 font-normal" id="next-class-room">(Hall B-204)</span>
+                </div>
+                <span id="next-class-prof" class="text-xs text-blue-600 bg-blue-50 dark:bg-blue-900/40 px-2.5 py-1 rounded-lg font-bold font-inter">Prof. Vance</span>
+              </div>
+            </div>
+
+            <!-- Quick Action Buttons on Banner -->
+            <div class="flex flex-wrap items-center gap-2">
+              <button onclick="navigateTo('timetable')" class="h-9 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition shadow-xs active:scale-95">
+                <span class="material-symbols-outlined text-[18px]">how_to_reg</span>
+                <span>Mark Attendance</span>
+              </button>
+              <button onclick="navigateTo('labs')" class="h-9 px-4 theme-subtle hover:opacity-90 border theme-border rounded-xl text-xs font-bold flex items-center gap-1.5 transition active:scale-95">
+                <span class="material-symbols-outlined text-blue-600 text-[18px]">add_task</span>
+                <span>College Works</span>
+              </button>
+              <button onclick="openFullscreenStudyTimer()" class="h-9 px-4 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition active:scale-95">
+                <span class="material-symbols-outlined text-[18px]">fullscreen</span>
+                <span>Focus Room</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 Executive Metrics Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 font-inter">
+          
+          <div class="theme-card p-5 rounded-2xl border theme-border shadow-xs">
+            <span class="text-xs text-slate-500 font-semibold">Today's Class Schedule</span>
+            <div class="mt-2 flex items-baseline gap-2">
+              <span id="metric-classes-today" class="text-3xl font-extrabold text-blue-600">6</span>
+              <span class="text-xs text-slate-500">Periods / Hours</span>
+            </div>
+            <div class="mt-3 flex items-center gap-1.5 text-xs text-blue-600 font-bold cursor-pointer" onclick="navigateTo('timetable')">
+              <span>View hourly sheet →</span>
+            </div>
+          </div>
+
+          <div class="theme-card p-5 rounded-2xl border theme-border shadow-xs">
+            <span class="text-xs text-slate-500 font-semibold">Overall Attendance</span>
+            <div class="mt-2 flex items-baseline gap-2">
+              <span id="metric-attendance-pct" class="text-3xl font-extrabold text-emerald-600">86.2%</span>
+              <span class="text-xs text-emerald-600 font-bold">Good Standing</span>
+            </div>
+            <div class="mt-3 text-xs text-slate-500" id="metric-attendance-ratio">
+              44 / 51 hours attended
+            </div>
+          </div>
+
+          <div class="theme-card p-5 rounded-2xl border theme-border shadow-xs">
+            <span class="text-xs text-slate-500 font-semibold">Pending College Works</span>
+            <div class="mt-2 flex items-baseline gap-2">
+              <span id="metric-pending-tasks" class="text-3xl font-extrabold text-amber-500">3</span>
+              <span class="text-xs text-slate-500">Assignments & Labs</span>
+            </div>
+            <div class="mt-3 text-xs text-red-600 font-bold" onclick="navigateTo('labs')">
+              <span>1 Due in 48 hours →</span>
+            </div>
+          </div>
+
+          <div class="theme-card p-5 rounded-2xl border theme-border shadow-xs">
+            <span class="text-xs text-slate-500 font-semibold">Study Deep Work</span>
+            <div class="mt-2 flex items-baseline gap-2">
+              <span id="metric-study-hours" class="text-3xl font-extrabold text-purple-600">2.5h</span>
+              <span class="text-xs text-slate-500">of 4.0h goal</span>
+            </div>
+            <div class="mt-3 text-xs text-purple-600 font-bold cursor-pointer" onclick="openFullscreenStudyTimer()">
+              <span>Launch Focus Room ↗</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 2-Column Split: Today's Timeline + Urgent Deadlines -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          <div class="lg:col-span-7 theme-card p-6 rounded-3xl border theme-border shadow-xs">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-base font-bold flex items-center gap-2">
+                <span class="material-symbols-outlined text-blue-600 text-[20px]">schedule</span>
+                <span>Today's Classes & Periods</span>
+              </h2>
+              <button onclick="navigateTo('timetable')" class="text-xs text-blue-600 font-bold font-inter hover:underline">
+                Open Daily Sheet ↗
+              </button>
+            </div>
+            <div id="dash-timeline-list" class="space-y-3 font-inter">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+          <div class="lg:col-span-5 space-y-6">
+            
+            <!-- Attendance Health Dials -->
+            <div class="theme-card p-6 rounded-3xl border theme-border shadow-xs">
+              <div class="flex items-center justify-between mb-3">
+                <h3 class="text-base font-bold">Subject Attendance Summary</h3>
+                <button onclick="navigateTo('timetable')" class="text-xs text-blue-600 font-bold font-inter hover:underline">All Subjects ↗</button>
+              </div>
+              <div id="dash-attendance-summary" class="space-y-2.5">
+                <!-- Rendered dynamically -->
+              </div>
+            </div>
+
+            <!-- Urgent Deliverables -->
+            <div class="theme-card p-6 rounded-3xl border theme-border shadow-xs">
+              <div class="flex items-center justify-between mb-3">
+                <h3 class="text-base font-bold">Upcoming Works & Labs</h3>
+                <button onclick="navigateTo('labs')" class="text-xs text-blue-600 font-bold font-inter hover:underline">View All ↗</button>
+              </div>
+              <div id="dash-tasks-summary" class="space-y-2.5 font-inter">
+                <!-- Rendered dynamically -->
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- VIEW 2: TIMETABLE & ATTENDANCE (COMBINED)                -->
+      <!-- ======================================================== -->
+      <section id="view-timetable" class="view-panel hidden space-y-6">
+        
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 theme-card p-6 rounded-3xl border theme-border shadow-xs">
+          <div>
+            <h1 class="text-2xl font-extrabold">Timetable & Attendance</h1>
+            <p class="text-xs text-slate-500 font-inter mt-1">Manage 7-day manual class timetable (Periods 1–13), daily attendance sheets, and risk analytics.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="confirmClearTimetable()" class="px-3.5 py-2 rounded-xl bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-300 hover:bg-red-100 border border-red-200 dark:border-red-800 text-xs font-bold flex items-center gap-1.5 transition">
+              <span class="material-symbols-outlined text-[18px]">delete_sweep</span>
+              <span>Clear Timetable & Attendance</span>
+            </button>
+            <button onclick="openAddSlotModal()" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center gap-1.5 transition shadow-xs">
+              <span class="material-symbols-outlined text-[18px]">add</span>
+              <span>Add Class / Hours</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Sub Navigation Tabs for Timetable & Attendance -->
+        <div class="flex flex-wrap gap-2 border-b theme-border pb-3 font-inter text-xs font-bold">
+          <button onclick="switchTimetableSubTab('daily-sheet', this)" class="tt-subtab-btn px-4 py-2 rounded-xl bg-blue-600 text-white shadow-xs">
+            1. Daily Class Sheet & Attendance
+          </button>
+          <button onclick="switchTimetableSubTab('week-matrix', this)" class="tt-subtab-btn px-4 py-2 rounded-xl theme-card border theme-border hover:bg-slate-100 dark:hover:bg-slate-800">
+            2. Weekly Timetable Matrix
+          </button>
+          <button onclick="switchTimetableSubTab('analytics-report', this)" class="tt-subtab-btn px-4 py-2 rounded-xl theme-card border theme-border hover:bg-slate-100 dark:hover:bg-slate-800">
+            3. Subject Attendance Analytics & Graph
+          </button>
+        </div>
+
+        <!-- Subtab 1: Daily Class Sheet & Attendance (Matching User Example Exactly!) -->
+        <div id="subtab-daily-sheet" class="space-y-6">
+          
+          <!-- 7-Day Selector Tabs (Mon-Sun with Holiday Badges on Sat/Sun) -->
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 theme-card p-4 rounded-2xl border theme-border">
+            <div class="flex flex-wrap items-center gap-1.5" id="timetable-day-buttons-row">
+              <button onclick="selectDailySheetDay('Monday', this)" class="sheet-day-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-blue-600 text-white shadow-xs">Mon</button>
+              <button onclick="selectDailySheetDay('Tuesday', this)" class="sheet-day-btn px-3.5 py-2 rounded-xl text-xs font-bold theme-card border theme-border hover:bg-slate-100 dark:hover:bg-slate-800">Tue</button>
+              <button onclick="selectDailySheetDay('Wednesday', this)" class="sheet-day-btn px-3.5 py-2 rounded-xl text-xs font-bold theme-card border theme-border hover:bg-slate-100 dark:hover:bg-slate-800">Wed</button>
+              <button onclick="selectDailySheetDay('Thursday', this)" class="sheet-day-btn px-3.5 py-2 rounded-xl text-xs font-bold theme-card border theme-border hover:bg-slate-100 dark:hover:bg-slate-800">Thu</button>
+              <button onclick="selectDailySheetDay('Friday', this)" class="sheet-day-btn px-3.5 py-2 rounded-xl text-xs font-bold theme-card border theme-border hover:bg-slate-100 dark:hover:bg-slate-800">Fri</button>
+              <button onclick="selectDailySheetDay('Saturday', this)" class="sheet-day-btn px-3.5 py-2 rounded-xl text-xs font-bold theme-card border theme-border hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-1">
+                <span>Sat</span>
+                <span id="sat-holiday-badge" class="text-[9px] bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-200 px-1 py-0.2 rounded font-mono">Holiday</span>
+              </button>
+              <button onclick="selectDailySheetDay('Sunday', this)" class="sheet-day-btn px-3.5 py-2 rounded-xl text-xs font-bold theme-card border theme-border hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-1">
+                <span>Sun</span>
+                <span id="sun-holiday-badge" class="text-[9px] bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-200 px-1 py-0.2 rounded font-mono">Holiday</span>
+              </button>
+            </div>
+            <div class="flex items-center gap-2 font-inter text-xs">
+              <button onclick="toggleActiveDayHoliday()" id="btn-toggle-day-holiday" class="px-3 py-1.5 rounded-lg theme-subtle border theme-border font-bold hover:opacity-80 transition flex items-center gap-1">
+                <span class="material-symbols-outlined text-[16px]">beach_access</span>
+                <span id="btn-holiday-label">Toggle Holiday</span>
+              </button>
+              <button onclick="markAllPeriodsForDay(true)" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition">
+                Mark All Present
+              </button>
+              <button onclick="markAllPeriodsForDay(false)" class="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold transition">
+                Mark All Absent
+              </button>
+            </div>
+          </div>
+
+          <!-- Dynamic Daily Attendance Sheet Container -->
+          <div class="theme-card p-6 rounded-3xl border theme-border shadow-xs">
+            <div class="flex items-center justify-between mb-4 border-b theme-border pb-3">
+              <div>
+                <h2 class="text-base font-extrabold flex items-center gap-2">
+                  <span id="daily-sheet-day-title">Monday</span>
+                  <span>Daily Class Attendance Sheet</span>
+                </h2>
+                <p class="text-xs text-slate-500 font-inter mt-0.5">Check each hour's period to record attendance. Automatically recalculates totals & percentages.</p>
+              </div>
+              <span class="text-xs font-bold text-blue-600 font-inter bg-blue-50 dark:bg-blue-900/40 px-3 py-1 rounded-xl">
+                Real-Time Synced
+              </span>
+            </div>
+
+            <!-- Subject Rows with Periods: e.g. Chemistry 3 hours: 1st [] 2nd [] 3rd [] -->
+            <div id="daily-sheet-subject-rows" class="space-y-4">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Subtab 2: Weekly Timetable Matrix -->
+        <div id="subtab-week-matrix" class="hidden space-y-4">
+          <div id="timetable-cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- Subtab 3: Subject Attendance Analytics & Graph -->
+        <div id="subtab-analytics-report" class="hidden space-y-6">
+          <div class="flex items-center justify-between">
+            <h2 class="text-base font-bold">Subject Attendance Overview & Risk Dials</h2>
+            <a href="/api/export/attendance.csv" target="_blank" class="px-3.5 py-2 rounded-xl theme-subtle border theme-border text-xs font-bold flex items-center gap-1.5 transition">
+              <span class="material-symbols-outlined text-[16px]">download</span>
+              <span>Export CSV</span>
+            </a>
+          </div>
+          <div id="attendance-subjects-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- VIEW 3: LABS & COLLEGE WORKS (COMBINED)                  -->
+      <!-- ======================================================== -->
+      <section id="view-labs" class="view-panel hidden space-y-6">
+        
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 theme-card p-6 rounded-3xl border theme-border shadow-xs">
+          <div>
+            <h1 class="text-2xl font-extrabold">Labs & College Works</h1>
+            <p class="text-xs text-slate-500 font-inter mt-1">Track homework assignments, lab experiment practicals, and focus study timers.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="openAddTaskModal()" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center gap-1.5 transition shadow-xs">
+              <span class="material-symbols-outlined text-[18px]">add</span>
+              <span>Add College Work</span>
+            </button>
+            <button onclick="openAddLabModal()" class="px-4 py-2 rounded-xl theme-subtle border theme-border text-xs font-bold flex items-center gap-1.5 transition">
+              <span class="material-symbols-outlined text-[18px]">science</span>
+              <span>Add Lab Session</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Sub Navigation Tabs for Labs & College Works -->
+        <div class="flex flex-wrap gap-2 border-b theme-border pb-3 font-inter text-xs font-bold">
+          <button onclick="switchWorksSubTab('works-tasks', this)" class="works-subtab-btn px-4 py-2 rounded-xl bg-blue-600 text-white shadow-xs">
+            1. College Works & Homework
+          </button>
+          <button onclick="switchWorksSubTab('labs-experiments', this)" class="works-subtab-btn px-4 py-2 rounded-xl theme-card border theme-border hover:bg-slate-100 dark:hover:bg-slate-800">
+            2. Lab Experiments & Records
+          </button>
+          <button onclick="switchWorksSubTab('study-planner-timer', this)" class="works-subtab-btn px-4 py-2 rounded-xl theme-card border theme-border hover:bg-slate-100 dark:hover:bg-slate-800">
+            3. Study Planner & Focus Timer
+          </button>
+        </div>
+
+        <!-- Subtab 1: College Works & Homework -->
+        <div id="subtab-works-tasks" class="space-y-4">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div class="flex gap-2 font-inter text-xs">
+              <button onclick="filterTasks('All', this)" class="task-filter-btn px-3.5 py-1.5 rounded-xl font-bold bg-blue-600 text-white">All Tasks</button>
+              <button onclick="filterTasks('Pending', this)" class="task-filter-btn px-3.5 py-1.5 rounded-xl font-bold theme-card border theme-border hover:bg-slate-100 dark:hover:bg-slate-800">Pending</button>
+              <button onclick="filterTasks('Completed', this)" class="task-filter-btn px-3.5 py-1.5 rounded-xl font-bold theme-card border theme-border hover:bg-slate-100 dark:hover:bg-slate-800">Completed</button>
+            </div>
+            <span class="text-xs text-slate-500 font-inter">Schedule up to 1 week ahead or semester</span>
+          </div>
+
+          <div id="tasks-list-container" class="space-y-3">
+            <!-- Rendered dynamically with Delete Option -->
+          </div>
+        </div>
+
+        <!-- Subtab 2: Lab Experiments & Records -->
+        <div id="subtab-labs-experiments" class="hidden space-y-4">
+          <div id="labs-list-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Rendered dynamically with Delete Option -->
+          </div>
+        </div>
+
+        <!-- Subtab 3: Study Planner & Fullscreen Focus Timer -->
+        <div id="subtab-study-planner-timer" class="hidden space-y-6">
+          
+          <!-- Study Timer Widget -->
+          <div class="theme-card p-6 sm:p-8 rounded-3xl border theme-border shadow-xs max-w-xl mx-auto text-center">
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex gap-2">
+                <button onclick="setTimerDuration(25, this)" class="timer-mode-btn px-3.5 py-1 rounded-full text-xs font-bold bg-blue-600 text-white">25m Pomodoro</button>
+                <button onclick="setTimerDuration(50, this)" class="timer-mode-btn px-3.5 py-1 rounded-full text-xs font-bold theme-subtle text-slate-600 dark:text-slate-300">50m Deep Work</button>
+              </div>
+              
+              <!-- Fullscreen Study Room Trigger Button -->
+              <button onclick="openFullscreenStudyTimer()" title="Enter Fullscreen Study Room" class="px-3 py-1.5 rounded-xl bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-200 text-xs font-bold flex items-center gap-1.5 hover:opacity-90 transition">
+                <span class="material-symbols-outlined text-[18px]">fullscreen</span>
+                <span>Fullscreen</span>
+              </button>
+            </div>
+
+            <div id="timer-display" class="text-6xl sm:text-7xl font-extrabold tracking-tight my-6 font-inter tabular-nums">
+              25:00
+            </div>
+
+            <div class="max-w-xs mx-auto mb-6">
+              <label class="block text-xs font-semibold text-slate-500 mb-1 font-inter">Tag Subject</label>
+              <select id="timer-subject-select" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle text-xs font-inter font-medium outline-none">
+                <!-- Rendered dynamically -->
+              </select>
+            </div>
+
+            <div class="flex items-center justify-center gap-4">
+              <button id="btn-start-timer" onclick="toggleStudyTimer()" class="w-32 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition shadow-xs flex items-center justify-center gap-1.5 active:scale-95">
+                <span class="material-symbols-outlined text-[18px]">play_arrow</span>
+                <span>Start</span>
+              </button>
+              <button onclick="resetStudyTimer()" class="px-5 py-3 rounded-xl theme-subtle hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold transition">
+                Reset
+              </button>
+            </div>
+          </div>
+
+          <!-- Study Planner Custom Tasks (Add & Delete Supported) -->
+          <div class="theme-card p-6 rounded-3xl border theme-border shadow-xs">
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <h3 class="text-base font-bold">Study Planner Tasks (Scheduled for Week)</h3>
+                <p class="text-xs text-slate-500 font-inter mt-0.5">Plan and schedule tasks up to 1 week ahead independently of class slots.</p>
+              </div>
+              <button onclick="openAddStudyPlanModal()" class="px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold flex items-center gap-1">
+                <span class="material-symbols-outlined text-[16px]">add</span>
+                <span>Add Study Task</span>
+              </button>
+            </div>
+            <div id="study-plans-list" class="space-y-2.5 font-inter text-xs">
+              <!-- Rendered dynamically with Delete Option -->
+            </div>
+          </div>
+
+          <!-- Study Sessions Log (Auto-pruned after 1 week + Manual Delete) -->
+          <div class="theme-card p-6 rounded-3xl border theme-border shadow-xs">
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <h3 class="text-base font-bold">Recent Study Sessions Log</h3>
+                <p class="text-xs text-slate-500 font-inter mt-0.5">Auto-cleared after 1 week. You can also delete any session manually.</p>
+              </div>
+              <button onclick="clearAllStudyLogs()" class="text-xs text-red-600 hover:underline font-bold font-inter">
+                Clear All History
+              </button>
+            </div>
+            <div id="study-sessions-list" class="space-y-2.5 font-inter text-xs">
+              <!-- Rendered dynamically with individual delete button -->
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- VIEW 4: DOCUMENT VAULT & SCANNER                         -->
+      <!-- ======================================================== -->
+      <section id="view-vault" class="view-panel hidden space-y-6">
+        
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 theme-card p-6 rounded-3xl border theme-border shadow-xs">
+          <div>
+            <h1 class="text-2xl font-extrabold">Document Vault & Scanner</h1>
+            <p class="text-xs text-slate-500 font-inter mt-1">Private cloud folder system for syllabi, notes, certificates, and multi-page scans.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="openScannerModal()" class="px-3.5 py-2 rounded-xl theme-subtle border theme-border text-xs font-bold flex items-center gap-1.5 transition">
+              <span class="material-symbols-outlined text-[18px]">photo_camera</span>
+              <span>Camera Scanner</span>
+            </button>
+            <button onclick="openUploadVaultModal()" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center gap-1.5 transition shadow-xs">
+              <span class="material-symbols-outlined text-[18px]">upload_file</span>
+              <span>Upload Document</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Folders Grid -->
+        <div id="vault-folders-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <!-- Rendered dynamically -->
+        </div>
+
+        <!-- Vault Files List & Trash -->
+        <div class="theme-card p-6 rounded-3xl border theme-border shadow-xs">
+          <div class="flex items-center justify-between mb-4">
+            <h2 id="vault-files-title" class="text-base font-bold">All Stored Files</h2>
+            <div class="flex items-center gap-2 font-inter text-xs font-bold">
+              <button onclick="loadVaultFiles(false)" id="tab-active-files" class="px-3 py-1 rounded-lg bg-blue-600 text-white">Active Files</button>
+              <button onclick="loadVaultFiles(true)" id="tab-trash-files" class="px-3 py-1 rounded-lg theme-subtle hover:opacity-80">Trash Bin</button>
+            </div>
+          </div>
+          <div id="vault-files-list" class="divide-y theme-border font-inter text-xs">
+            <!-- Rendered dynamically with download, preview, trash, and permanent wipe -->
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- VIEW 5: PROFILE & SETTINGS                               -->
+      <!-- ======================================================== -->
+      <section id="view-settings" class="view-panel hidden space-y-6">
+        
+        <div class="theme-card p-6 rounded-3xl border theme-border shadow-xs">
+          <h1 class="text-2xl font-extrabold">Profile & Settings</h1>
+          <p class="text-xs text-slate-500 font-inter mt-1">Student identity, grade calculators, unified academic calendar, and system preferences.</p>
+        </div>
+
+        <!-- Sub Navigation Tabs for Profile & Settings -->
+        <div class="flex flex-wrap gap-2 border-b theme-border pb-3 font-inter text-xs font-bold">
+          <button onclick="switchSettingsSubTab('student-profile', this)" class="settings-subtab-btn px-4 py-2 rounded-xl bg-blue-600 text-white shadow-xs">
+            1. Student Profile & Bio
+          </button>
+          <button onclick="switchSettingsSubTab('grade-calculator', this)" class="settings-subtab-btn px-4 py-2 rounded-xl theme-card border theme-border hover:bg-slate-100 dark:hover:bg-slate-800">
+            2. SGPA & CGPA Calculator
+          </button>
+          <button onclick="switchSettingsSubTab('unified-calendar', this)" class="settings-subtab-btn px-4 py-2 rounded-xl theme-card border theme-border hover:bg-slate-100 dark:hover:bg-slate-800">
+            3. Unified Academic Calendar
+          </button>
+          <button onclick="switchSettingsSubTab('preferences-reset', this)" class="settings-subtab-btn px-4 py-2 rounded-xl theme-card border theme-border hover:bg-slate-100 dark:hover:bg-slate-800">
+            4. Preferences & Factory Reset
+          </button>
+        </div>
+
+        <!-- Subtab 1: Student Profile -->
+        <div id="subtab-student-profile" class="theme-card p-6 sm:p-8 rounded-3xl border theme-border shadow-xs max-w-2xl">
+          <form onsubmit="handleProfileUpdate(event)" class="space-y-4 font-inter text-xs">
+            <div class="flex items-center gap-4 pb-4 border-b theme-border">
+              <img id="settings-avatar-preview" class="w-16 h-16 rounded-2xl object-cover ring-2 ring-blue-500/30" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80"/>
+              <div>
+                <span class="font-bold text-sm block" id="settings-name-display">Elena Rostova</span>
+                <span class="text-[11px] text-slate-500" id="settings-email-display">elena@collegeos.edu</span>
+              </div>
+            </div>
+
+            <div>
+              <label class="block font-semibold mb-1">Student Full Name</label>
+              <input type="text" id="settings-input-name" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none focus:ring-2 focus:ring-blue-500/20">
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block font-semibold mb-1">College / University</label>
+                <input type="text" id="settings-input-college" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none focus:ring-2 focus:ring-blue-500/20">
+              </div>
+              <div>
+                <label class="block font-semibold mb-1">Current Semester</label>
+                <input type="text" id="settings-input-semester" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none focus:ring-2 focus:ring-blue-500/20">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block font-semibold mb-1">Academic Major</label>
+                <input type="text" id="settings-input-major" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none focus:ring-2 focus:ring-blue-500/20">
+              </div>
+              <div>
+                <label class="block font-semibold mb-1">Student ID / Roll No</label>
+                <input type="text" id="settings-input-id" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none focus:ring-2 focus:ring-blue-500/20">
+              </div>
+            </div>
+
+            <button type="submit" class="px-6 py-2.5 rounded-xl bg-blue-600 text-white font-bold text-xs shadow-xs hover:bg-blue-700 transition">
+              Save Profile Changes
+            </button>
+          </form>
+        </div>
+
+        <!-- Subtab 2: SGPA & CGPA Grade Calculator -->
+        <div id="subtab-grade-calculator" class="hidden space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="theme-card p-6 rounded-3xl border theme-border shadow-xs text-center flex flex-col items-center justify-center">
+              <span class="text-xs text-slate-500 font-inter font-semibold">Cumulative CGPA</span>
+              <div id="grades-cgpa-val" class="text-6xl font-extrabold text-blue-600 mt-3">3.84</div>
+              <span class="text-xs text-emerald-600 font-bold font-inter mt-1">Excellent Standing</span>
+              <span class="text-[11px] text-slate-500 font-inter mt-2">Credits Completed: 92</span>
+            </div>
+
+            <div class="md:col-span-2 theme-card p-6 rounded-3xl border theme-border shadow-xs">
+              <h2 class="text-base font-bold mb-3">Calculate Semester SGPA</h2>
+              <div id="sgpa-calculator-rows" class="space-y-2.5 font-inter text-xs">
+                <!-- Dynamically populated -->
+              </div>
+              <div class="mt-4 flex flex-wrap items-center justify-between gap-3 pt-3 border-t theme-border">
+                <button onclick="addCourseToSgpaCalc()" class="text-xs font-bold text-blue-600 flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[16px]">add_circle</span>
+                  <span>Add Course Row</span>
+                </button>
+                <div class="flex items-center gap-3">
+                  <div class="text-right">
+                    <span class="text-[11px] text-slate-500 block">Calculated SGPA:</span>
+                    <span id="calculated-sgpa-badge" class="text-lg font-extrabold font-inter text-blue-600">--</span>
+                  </div>
+                  <button onclick="calculateAndDisplaySgpa()" class="px-4 py-2 rounded-xl bg-blue-600 text-white text-xs font-bold transition hover:bg-blue-700">
+                    Calculate SGPA
+                  </button>
+                  <button onclick="saveCalculatedSgpaToProfile()" id="btn-save-sgpa-profile" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition shadow-xs flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-[16px]">check_circle</span>
+                    <span>Save & Update Cumulative CGPA</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Subtab 3: Unified Academic Calendar (Single Active PDF + Event Marker System) -->
+        <div id="subtab-unified-calendar" class="hidden space-y-6">
+          
+          <!-- Single Active Academic Calendar PDF Card -->
+          <div class="theme-card p-6 rounded-3xl border theme-border shadow-xs">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+              <div>
+                <h3 class="text-base font-bold flex items-center gap-2">
+                  <span class="material-symbols-outlined text-blue-600">picture_as_pdf</span>
+                  <span>Official Academic Calendar PDF</span>
+                </h3>
+                <p class="text-xs text-slate-500 font-inter mt-0.5">Maintain a single authoritative academic calendar PDF for your current session.</p>
+              </div>
+            </div>
+
+            <!-- PDF Status Container -->
+            <div id="calendar-pdf-status-container" class="p-4 rounded-2xl theme-subtle border theme-border">
+              <!-- Dynamically populated: View PDF, Delete PDF or Upload Input -->
+            </div>
+          </div>
+
+          <!-- Academic Calendar Events & Markers -->
+          <div class="theme-card p-6 rounded-3xl border theme-border shadow-xs">
+            <div class="flex items-center justify-between flex-wrap gap-2 mb-4 pb-3 border-b theme-border">
+              <div>
+                <h3 class="text-base font-bold">Academic Events & Deliverables</h3>
+                <p class="text-xs text-slate-500 font-inter mt-0.5">Classes, examinations, midterms, assignment deadlines, and vacation milestones.</p>
+              </div>
+              <button onclick="openAddCalendarEventModal()" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition">
+                <span class="material-symbols-outlined text-[18px]">add</span>
+                <span>Add Event Marker</span>
+              </button>
+            </div>
+            <div id="calendar-events-container" class="space-y-3 font-inter">
+              <!-- Rendered dynamically with Edit and Delete options -->
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Subtab 4: Preferences & Factory Reset -->
+        <div id="subtab-preferences-reset" class="hidden space-y-6 max-w-2xl">
+          
+          <!-- Attendance Target Settings (Type 1 & Type 2) -->
+          <div class="theme-card p-6 rounded-3xl border theme-border shadow-xs">
+            <h3 class="text-base font-bold mb-1">Attendance Target Policies (Type 1 & Type 2)</h3>
+            <p class="text-xs text-slate-500 font-inter mb-4">Choose whether all subjects share a uniform target attendance % (Type 1) or each subject has a custom target % (Type 2).</p>
+            
+            <div class="space-y-4 font-inter text-xs">
+              <div class="p-4 rounded-2xl theme-subtle border theme-border space-y-2">
+                <span class="font-bold text-slate-800 dark:text-slate-200 block">Type 1: Global Attendance Target %</span>
+                <span class="text-[11px] text-slate-500 block">Sets a universal threshold (default: 75%) that automatically updates every course.</span>
+                <div class="flex items-center gap-3 pt-1">
+                  <input type="number" id="pref-global-target" min="50" max="100" value="75" class="w-24 h-10 px-3 rounded-xl border theme-border theme-card font-bold text-center outline-none">
+                  <span class="text-slate-500 font-bold">%</span>
+                  <button onclick="saveAttendanceTargetSettings()" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition">
+                    Apply Global Target
+                  </button>
+                </div>
+              </div>
+
+              <div class="p-4 rounded-2xl theme-subtle border theme-border flex items-center justify-between gap-4">
+                <div>
+                  <span class="font-bold block text-slate-800 dark:text-slate-200">Type 2: Enable Custom Targets Per Subject</span>
+                  <span class="text-slate-500 text-[11px] mt-0.5 block">When enabled, you can edit and set independent targets (e.g. 85% for Lab, 70% for Elective) on each subject card.</span>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                  <input type="checkbox" id="pref-custom-target-switch" onchange="toggleCustomTargetsSwitch(this.checked)" class="sr-only peer">
+                  <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Theme Switcher Card -->
+          <div class="theme-card p-6 rounded-3xl border theme-border shadow-xs">
+            <h3 class="text-base font-bold mb-2">Display & Contrast Modes</h3>
+            <p class="text-xs text-slate-500 font-inter mb-4">Toggle between high-contrast Dark Mode and White Mode. High contrast enhances text and indicator readability.</p>
+            <div class="flex items-center gap-4">
+              <button onclick="setThemeMode('dark')" class="px-5 py-2.5 rounded-xl bg-slate-900 text-white text-xs font-bold border border-slate-700 flex items-center gap-2 shadow-xs">
+                <span>🌙 High-Contrast Dark Mode</span>
+              </button>
+              <button onclick="setThemeMode('light')" class="px-5 py-2.5 rounded-xl bg-white text-slate-900 text-xs font-bold border border-slate-300 flex items-center gap-2 shadow-xs">
+                <span>☀️ Pure White Mode</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Factory Reset Card (Requested by User!) -->
+          <div class="theme-card p-6 rounded-3xl border border-red-300 dark:border-red-900 shadow-xs bg-red-50/20">
+            <div class="flex items-start gap-3">
+              <span class="material-symbols-outlined text-red-600 text-3xl">restart_alt</span>
+              <div class="flex-1">
+                <h3 class="text-base font-bold text-red-600">Factory Reset Workspace</h3>
+                <p class="text-xs text-slate-600 dark:text-slate-400 font-inter mt-1 leading-relaxed">
+                  Permanently resets and wipes all your academic records saved on this device (offline cache) and on the cloud/Firestore (subjects, timetable slots, attendance marks, homework, and vault files). Fresh initial defaults will be restored.
+                </p>
+                <button onclick="triggerFactoryReset()" class="mt-4 px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-sm transition active:scale-95">
+                  ⚠️ Execute Factory Reset
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sign Out -->
+          <div class="theme-card p-6 rounded-3xl border theme-border flex items-center justify-between">
+            <div>
+              <span class="font-bold text-xs block">End Active Session</span>
+              <span class="text-[11px] text-slate-500 font-inter">Sign out of College OS on this device.</span>
+            </div>
+            <button onclick="API.logout()" class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-red-600 font-bold text-xs hover:bg-red-50 transition">
+              Sign Out
+            </button>
+          </div>
+
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- ======================================================== -->
+    <!-- 5-ITEM MOBILE BOTTOM NAVIGATION DOCK (Pure App Look)     -->
+    <!-- ======================================================== -->
+    <div class="lg:hidden fixed bottom-0 left-0 right-0 theme-card/95 backdrop-blur-md border-t theme-border z-40 px-2 py-1.5 flex items-center justify-around shadow-xl">
+      
+      <!-- 1. Dashboard -->
+      <button onclick="navigateTo('dashboard')" class="mobile-nav-btn flex flex-col items-center gap-0.5 text-blue-600" data-view="dashboard">
+        <img src="/icons/nav-dashboard.jpg" class="w-6 h-6 rounded-md object-cover">
+        <span class="text-[9px] font-bold font-inter">Dashboard</span>
+      </button>
+
+      <!-- 2. Timetable & Attendance -->
+      <button onclick="navigateTo('timetable')" class="mobile-nav-btn flex flex-col items-center gap-0.5 text-slate-500" data-view="timetable">
+        <img src="/icons/nav-timetable.jpg" class="w-6 h-6 rounded-md object-cover">
+        <span class="text-[9px] font-bold font-inter">Schedule</span>
+      </button>
+
+      <!-- 3. Labs & Works -->
+      <button onclick="navigateTo('labs')" class="mobile-nav-btn flex flex-col items-center gap-0.5 text-slate-500" data-view="labs">
+        <img src="/icons/nav-labs.jpg" class="w-6 h-6 rounded-md object-cover">
+        <span class="text-[9px] font-bold font-inter">Works/Labs</span>
+      </button>
+
+      <!-- 4. Vault -->
+      <button onclick="navigateTo('vault')" class="mobile-nav-btn flex flex-col items-center gap-0.5 text-slate-500" data-view="vault">
+        <img src="/icons/nav-vault.jpg" class="w-6 h-6 rounded-md object-cover">
+        <span class="text-[9px] font-bold font-inter">Vault</span>
+      </button>
+
+      <!-- 5. Profile & Settings -->
+      <button onclick="navigateTo('settings')" class="mobile-nav-btn flex flex-col items-center gap-0.5 text-slate-500" data-view="settings">
+        <img src="/icons/nav-settings.jpg" class="w-6 h-6 rounded-md object-cover">
+        <span class="text-[9px] font-bold font-inter">Profile</span>
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- FULLSCREEN STUDY FOCUS ROOM (Laptop/Desktop & Mobile)     -->
+  <!-- ======================================================== -->
+  <div id="fullscreen-study-room" class="fixed inset-0 z-50 bg-[#0B0F17] text-white hidden flex-col items-center justify-between p-8">
+    
+    <!-- Top Bar with Exit Cross Icon -->
+    <div class="w-full max-w-5xl flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <img src="/icons/logo.jpg" class="w-8 h-8 rounded-xl object-cover ring-1 ring-white/20">
+        <div>
+          <span class="text-sm font-extrabold tracking-tight">College OS Deep Work Room</span>
+          <span class="text-[10px] text-slate-400 block font-inter">Press ESC or click ✕ anytime to exit</span>
+        </div>
+      </div>
+      <button onclick="closeFullscreenStudyTimer()" class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-lg transition">
+        ✕
+      </button>
+    </div>
+
+    <!-- Center Giant Focus Clock -->
+    <div class="flex flex-col items-center justify-center my-auto text-center space-y-6">
+      <div class="px-4 py-1.5 rounded-full bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs font-bold font-inter tracking-wide uppercase">
+        <span id="fs-subject-tag">Independent Study Block</span>
+      </div>
+
+      <div id="fs-timer-display" class="text-8xl sm:text-9xl md:text-[160px] font-extrabold tracking-tight font-inter tabular-nums text-white drop-shadow-lg">
+        25:00
+      </div>
+
+      <div class="flex items-center gap-4 pt-4">
+        <button id="fs-btn-start" onclick="toggleStudyTimer()" class="px-8 py-4 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-sm shadow-lg flex items-center gap-2 active:scale-95 transition">
+          <span class="material-symbols-outlined text-[22px]">play_arrow</span>
+          <span>Start Focus Timer</span>
+        </button>
+        <button onclick="resetStudyTimer()" class="px-6 py-4 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-bold text-sm transition">
+          Reset
+        </button>
+      </div>
+    </div>
+
+    <!-- Bottom Audio / Ambient Tip -->
+    <div class="w-full max-w-md text-center text-xs text-slate-500 font-inter">
+      <span>💡 Tip: Fullscreen focus mode blocks distractions and keeps your academic momentum going.</span>
+    </div>
+
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODALS: QUICK ACTIONS, SEARCH, SCANNER, ADD FORMS        -->
+  <!-- ======================================================== -->
+
+  <!-- 1. Quick Actions Modal -->
+  <div id="modal-quick-actions" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs hidden flex items-center justify-center p-4">
+    <div class="theme-card rounded-3xl p-6 w-full max-w-sm shadow-2xl border theme-border">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-base font-bold">Quick Action Shortcuts</h3>
+        <button onclick="closeModal('modal-quick-actions')" class="text-slate-400 hover:text-slate-600">✕</button>
+      </div>
+      <div class="grid grid-cols-2 gap-3 font-inter text-xs font-bold">
+        <button onclick="closeModal('modal-quick-actions'); openAddTaskModal();" class="p-3.5 rounded-2xl theme-subtle border theme-border text-left flex flex-col gap-1 transition">
+          <span class="material-symbols-outlined text-blue-600 text-[22px]">add_task</span>
+          <span>New Task</span>
+        </button>
+        <button onclick="closeModal('modal-quick-actions'); navigateTo('timetable');" class="p-3.5 rounded-2xl theme-subtle border theme-border text-left flex flex-col gap-1 transition">
+          <span class="material-symbols-outlined text-emerald-600 text-[22px]">how_to_reg</span>
+          <span>Mark Attendance</span>
+        </button>
+        <button onclick="closeModal('modal-quick-actions'); openFullscreenStudyTimer();" class="p-3.5 rounded-2xl theme-subtle border theme-border text-left flex flex-col gap-1 transition">
+          <span class="material-symbols-outlined text-purple-600 text-[22px]">timer</span>
+          <span>Focus Room</span>
+        </button>
+        <button onclick="closeModal('modal-quick-actions'); openScannerModal();" class="p-3.5 rounded-2xl theme-subtle border theme-border text-left flex flex-col gap-1 transition">
+          <span class="material-symbols-outlined text-amber-600 text-[22px]">document_scanner</span>
+          <span>Scan Document</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Global Search Command Palette (CMD+K) -->
+  <div id="modal-search" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs hidden flex items-start justify-center pt-20 p-4">
+    <div class="theme-card rounded-3xl w-full max-w-xl shadow-2xl border theme-border overflow-hidden">
+      <div class="p-4 border-b theme-border flex items-center gap-3">
+        <span class="material-symbols-outlined text-slate-400">search</span>
+        <input id="input-global-search" oninput="handleGlobalSearch(this.value)" autofocus class="w-full text-sm font-inter outline-none theme-card placeholder:text-slate-400" placeholder="Search courses, homework, labs, documents, notes..."/>
+        <kbd onclick="closeModal('modal-search')" class="cursor-pointer text-[10px] theme-subtle px-2 py-1 rounded font-mono text-slate-500">ESC</kbd>
+      </div>
+      <div id="global-search-results" class="max-h-80 overflow-y-auto p-3 space-y-1 font-inter text-xs">
+        <div class="p-4 text-center text-slate-400 text-xs">Start typing to search your academic records...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Add College Work / Task Modal -->
+  <div id="modal-add-task" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs hidden flex items-center justify-center p-4">
+    <div class="theme-card rounded-3xl p-6 w-full max-w-md shadow-2xl border theme-border">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-base font-bold">Add College Work / Task</h3>
+        <button onclick="closeModal('modal-add-task')" class="text-slate-400 hover:text-slate-600">✕</button>
+      </div>
+      <form onsubmit="handleCreateTask(event)" class="space-y-3 font-inter text-xs">
+        <div>
+          <label class="block font-semibold mb-1">Title</label>
+          <input type="text" id="task-input-title" required placeholder="e.g. Chemistry Lab Report 3" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold mb-1">Type</label>
+            <select id="task-input-type" onchange="toggleCustomTaskType(this.value)" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none">
+              <option value="Assignment">Assignment</option>
+              <option value="Homework">Homework</option>
+              <option value="Project">Project</option>
+              <option value="Academic Task">Academic Task</option>
+              <option value="custom">+ Custom Type...</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold mb-1">Priority</label>
+            <select id="task-input-priority" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none">
+              <option value="High">High</option>
+              <option value="Medium" selected>Medium</option>
+              <option value="Low">Low</option>
+            </select>
+          </div>
+        </div>
+        <div id="task-custom-type-container" class="hidden">
+          <label class="block font-semibold mb-1 text-blue-600">Enter Custom Task Type</label>
+          <input type="text" id="task-input-custom-type" placeholder="e.g. Seminar Presentation, Thesis Draft" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none">
+        </div>
+        <div>
+          <label class="block font-semibold mb-1">Subject</label>
+          <select id="task-input-subject" onchange="toggleCustomTaskSubject(this.value)" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none">
+            <!-- Rendered dynamically -->
+          </select>
+        </div>
+        <div id="task-custom-subject-container" class="hidden">
+          <label class="block font-semibold mb-1 text-blue-600">Enter Custom Subject Name</label>
+          <input type="text" id="task-input-custom-subject" placeholder="e.g. Robotics & Automation" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none">
+        </div>
+        <div>
+          <label class="block font-semibold mb-1">Due Date (Schedule up to 1 week ahead)</label>
+          <input type="date" id="task-input-due" required class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none">
+          <div class="flex gap-2 mt-2">
+            <button type="button" onclick="setQuickTaskDueDate(1)" class="px-2.5 py-1 rounded-lg theme-subtle border theme-border text-[10px] font-bold">+1 Day</button>
+            <button type="button" onclick="setQuickTaskDueDate(3)" class="px-2.5 py-1 rounded-lg theme-subtle border theme-border text-[10px] font-bold">+3 Days</button>
+            <button type="button" onclick="setQuickTaskDueDate(7)" class="px-2.5 py-1 rounded-lg theme-subtle border theme-border text-[10px] font-bold">+1 Week</button>
+          </div>
+        </div>
+        <button type="submit" class="w-full py-3 rounded-xl bg-blue-600 text-white font-bold text-xs shadow-xs hover:bg-blue-700 transition mt-2">
+          Save Task
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 4. Add Class Slot Modal (Periods 1 to 13 & 7 Days) -->
+  <div id="modal-add-slot" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs hidden flex items-center justify-center p-4">
+    <div class="theme-card rounded-3xl p-6 w-full max-w-md shadow-2xl border theme-border">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h3 class="text-base font-bold">Add Class to Timetable</h3>
+          <p class="text-[11px] text-slate-500 font-inter">Add 1–13 periods across Monday to Sunday</p>
+        </div>
+        <button onclick="closeModal('modal-add-slot')" class="text-slate-400 hover:text-slate-600">✕</button>
+      </div>
+      <form onsubmit="handleCreateSlot(event)" class="space-y-3 font-inter text-xs">
+        <div>
+          <label class="block font-semibold mb-1">Day of Week (7 Days)</label>
+          <select id="slot-input-day" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none">
+            <option value="Monday">Monday</option>
+            <option value="Tuesday">Tuesday</option>
+            <option value="Wednesday">Wednesday</option>
+            <option value="Thursday">Thursday</option>
+            <option value="Friday">Friday</option>
+            <option value="Saturday">Saturday (Weekend / Extra Class)</option>
+            <option value="Sunday">Sunday (Weekend / Extra Class)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block font-semibold mb-1">Subject</label>
+          <select id="slot-input-subject" onchange="toggleCustomSlotSubject(this.value)" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none">
+            <!-- Rendered dynamically -->
+          </select>
+        </div>
+        <div id="slot-custom-subject-container" class="hidden space-y-2 p-3 rounded-xl theme-subtle border theme-border">
+          <div>
+            <label class="block font-semibold mb-1 text-blue-600">Custom Subject Name</label>
+            <input type="text" id="slot-input-custom-name" placeholder="e.g. Cloud Architecture" class="w-full h-9 px-3 rounded-lg border theme-border theme-card outline-none">
+          </div>
+          <div>
+            <label class="block font-semibold mb-1 text-blue-600">Subject Code</label>
+            <input type="text" id="slot-input-custom-code" placeholder="e.g. CS 508" class="w-full h-9 px-3 rounded-lg border theme-border theme-card outline-none">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold mb-1">Starting Period (1–13)</label>
+            <select id="slot-input-period" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none font-bold">
+              <option value="1">Period 1 (08:30)</option>
+              <option value="2">Period 2 (09:30)</option>
+              <option value="3">Period 3 (10:45)</option>
+              <option value="4">Period 4 (11:45)</option>
+              <option value="5">Period 5 (13:30)</option>
+              <option value="6">Period 6 (14:30)</option>
+              <option value="7">Period 7 (15:30)</option>
+              <option value="8">Period 8 (16:30)</option>
+              <option value="9">Period 9 (17:30)</option>
+              <option value="10">Period 10 (18:30)</option>
+              <option value="11">Period 11 (19:30)</option>
+              <option value="12">Period 12 (20:30)</option>
+              <option value="13">Period 13 (21:30)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold mb-1">Number of Hours</label>
+            <select id="slot-input-hours" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none font-bold">
+              <option value="1" selected>1 Hour (1 period)</option>
+              <option value="2">2 Hours (2 periods)</option>
+              <option value="3">3 Hours (3 periods)</option>
+              <option value="4">4 Hours (4 periods)</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold mb-1">Classroom / Hall</label>
+            <input type="text" id="slot-input-room" placeholder="e.g. Hall B-204" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none">
+          </div>
+          <div>
+            <label class="block font-semibold mb-1">Faculty / Instructor</label>
+            <input type="text" id="slot-input-faculty" placeholder="e.g. Prof. Vance" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none">
+          </div>
+        </div>
+        <button type="submit" class="w-full py-3 rounded-xl bg-blue-600 text-white font-bold text-xs shadow-xs hover:bg-blue-700 transition mt-2">
+          Save Class to Timetable & Attendance Sheet
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 5. Subject Attendance Drill-Down History Modal (Requested by User!) -->
+  <div id="modal-subject-history" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs hidden flex items-center justify-center p-4">
+    <div class="theme-card rounded-3xl p-6 w-full max-w-lg shadow-2xl border theme-border max-h-[85vh] flex flex-col">
+      <div class="flex items-center justify-between pb-3 border-b theme-border">
+        <div>
+          <h3 id="hist-modal-title" class="text-base font-bold text-blue-600">Attendance Class History</h3>
+          <p id="hist-modal-subtitle" class="text-xs text-slate-500 font-inter">View and modify past class attendance marks</p>
+        </div>
+        <button onclick="closeModal('modal-subject-history')" class="text-slate-400 hover:text-slate-600 text-lg">✕</button>
+      </div>
+      
+      <div class="py-3 flex items-center justify-between font-inter text-xs theme-subtle px-4 rounded-xl my-3">
+        <div>
+          <span class="text-[10px] text-slate-500 block">Current Standing</span>
+          <span id="hist-modal-stat-pct" class="font-extrabold text-xl text-emerald-600">85.0%</span>
+        </div>
+        <div class="text-right">
+          <span class="text-[10px] text-slate-500 block">Class Ratio</span>
+          <span id="hist-modal-stat-ratio" class="font-bold text-xs text-slate-700 dark:text-slate-300">17 / 20 hours attended</span>
+        </div>
+      </div>
+
+      <div id="hist-modal-records-list" class="overflow-y-auto flex-1 space-y-2 pr-1 font-inter text-xs">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. Academic Calendar Event Marker Modal (Add & Edit) -->
+  <div id="modal-calendar-event" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs hidden flex items-center justify-center p-4">
+    <div class="theme-card rounded-3xl p-6 w-full max-w-md shadow-2xl border theme-border">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h3 id="modal-cal-event-title" class="text-base font-bold">Add Academic Event Marker</h3>
+          <p class="text-[11px] text-slate-500 font-inter">Mark examinations, vacations, milestones, and submissions</p>
+        </div>
+        <button onclick="closeModal('modal-calendar-event')" class="text-slate-400 hover:text-slate-600">✕</button>
+      </div>
+      <form onsubmit="handleCalendarEventSubmit(event)" class="space-y-3 font-inter text-xs">
+        <input type="hidden" id="cal-event-input-id">
+        <div>
+          <label class="block font-semibold mb-1">Event Title</label>
+          <input type="text" id="cal-event-input-title" required placeholder="e.g. Midterm Examination Phase 1" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold mb-1">Event Date</label>
+            <input type="date" id="cal-event-input-date" required class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none">
+          </div>
+          <div>
+            <label class="block font-semibold mb-1">Event Type</label>
+            <select id="cal-event-input-type" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none">
+              <option value="Examination">Examination</option>
+              <option value="Midterm">Midterm</option>
+              <option value="Vacation">Vacation / Holiday</option>
+              <option value="Submission Deadline">Submission Deadline</option>
+              <option value="Academic Milestone">Academic Milestone</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block font-semibold mb-1">Location / Venue</label>
+          <input type="text" id="cal-event-input-loc" placeholder="e.g. Exam Hall 3 or Campus Wide" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none">
+        </div>
+        <button type="submit" id="btn-submit-cal-event" class="w-full py-3 rounded-xl bg-blue-600 text-white font-bold text-xs shadow-xs hover:bg-blue-700 transition mt-2">
+          Save Event Marker
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 7. Camera Scanner Modal -->
+  <div id="modal-scanner" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs hidden flex items-center justify-center p-4">
+    <div class="theme-card rounded-3xl p-6 w-full max-w-md shadow-2xl border theme-border text-center">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-base font-bold">Document Camera Scanner</h3>
+        <button onclick="closeModal('modal-scanner')" class="text-slate-400">✕</button>
+      </div>
+      <div class="p-6 rounded-2xl theme-subtle border-2 border-dashed border-slate-300 dark:border-slate-700 mb-4 flex flex-col items-center justify-center gap-2">
+        <span class="material-symbols-outlined text-4xl text-blue-600">photo_camera</span>
+        <span class="text-xs font-bold">Capture or Upload Pages</span>
+        <span class="text-[11px] text-slate-500 font-inter">Scanned pages are compiled into a PDF and saved to your Vault.</span>
+        <input type="file" id="scanner-file-input" accept="image/*" capture="environment" class="mt-2 text-xs">
+      </div>
+      <input type="text" id="scanner-doc-title" placeholder="Document Title (e.g. Chemistry Notes)" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle text-xs mb-3 font-inter outline-none">
+      <button onclick="handleSaveScannedDoc()" class="w-full py-3 rounded-xl bg-blue-600 text-white font-bold text-xs shadow-xs hover:bg-blue-700 transition">
+        Compile & Save to Vault
+      </button>
+    </div>
+  </div>
+
+  <!-- 8. Add Lab Modal (with custom type & custom subject) -->
+  <div id="modal-add-lab" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs hidden flex items-center justify-center p-4">
+    <div class="theme-card rounded-3xl p-6 w-full max-w-md shadow-2xl border theme-border">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-base font-bold">Add Lab Session / Practical</h3>
+        <button onclick="closeModal('modal-add-lab')" class="text-slate-400">✕</button>
+      </div>
+      <form onsubmit="handleCreateLab(event)" class="space-y-3 font-inter text-xs">
+        <div>
+          <label class="block font-semibold mb-1">Experiment / Session Title</label>
+          <input type="text" id="lab-input-title" required placeholder="e.g. Chemistry Lab 04: Chemical Kinetics" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold mb-1">Subject</label>
+            <select id="lab-input-subject" onchange="toggleCustomLabSubject(this.value)" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none">
+              <!-- Rendered dynamically -->
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold mb-1">Lab Work Type</label>
+            <select id="lab-input-type" onchange="toggleCustomLabType(this.value)" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none">
+              <option value="Practical">Practical Experiment</option>
+              <option value="Lab Record">Lab Record Work</option>
+              <option value="Viva Voce">Viva Voce Prep</option>
+              <option value="Hardware Practical">Hardware Practical</option>
+              <option value="custom">+ Custom Type...</option>
+            </select>
+          </div>
+        </div>
+        <div id="lab-custom-subject-container" class="hidden">
+          <label class="block font-semibold mb-1 text-blue-600">Enter Custom Subject Name</label>
+          <input type="text" id="lab-input-custom-subject" placeholder="e.g. Advanced Embedded Systems" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none">
+        </div>
+        <div id="lab-custom-type-container" class="hidden">
+          <label class="block font-semibold mb-1 text-blue-600">Enter Custom Lab Type</label>
+          <input type="text" id="lab-input-custom-type" placeholder="e.g. Hardware Circuit Test" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none">
+        </div>
+        <div>
+          <label class="block font-semibold mb-1">Description / Experiment Goal</label>
+          <input type="text" id="lab-input-desc" placeholder="e.g. Rate law constant spectrophotometric analysis" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold mb-1">Session Date</label>
+            <input type="date" id="lab-input-session-date" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none">
+          </div>
+          <div>
+            <label class="block font-semibold mb-1">Submission Deadline</label>
+            <input type="date" id="lab-input-deadline" required class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none">
+          </div>
+        </div>
+        <div>
+          <label class="block font-semibold mb-1">Record Sign-off Status</label>
+          <select id="lab-input-status" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none">
+            <option value="Pending Sign-off">Pending Sign-off</option>
+            <option value="Verified by Instructor">Verified by Instructor</option>
+          </select>
+        </div>
+        <button type="submit" class="w-full py-3 rounded-xl bg-blue-600 text-white font-bold text-xs shadow-xs hover:bg-blue-700 transition mt-2">
+          Save Lab Record
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 9. Add Custom Study Plan Task Modal (Scheduled up to 1 week ahead) -->
+  <div id="modal-add-study-plan" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs hidden flex items-center justify-center p-4">
+    <div class="theme-card rounded-3xl p-6 w-full max-w-md shadow-2xl border theme-border">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-base font-bold">Add Custom Study Task</h3>
+        <button onclick="closeModal('modal-add-study-plan')" class="text-slate-400">✕</button>
+      </div>
+      <form onsubmit="handleCreateStudyPlan(event)" class="space-y-3 font-inter text-xs">
+        <div>
+          <label class="block font-semibold mb-1">Task / Focus Goal</label>
+          <input type="text" id="plan-input-title" required placeholder="e.g. Chapter 4 Practice Problems" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold mb-1">Subject</label>
+            <select id="plan-input-subject" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none">
+              <!-- Rendered dynamically -->
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold mb-1">Target Minutes</label>
+            <input type="number" id="plan-input-minutes" value="60" min="15" max="360" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none">
+          </div>
+        </div>
+        <div>
+          <label class="block font-semibold mb-1">Scheduled Date (Schedule up to 1 week ahead)</label>
+          <input type="date" id="plan-input-date" required class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none">
+        </div>
+        <button type="submit" class="w-full py-3 rounded-xl bg-purple-600 text-white font-bold text-xs shadow-xs hover:bg-purple-700 transition mt-2">
+          Schedule Study Task
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 9. Upload Document to Vault Modal -->
+  <div id="modal-upload-vault" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs hidden flex items-center justify-center p-4">
+    <div class="theme-card rounded-3xl p-6 w-full max-w-md shadow-2xl border theme-border">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-base font-bold">Upload to Document Vault</h3>
+        <button onclick="closeModal('modal-upload-vault')" class="text-slate-400">✕</button>
+      </div>
+      <form onsubmit="handleVaultUpload(event)" class="space-y-3 font-inter text-xs">
+        <div>
+          <label class="block font-semibold mb-1">Target Folder</label>
+          <select id="vault-input-folder" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none">
+            <!-- Rendered dynamically -->
+          </select>
+        </div>
+        <div class="p-6 rounded-2xl theme-subtle border-2 border-dashed border-slate-300 dark:border-slate-700 text-center">
+          <span class="material-symbols-outlined text-3xl text-blue-600">upload_file</span>
+          <p class="font-bold mt-1">Choose File</p>
+          <p class="text-[11px] text-slate-500 mt-0.5">PDF, DOCX, Images, Notes (up to 25MB)</p>
+          <input type="file" id="vault-file-input" required class="mt-3 text-xs">
+        </div>
+        <button type="submit" class="w-full py-3 rounded-xl bg-blue-600 text-white font-bold text-xs shadow-xs hover:bg-blue-700 transition">
+          Upload & Encrypt to Vault
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Firebase Scripts (Compat v10) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="/js/firebase-config.js"></script>
+
+  <!-- Application Scripts -->
+  <script src="/js/api.js"></script>
+  <script src="/js/pwa.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>

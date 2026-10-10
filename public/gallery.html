@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>College OS — Academic Workspace (Stitch UI System)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Manrope', sans-serif; }
+    .font-inter { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="bg-[#F5F7FC] text-[#121B2E] min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-white border-b border-[#E5EAF2] sticky top-0 z-30 px-6 py-4 flex items-center justify-between shadow-sm">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-[#101828] text-white flex items-center justify-center font-bold text-lg shadow-sm">
+        🎓
+      </div>
+      <div>
+        <h1 class="text-xl font-bold tracking-tight text-[#101828]">College OS Academic Workspace</h1>
+        <p class="text-xs text-[#667085] font-inter">Imported from Google Stitch · Project ID: <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-800">4238310572605017539</code></p>
+      </div>
+    </div>
+    
+    <div class="flex items-center gap-3">
+      <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        6 Screens Synced
+      </span>
+      <a href="./DESIGN.md" target="_blank" class="px-3.5 py-2 text-xs font-semibold text-[#101828] bg-slate-100 hover:bg-slate-200 rounded-lg transition">
+        📄 View DESIGN.md
+      </a>
+      <a href="./stitch.json" target="_blank" class="px-3.5 py-2 text-xs font-semibold text-[#101828] bg-slate-100 hover:bg-slate-200 rounded-lg transition">
+        ⚙️ Raw stitch.json
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Showcase Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-6 flex flex-col gap-8">
+    
+    <!-- Screen Selector Tabs & Live Interactive Viewer -->
+    <section class="bg-white rounded-2xl border border-[#E5EAF2] shadow-sm p-6">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-[#E5EAF2]">
+        <div>
+          <h2 class="text-lg font-bold text-[#101828]">Interactive Screen Preview</h2>
+          <p class="text-xs text-[#667085] font-inter">Click any screen tab below to preview live in the viewport or open full screen</p>
+        </div>
+        <div class="flex items-center gap-2" id="controls">
+          <button id="btn-desktop" onclick="setViewport('100%')" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-[#101828] text-white transition">Desktop (100%)</button>
+          <button id="btn-tablet" onclick="setViewport('768px')" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition">Tablet (768px)</button>
+          <button id="btn-mobile" onclick="setViewport('390px')" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition">Mobile (390px)</button>
+          <a id="btn-external" href="./screens/dashboard.html" target="_blank" class="ml-2 px-3 py-1.5 text-xs font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition inline-flex items-center gap-1">
+            Open Standalone ↗
+          </a>
+        </div>
+      </div>
+
+      <!-- Tab Buttons -->
+      <div class="flex flex-wrap gap-2 pt-4">
+        <button onclick="switchScreen('dashboard', this)" class="screen-tab px-4 py-2 rounded-xl text-xs font-semibold bg-[#101828] text-white shadow-sm transition">
+          1. Dashboard
+        </button>
+        <button onclick="switchScreen('academic-tasks', this)" class="screen-tab px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+          2. Academic Tasks
+        </button>
+        <button onclick="switchScreen('attendance-tracker', this)" class="screen-tab px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+          3. Attendance Tracker
+        </button>
+        <button onclick="switchScreen('timetable-scheduler', this)" class="screen-tab px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+          4. Timetable Scheduler
+        </button>
+        <button onclick="switchScreen('profile-settings', this)" class="screen-tab px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+          5. Profile & Settings
+        </button>
+        <button onclick="switchScreen('global-search', this)" class="screen-tab px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+          6. Global Search & Actions
+        </button>
+      </div>
+
+      <!-- Iframe Frame -->
+      <div class="mt-4 bg-[#F5F7FC] p-4 rounded-xl border border-[#E5EAF2] flex justify-center min-h-[750px]">
+        <div id="viewport-wrapper" class="w-full transition-all duration-300 shadow-lg rounded-xl overflow-hidden bg-white border border-slate-200">
+          <iframe id="preview-frame" src="./screens/dashboard.html" class="w-full h-[750px] border-0"></iframe>
+        </div>
+      </div>
+    </section>
+
+    <!-- Grid of All Screens & Thumbnails -->
+    <section>
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-bold text-[#101828]">All Screens Catalog</h2>
+        <span class="text-xs text-[#667085] font-inter">Click card to launch screen</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        <!-- Card 1 -->
+        <a href="./screens/dashboard.html" target="_blank" class="group bg-white rounded-2xl border border-[#E5EAF2] overflow-hidden hover:shadow-md transition flex flex-col">
+          <div class="aspect-video bg-slate-100 overflow-hidden border-b border-[#E5EAF2]">
+            <img src="./screenshots/dashboard.png" alt="Dashboard" class="w-full h-full object-cover object-top group-hover:scale-105 transition duration-300">
+          </div>
+          <div class="p-4 flex-1 flex flex-col justify-between">
+            <div>
+              <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Screen 01</span>
+              <h3 class="text-base font-bold text-[#101828] mt-1">Dashboard</h3>
+              <p class="text-xs text-[#667085] mt-1 font-inter">Central overview with schedule timeline, attendance cards, task queues, and quick study timers.</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-blue-600 font-semibold">
+              <span>screens/dashboard.html</span>
+              <span>Launch ↗</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- Card 2 -->
+        <a href="./screens/academic-tasks.html" target="_blank" class="group bg-white rounded-2xl border border-[#E5EAF2] overflow-hidden hover:shadow-md transition flex flex-col">
+          <div class="aspect-video bg-slate-100 overflow-hidden border-b border-[#E5EAF2]">
+            <img src="./screenshots/academic-tasks.png" alt="Academic Tasks" class="w-full h-full object-cover object-top group-hover:scale-105 transition duration-300">
+          </div>
+          <div class="p-4 flex-1 flex flex-col justify-between">
+            <div>
+              <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Screen 02</span>
+              <h3 class="text-base font-bold text-[#101828] mt-1">Academic Tasks</h3>
+              <p class="text-xs text-[#667085] mt-1 font-inter">Assignment queues, exam milestone checklists, priority tagging, and semester deadlines.</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-blue-600 font-semibold">
+              <span>screens/academic-tasks.html</span>
+              <span>Launch ↗</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- Card 3 -->
+        <a href="./screens/attendance-tracker.html" target="_blank" class="group bg-white rounded-2xl border border-[#E5EAF2] overflow-hidden hover:shadow-md transition flex flex-col">
+          <div class="aspect-video bg-slate-100 overflow-hidden border-b border-[#E5EAF2]">
+            <img src="./screenshots/attendance-tracker.png" alt="Attendance Tracker" class="w-full h-full object-cover object-top group-hover:scale-105 transition duration-300">
+          </div>
+          <div class="p-4 flex-1 flex flex-col justify-between">
+            <div>
+              <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Screen 03</span>
+              <h3 class="text-base font-bold text-[#101828] mt-1">Attendance Tracker</h3>
+              <p class="text-xs text-[#667085] mt-1 font-inter">Course-wise attendance dials, safe margin / skip counters, threshold risk alerts, and history logs.</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-blue-600 font-semibold">
+              <span>screens/attendance-tracker.html</span>
+              <span>Launch ↗</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- Card 4 -->
+        <a href="./screens/timetable-scheduler.html" target="_blank" class="group bg-white rounded-2xl border border-[#E5EAF2] overflow-hidden hover:shadow-md transition flex flex-col">
+          <div class="aspect-video bg-slate-100 overflow-hidden border-b border-[#E5EAF2]">
+            <img src="./screenshots/timetable-scheduler.png" alt="Timetable Scheduler" class="w-full h-full object-cover object-top group-hover:scale-105 transition duration-300">
+          </div>
+          <div class="p-4 flex-1 flex flex-col justify-between">
+            <div>
+              <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Screen 04</span>
+              <h3 class="text-base font-bold text-[#101828] mt-1">Timetable Scheduler</h3>
+              <p class="text-xs text-[#667085] mt-1 font-inter">Weekly class schedule matrix, lecture room navigation, faculty tags, and calendar sync.</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-blue-600 font-semibold">
+              <span>screens/timetable-scheduler.html</span>
+              <span>Launch ↗</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- Card 5 -->
+        <a href="./screens/profile-settings.html" target="_blank" class="group bg-white rounded-2xl border border-[#E5EAF2] overflow-hidden hover:shadow-md transition flex flex-col">
+          <div class="aspect-video bg-slate-100 overflow-hidden border-b border-[#E5EAF2]">
+            <img src="./screenshots/profile-settings.png" alt="Profile & Settings" class="w-full h-full object-cover object-top group-hover:scale-105 transition duration-300">
+          </div>
+          <div class="p-4 flex-1 flex flex-col justify-between">
+            <div>
+              <span class="text-[10px] font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Screen 05</span>
+              <h3 class="text-base font-bold text-[#101828] mt-1">Profile & Settings</h3>
+              <p class="text-xs text-[#667085] mt-1 font-inter">Student identity card, semester GPA history, credit targets, notification thresholds, and security.</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-blue-600 font-semibold">
+              <span>screens/profile-settings.html</span>
+              <span>Launch ↗</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- Card 6 -->
+        <a href="./screens/global-search.html" target="_blank" class="group bg-white rounded-2xl border border-[#E5EAF2] overflow-hidden hover:shadow-md transition flex flex-col">
+          <div class="aspect-video bg-slate-100 overflow-hidden border-b border-[#E5EAF2]">
+            <img src="./screenshots/global-search.png" alt="Global Search" class="w-full h-full object-cover object-top group-hover:scale-105 transition duration-300">
+          </div>
+          <div class="p-4 flex-1 flex flex-col justify-between">
+            <div>
+              <span class="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Screen 06</span>
+              <h3 class="text-base font-bold text-[#101828] mt-1">Global Search & Quick Actions</h3>
+              <p class="text-xs text-[#667085] mt-1 font-inter">Command palette (Cmd+K), instant syllabus lookup, professor contact search, and quick captures.</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-blue-600 font-semibold">
+              <span>screens/global-search.html</span>
+              <span>Launch ↗</span>
+            </div>
+          </div>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- Design Tokens Summary -->
+    <section class="bg-white rounded-2xl border border-[#E5EAF2] shadow-sm p-6 mb-8">
+      <h2 class="text-lg font-bold text-[#101828] mb-4">Design Tokens & Theme Specs</h2>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 font-inter">
+        <div class="p-3 rounded-xl border border-slate-100 bg-[#F5F7FC]">
+          <span class="text-xs text-slate-500 font-medium">Primary Accent</span>
+          <div class="flex items-center gap-2 mt-1">
+            <span class="w-4 h-4 rounded-full bg-[#101828] border"></span>
+            <span class="font-bold text-sm">#101828</span>
+          </div>
+        </div>
+        <div class="p-3 rounded-xl border border-slate-100 bg-[#F5F7FC]">
+          <span class="text-xs text-slate-500 font-medium">Secondary / Blue</span>
+          <div class="flex items-center gap-2 mt-1">
+            <span class="w-4 h-4 rounded-full bg-[#1451D1] border"></span>
+            <span class="font-bold text-sm">#1451D1</span>
+          </div>
+        </div>
+        <div class="p-3 rounded-xl border border-slate-100 bg-[#F5F7FC]">
+          <span class="text-xs text-slate-500 font-medium">Headline Font</span>
+          <div class="font-bold text-sm mt-1">Manrope (SemiBold/Bold)</div>
+        </div>
+        <div class="p-3 rounded-xl border border-slate-100 bg-[#F5F7FC]">
+          <span class="text-xs text-slate-500 font-medium">Body / Tabular Font</span>
+          <div class="font-bold text-sm mt-1">Inter (Regular/Medium)</div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    function switchScreen(slug, btn) {
+      document.getElementById('preview-frame').src = './screens/' + slug + '.html';
+      document.getElementById('btn-external').href = './screens/' + slug + '.html';
+      
+      document.querySelectorAll('.screen-tab').forEach(b => {
+        b.className = 'screen-tab px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition';
+      });
+      btn.className = 'screen-tab px-4 py-2 rounded-xl text-xs font-semibold bg-[#101828] text-white shadow-sm transition';
+    }
+
+    function setViewport(width) {
+      const el = document.getElementById('viewport-wrapper');
+      el.style.maxWidth = width;
+      
+      const buttons = {
+        '100%': 'btn-desktop',
+        '768px': 'btn-tablet',
+        '390px': 'btn-mobile'
+      };
+      
+      Object.keys(buttons).forEach(w => {
+        const b = document.getElementById(buttons[w]);
+        if (w === width) {
+          b.className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-[#101828] text-white transition';
+        } else {
+          b.className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition';
+        }
+      });
+    }
+  </script>
+</body>
+</html>

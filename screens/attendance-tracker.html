@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "surface": "#f9f9ff", "secondary-container": "#3b6ceb", "tertiary-fixed-dim": "#d3bbff", "on-secondary-container": "#fefcff", "surface-container-highest": "#d9e2fc", "surface-dim": "#d1daf4", "background": "#f9f9ff", "on-secondary-fixed": "#00174c", "surface-container-lowest": "#ffffff", "on-tertiary-fixed-variant": "#5729a3", "on-tertiary": "#ffffff", "on-secondary-fixed-variant": "#003daa", "on-secondary": "#ffffff", "tertiary-container": "#260059", "on-primary-container": "#7c8498", "error-container": "#ffdad6", "surface-container": "#e9edff", "on-tertiary-container": "#966ce6", "outline": "#76777d", "secondary": "#1451d1", "primary-fixed": "#dbe2f9", "surface-container-high": "#e1e8ff", "on-surface": "#121b2e", "on-tertiary-fixed": "#260059", "surface-container-low": "#f1f3ff", "error": "#ba1a1a", "primary": "#000000", "surface-bright": "#f9f9ff", "on-primary-fixed": "#141b2c", "tertiary-fixed": "#ebddff", "inverse-primary": "#bfc6dc", "on-primary-fixed-variant": "#3f4759", "outline-variant": "#c6c6cd", "tertiary": "#000000", "on-primary": "#ffffff", "on-surface-variant": "#45474c", "secondary-fixed-dim": "#b4c4ff", "primary-fixed-dim": "#bfc6dc", "on-background": "#121b2e", "surface-tint": "#565e71", "inverse-on-surface": "#edf0ff", "primary-container": "#141b2c", "secondary-fixed": "#dbe1ff", "inverse-surface": "#273044", "on-error-container": "#93000a", "surface-variant": "#d9e2fc", "on-error": "#ffffff" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "margin-lg": "3rem", "gutter": "1.5rem", "margin-sm": "1rem", "space-lg": "1.5rem", "space-xs": "0.25rem", "space-sm": "0.5rem", "space-md": "1rem", "space-xl": "2.5rem", "margin": "2rem", "gutter-sm": "1rem", "gutter-lg": "2rem" }, "fontFamily": { "headline-xl": [ "Manrope" ], "data-tabular": [ "Inter" ], "title-sm": [ "Manrope" ], "headline-lg-mobile": [ "Manrope" ], "headline-xl-mobile": [ "Manrope" ], "body-sm": [ "Manrope" ], "title-md": [ "Manrope" ], "label-md": [ "Inter" ], "headline-lg": [ "Manrope" ], "headline-md": [ "Manrope" ], "headline-sm": [ "Manrope" ], "label-sm": [ "Inter" ], "body-lg": [ "Manrope" ], "body-md": [ "Manrope" ] }, "fontSize": { "headline-xl": [ "40px", { "lineHeight": "48px", "letterSpacing": "-0.03em", "fontWeight": "700" } ], "data-tabular": [ "14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "500" } ], "title-sm": [ "14px", { "lineHeight": "20px", "letterSpacing": "-0.005em", "fontWeight": "600" } ], "headline-lg-mobile": [ "24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" } ], "headline-xl-mobile": [ "30px", { "lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "700" } ], "body-sm": [ "13px", { "lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400" } ], "title-md": [ "16px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" } ], "label-md": [ "12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" } ], "headline-lg": [ "32px", { "lineHeight": "40px", "letterSpacing": "-0.025em", "fontWeight": "700" } ], "headline-md": [ "24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600" } ], "headline-sm": [ "20px", { "lineHeight": "28px", "letterSpacing": "-0.015em", "fontWeight": "600" } ], "label-sm": [ "11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "600" } ], "body-lg": [ "16px", { "lineHeight": "26px", "letterSpacing": "-0.01em", "fontWeight": "400" } ], "body-md": [ "14px", { "lineHeight": "22px", "letterSpacing": "0em", "fontWeight": "400" } ] } } } };</script></head><body class="bg-surface font-body-md text-on-surface antialiased"><aside class="hidden lg:flex fixed left-0 top-0 bottom-0 w-[250px] bg-surface-container-lowest z-50 flex-col shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-space-md flex items-center justify-between"><div class="flex items-center gap-space-sm"><img alt="College OS Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1VApClFyJmXRwjWaHWiTqb1HRBaT4vjBDV_O0iJIqHGpaYBYiedW7A4MSnSY0BFaMnMu12_EvM-9WPtGjcLNMbDeMAGM18lonCpSAN2L1CCfZpHRyo_39VEOdOFw9nxgj-flGtcUCGUgsvQIxLq9PrCrMdcePTBSGUv3zG6ppNcqZ8zHpxXmHdB21QtJO8xIrfey2F2IL-idg29Q3d7yJOwGgJXga0Sp_ewD9Wc5zOmd78jMyUH0mwws4U"/><div class="flex flex-col"><span class="font-headline-sm text-title-sm text-on-surface leading-tight font-bold">College OS</span><span class="font-label-sm text-label-sm text-on-surface-variant">Student OS</span></div></div><span class="font-label-sm text-label-sm bg-surface-container text-secondary px-2 py-0.5 rounded-full font-medium">v2.4</span></div><div class="px-space-md py-space-xs"><div class="px-space-sm py-1 bg-surface-container-low rounded-lg flex items-center justify-between"><span class="font-label-sm text-label-sm text-on-surface-variant font-medium">Fall '26 Session</span><span class="h-1.5 w-1.5 rounded-full bg-secondary"></span></div></div><nav class="flex-1 px-space-sm py-space-sm space-y-1 overflow-y-auto" data-active-classes="bg-secondary text-on-secondary shadow-sm font-semibold"><a class="flex items-center gap-space-sm px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-body-md text-body-md" data-path="dashboard" href="#"><span class="material-symbols-outlined text-[20px]">grid_view</span><span>Dashboard</span></a><a class="flex items-center gap-space-sm px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-body-md text-body-md" data-path="timetable" href="#"><span class="material-symbols-outlined text-[20px]">calendar_today</span><span>Timetable</span></a><a aria-current="page" class="flex items-center gap-space-sm px-3 py-2 rounded-lg transition-colors bg-secondary text-on-secondary shadow-sm font-semibold" data-path="attendance" href="#"><span class="material-symbols-outlined text-[20px]">verified</span><span>Attendance</span></a><a class="flex items-center gap-space-sm px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-body-md text-body-md" data-path="tasks" href="#"><span class="material-symbols-outlined text-[20px]">assignment_turned_in</span><span>Tasks</span></a><a class="flex items-center gap-space-sm px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-body-md text-body-md" data-path="study-planner" href="#"><span class="material-symbols-outlined text-[20px]">timer</span><span>Study Planner</span></a><a class="flex items-center gap-space-sm px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-body-md text-body-md" data-path="grade-calculator" href="#"><span class="material-symbols-outlined text-[20px]">calculate</span><span>Grade Calculator</span></a><a class="flex items-center gap-space-sm px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-body-md text-body-md" data-path="document-scanner" href="#"><span class="material-symbols-outlined text-[20px]">document_scanner</span><span>Document Scanner</span></a><a class="flex items-center gap-space-sm px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-body-md text-body-md" data-path="data-vault" href="#"><span class="material-symbols-outlined text-[20px]">folder_shared</span><span>Data Vault</span></a><div class="pt-space-sm pb-space-xs"><div class="h-[1px] bg-surface-container-high mx-2"></div></div><a class="flex items-center gap-space-sm px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-body-md text-body-md" data-path="notifications" href="#"><span class="material-symbols-outlined text-[20px]">notifications</span><span>Notifications</span></a><a class="flex items-center gap-space-sm px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-body-md text-body-md" data-path="settings" href="#"><span class="material-symbols-outlined text-[20px]">tune</span><span>Settings</span></a></nav><div class="p-space-sm"><div class="p-space-sm rounded-xl bg-surface-container flex items-center justify-between"><div class="flex items-center gap-2"><span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-secondary"></span></span><span class="font-label-sm text-label-sm text-on-surface-variant">Cloud Firestore</span></div><span class="font-label-sm text-label-sm text-secondary font-semibold">Ready</span></div></div></aside><div class="lg:pl-[250px] min-h-screen flex flex-col"><header class="fixed top-0 left-0 lg:left-[250px] right-0 h-16 bg-surface-container-lowest/90 backdrop-blur-xl z-40 shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 w-full px-space-md lg:px-space-lg flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-md flex-1"><div class="flex items-center gap-2 lg:hidden"><img alt="College OS Logo" class="h-7 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1VApClFyJmXRwjWaHWiTqb1HRBaT4vjBDV_O0iJIqHGpaYBYiedW7A4MSnSY0BFaMnMu12_EvM-9WPtGjcLNMbDeMAGM18lonCpSAN2L1CCfZpHRyo_39VEOdOFw9nxgj-flGtcUCGUgsvQIxLq9PrCrMdcePTBSGUv3zG6ppNcqZ8zHpxXmHdB21QtJO8xIrfey2F2IL-idg29Q3d7yJOwGgJXga0Sp_ewD9Wc5zOmd78jMyUH0mwws4U"/><span class="font-headline-sm text-title-sm text-on-surface font-bold">College OS</span></div><div class="hidden sm:flex items-center gap-2 bg-surface-container px-3 py-1.5 rounded-full text-on-surface"><span class="material-symbols-outlined text-secondary text-[18px]">school</span><span class="font-label-md text-label-md font-semibold text-on-surface">Semester 5</span><span class="text-outline-variant font-label-md">•</span><span class="font-body-sm text-body-sm text-on-surface-variant">Computer Science &amp; Eng</span><span class="material-symbols-outlined text-on-surface-variant text-[16px]">expand_more</span></div><div class="hidden md:flex items-center flex-1 max-w-sm"><div class="relative w-full"><span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span><input class="w-full h-9 pl-9 pr-14 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-secondary/20 transition-all" placeholder="Search courses, notes, tasks..." type="text"/><kbd class="absolute right-2 top-1/2 -translate-y-1/2 px-1.5 py-0.5 text-[10px] font-label-sm font-semibold text-on-surface-variant bg-surface-container rounded">⌘K</kbd></div></div></div><div class="flex items-center gap-space-sm"><div class="hidden xl:flex items-center gap-2 px-3 py-1 bg-surface-container rounded-full"><span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-secondary"></span></span><span class="font-label-sm text-label-sm text-on-surface-variant font-medium">Synced • Just now</span></div><button class="h-9 px-3 bg-secondary hover:bg-secondary-container text-on-secondary rounded-lg font-title-sm text-title-sm flex items-center gap-1.5 transition-colors shadow-sm" type="button"><span class="material-symbols-outlined text-[18px]">add</span><span class="hidden sm:inline font-medium">New</span></button><a class="relative h-9 w-9 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="notifications" href="#"><span class="material-symbols-outlined text-[20px]">notifications</span><span class="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-error ring-2 ring-surface-container-lowest"></span></a><div class="h-6 w-[1px] bg-surface-container-high hidden sm:block"></div><div class="flex items-center gap-space-sm pl-1"><div class="hidden md:flex flex-col text-right"><span class="font-title-sm text-title-sm text-on-surface leading-tight font-semibold">Elena Rostova</span><span class="font-label-sm text-label-sm text-on-surface-variant">Junior • 3.84 GPA</span></div><img alt="Profile" class="w-8 h-8 rounded-full object-cover ring-2 ring-surface-container-high" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjsb3KOTotApe3WDCnzHHicXTnL8X-L3VDv3rXc249vSwGEnLEB3S-nx6NqZIZzrgE9O2KLiYAatDVwsiqTyO9leysz8DVuaufeLpUHkynPQ3zHzau-X5BAxSm_3xh039puaeUm9RnvuBZY_nmHo2cP-ycNWjRSPAQEPoS3X9nBEjjh9DsmGn9yu5u7MkXSA7Z12vPdwlZeMIZd5E8PDWcu7lcBAfSG4D5G3W-JNuu1kxpVRvDREO5"/></div></div></div></header><main class="w-full pt-16 pb-20 lg:pb-space-lg px-space-md lg:px-space-lg flex-1"><div class="flex flex-col w-full">
+<div class="flex flex-col gap-space-lg w-full max-w-[1440px] mx-auto pb-12">
+<!-- Top Command & Forecasting Header -->
+<div class="flex flex-col lg:flex-row lg:items-end justify-between gap-space-md bg-surface-container-lowest p-space-lg rounded-2xl shadow-sm">
+<div class="flex flex-col gap-1.5 max-w-2xl">
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-0.5 rounded-full font-label-sm text-label-sm bg-surface-container text-secondary font-semibold">Semester 5 Tracker</span>
+<span class="flex items-center gap-1 font-label-sm text-label-sm text-on-surface-variant font-medium">
+<span class="material-symbols-outlined text-[14px] text-secondary">verified</span>
+            Automated Projection Engine Active
+          </span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Attendance Tracker &amp; Target Calculator</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Track your verified attendance percentage, calculate safe skips, and simulate projected classes required to maintain institutional compliance.</p>
+</div>
+<div class="flex flex-wrap items-center gap-3">
+<!-- Target Goal Pill Selector -->
+<div class="flex items-center gap-2 bg-surface-container-low px-3 py-1.5 rounded-xl">
+<span class="font-label-sm text-label-sm text-on-surface-variant font-semibold">Target Goal:</span>
+<div class="inline-flex bg-surface-container p-0.5 rounded-lg" id="targetSelector">
+<button class="px-2.5 py-1 rounded-md font-label-md text-label-md font-semibold bg-surface-container-lowest text-secondary shadow-sm transition-all" id="target-75" onclick="setGlobalTarget(75)" type="button">75%</button>
+<button class="px-2.5 py-1 rounded-md font-label-md text-label-md font-medium text-on-surface-variant hover:text-on-surface transition-all" id="target-80" onclick="setGlobalTarget(80)" type="button">80%</button>
+<button class="px-2.5 py-1 rounded-md font-label-md text-label-md font-medium text-on-surface-variant hover:text-on-surface transition-all" id="target-85" onclick="setGlobalTarget(85)" type="button">85%</button>
+</div>
+</div>
+<button class="h-10 px-4 bg-primary hover:bg-surface-container-highest text-on-primary rounded-xl font-title-sm text-title-sm flex items-center gap-2 shadow-sm transition-all" onclick="openRecordModal()" type="button">
+<span class="material-symbols-outlined text-[18px]">add_task</span>
+<span>Record Today</span>
+</button>
+<button class="h-10 px-3.5 bg-surface-container hover:bg-surface-container-high text-on-surface rounded-xl font-title-sm text-title-sm flex items-center gap-2 transition-all" onclick="triggerExportToast()" type="button">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">download</span>
+<span class="hidden sm:inline">Export Audit</span>
+</button>
+</div>
+</div>
+<!-- 4 High-Level Analytic Metric Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-md">
+<!-- Cumulative Metric Card -->
+<div class="relative overflow-hidden bg-surface-container-lowest p-space-lg rounded-2xl shadow-sm flex flex-col justify-between group">
+<div class="flex items-start justify-between">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Overall Cumulative</span>
+<div class="flex items-baseline gap-2 mt-1">
+<span class="font-headline-xl text-headline-xl text-on-surface font-extrabold" id="totalPercentageDisplay">86.8%</span>
+</div>
+</div>
+<div class="relative w-12 h-12 flex items-center justify-center">
+<svg class="w-12 h-12 -rotate-90" viewbox="0 0 36 36">
+<path class="text-surface-container" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3.5"></path>
+<path class="text-secondary" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="86.8, 100" stroke-linecap="round" stroke-width="3.5"></path>
+</svg>
+<span class="material-symbols-outlined absolute text-[18px] text-secondary">donut_large</span>
+</div>
+</div>
+<div class="mt-4 flex flex-col gap-1.5">
+<div class="flex items-center gap-1.5">
+<span class="px-2 py-0.5 rounded-full font-label-sm text-label-sm font-semibold bg-surface-container-highest text-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">shield</span>
+              Safe zone (+11.8% above req.)
+            </span>
+</div>
+<span class="font-data-tabular text-data-tabular text-on-surface-variant font-medium">145 / 167 total sessions cleared</span>
+</div>
+</div>
+<!-- Safe Skips Buffer -->
+<div class="bg-surface-container-lowest p-space-lg rounded-2xl shadow-sm flex flex-col justify-between">
+<div class="flex items-start justify-between">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Safe Skips Available</span>
+<div class="flex items-baseline gap-2 mt-1">
+<span class="font-headline-xl text-headline-xl text-secondary font-extrabold" id="safeSkipsTotal">18</span>
+<span class="font-title-sm text-title-sm text-on-surface-variant">classes</span>
+</div>
+</div>
+<div class="w-10 h-10 rounded-xl bg-surface-container-low flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[22px]">flight_takeoff</span>
+</div>
+</div>
+<div class="mt-4 flex flex-col gap-1">
+<div class="w-full bg-surface-container rounded-full h-1.5 overflow-hidden">
+<div class="bg-secondary h-1.5 rounded-full" style="width: 72%;"></div>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-1">Margin maintained across 5 compliant subjects</span>
+</div>
+</div>
+<!-- Compliance Risk Card -->
+<div class="bg-surface-container-lowest p-space-lg rounded-2xl shadow-sm flex flex-col justify-between">
+<div class="flex items-start justify-between">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Subjects at Risk</span>
+<div class="flex items-baseline gap-2 mt-1">
+<span class="font-headline-xl text-headline-xl text-error font-extrabold">1</span>
+<span class="font-title-sm text-title-sm text-on-surface-variant">critical / 1 warning</span>
+</div>
+</div>
+<div class="w-10 h-10 rounded-xl bg-error-container flex items-center justify-center text-on-error-container">
+<span class="material-symbols-outlined text-[22px]">warning</span>
+</div>
+</div>
+<div class="mt-4 flex flex-col gap-1">
+<div class="flex items-center gap-1.5">
+<span class="h-2 w-2 rounded-full bg-error animate-pulse"></span>
+<span class="font-label-md text-label-md text-error font-semibold">HUM110 at 73.9%</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Deficit of 2 sessions for exam admit card</span>
+</div>
+</div>
+<!-- Momentum & Streak -->
+<div class="bg-surface-container-lowest p-space-lg rounded-2xl shadow-sm flex flex-col justify-between">
+<div class="flex items-start justify-between">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Consistency Streak</span>
+<div class="flex items-baseline gap-2 mt-1">
+<span class="font-headline-xl text-headline-xl text-on-surface font-extrabold">14</span>
+<span class="font-title-sm text-title-sm text-on-surface-variant">days unbroken</span>
+</div>
+</div>
+<div class="w-10 h-10 rounded-xl bg-surface-container-high flex items-center justify-center text-on-surface">
+<span class="material-symbols-outlined text-[22px]">local_fire_department</span>
+</div>
+</div>
+<div class="mt-4 flex items-center gap-1.5">
+<div class="flex -space-x-1">
+<span class="w-4 h-4 rounded-full bg-surface-container-highest flex items-center justify-center text-[10px] font-bold text-secondary">M</span>
+<span class="w-4 h-4 rounded-full bg-surface-container-highest flex items-center justify-center text-[10px] font-bold text-secondary">T</span>
+<span class="w-4 h-4 rounded-full bg-surface-container-highest flex items-center justify-center text-[10px] font-bold text-secondary">W</span>
+<span class="w-4 h-4 rounded-full bg-secondary text-on-secondary flex items-center justify-center text-[10px] font-bold">T</span>
+<span class="w-4 h-4 rounded-full bg-secondary text-on-secondary flex items-center justify-center text-[10px] font-bold">F</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant font-medium ml-1">No unexcused drops in 2.5 weeks</span>
+</div>
+</div>
+</div>
+<!-- Live Simulation Alert & Contextual Forecast Banner -->
+<div class="bg-gradient-to-r from-surface-container to-surface-container-low p-space-md rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-space-md">
+<div class="flex items-center gap-space-sm">
+<div class="w-9 h-9 rounded-xl bg-surface-container-lowest flex items-center justify-center text-secondary shadow-sm">
+<span class="material-symbols-outlined text-[20px]">psychology</span>
+</div>
+<div>
+<h2 class="font-title-sm text-title-sm text-on-surface font-bold">Attendance Forecaster Intelligence</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Projections update in real-time. If you maintain 100% attendance next week (+18 sessions), your cumulative rises to <span class="font-semibold text-secondary">88.1%</span>.</p>
+</div>
+</div>
+<div class="flex items-center gap-2 shrink-0">
+<button class="px-3 py-1.5 bg-surface-container-lowest hover:bg-surface-bright text-on-surface rounded-xl font-label-md text-label-md font-semibold flex items-center gap-1.5 shadow-sm transition-all" onclick="openSubjectDeepDive('HUM110')" type="button">
+<span class="material-symbols-outlined text-[16px] text-error">priority_high</span>
+<span>Resolve HUM110 Deficit</span>
+</button>
+</div>
+</div>
+<!-- Main Subject Table Grid & Action Deck -->
+<div class="bg-surface-container-lowest rounded-2xl shadow-sm overflow-hidden flex flex-col">
+<div class="p-space-lg flex flex-col sm:flex-row sm:items-center justify-between gap-space-md bg-surface-container-lowest">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">Enrolled Subjects &amp; Forecasting Matrix</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Simulate lecture absences and log class outcomes with 1-click ledger updates.</p>
+</div>
+<div class="flex items-center gap-2">
+<div class="flex items-center gap-1 bg-surface-container-low px-3 py-1.5 rounded-xl">
+<span class="material-symbols-outlined text-on-surface-variant text-[16px]">filter_list</span>
+<select class="bg-transparent font-label-md text-label-md text-on-surface focus:outline-none cursor-pointer" onchange="filterSubjects(this.value)">
+<option value="all">All Disciplines (6)</option>
+<option value="critical">At-Risk Only (&lt;75%)</option>
+<option value="safe">Safe Margin (≥75%)</option>
+</select>
+</div>
+</div>
+</div>
+<!-- Subject Table Component -->
+<div class="w-full overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">
+<th class="py-3 px-space-lg">Course &amp; Faculty</th>
+<th class="py-3 px-4 text-center">Conducted</th>
+<th class="py-3 px-4 text-center">Attended</th>
+<th class="py-3 px-4 text-center">Missed</th>
+<th class="py-3 px-4 text-center">Ratio</th>
+<th class="py-3 px-space-lg">Forecast &amp; Buffer Strategy</th>
+<th class="py-3 px-space-lg text-right">Instant Logger</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container-high" id="subjectRowsContainer">
+<!-- Row 1: CS301 Database Systems -->
+<tr class="hover:bg-surface-container-low/60 transition-colors group" data-status="safe" id="row-CS301">
+<td class="py-4 px-space-lg">
+<div class="flex items-center gap-3">
+<div class="w-2.5 h-10 rounded-full bg-secondary shrink-0"></div>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-title-sm text-title-sm text-on-surface font-bold">CS301 Database Systems</span>
+<span class="px-2 py-0.5 rounded-full font-label-sm text-label-sm bg-surface-container text-on-surface-variant font-medium">4 Cr</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Prof. Marcus Vance • Hall 402</span>
+</div>
+</div>
+</td>
+<td class="py-4 px-4 text-center font-data-tabular text-data-tabular font-medium text-on-surface" id="cond-CS301">36</td>
+<td class="py-4 px-4 text-center font-data-tabular text-data-tabular font-semibold text-on-surface" id="pres-CS301">33</td>
+<td class="py-4 px-4 text-center font-data-tabular text-data-tabular text-on-surface-variant" id="abs-CS301">3</td>
+<td class="py-4 px-4 text-center">
+<span class="inline-flex items-center px-3 py-1 rounded-full font-data-tabular text-title-sm font-bold bg-surface-container-highest text-secondary" id="pct-CS301">
+                  91.7%
+                </span>
+</td>
+<td class="py-4 px-space-lg">
+<div class="flex flex-col gap-1 max-w-xs">
+<div class="flex items-center gap-1.5 text-secondary font-semibold font-label-md text-label-md">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+<span id="forecast-CS301">Safe to miss 7 more classes</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Will retain 76.7% after 7 bunks</span>
+</div>
+</td>
+<td class="py-4 px-space-lg text-right">
+<div class="inline-flex items-center gap-1.5">
+<button class="h-8 w-8 rounded-lg bg-surface-container hover:bg-surface-container-highest text-secondary flex items-center justify-center transition-all" onclick="quickLog('CS301', 'present')" title="Mark Present" type="button">
+<span class="material-symbols-outlined text-[18px]">done</span>
+</button>
+<button class="h-8 w-8 rounded-lg bg-surface-container hover:bg-error-container text-on-surface-variant hover:text-error flex items-center justify-center transition-all" onclick="quickLog('CS301', 'absent')" title="Mark Absent" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+<button class="h-8 w-8 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface-variant flex items-center justify-center transition-all" onclick="openSubjectDeepDive('CS301')" title="Detailed Analytics" type="button">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 2: MATH240 Linear Algebra -->
+<tr class="hover:bg-surface-container-low/60 transition-colors group" data-status="safe" id="row-MATH240">
+<td class="py-4 px-space-lg">
+<div class="flex items-center gap-3">
+<div class="w-2.5 h-10 rounded-full bg-secondary-container shrink-0"></div>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-title-sm text-title-sm text-on-surface font-bold">MATH240 Linear Algebra</span>
+<span class="px-2 py-0.5 rounded-full font-label-sm text-label-sm bg-surface-container text-on-surface-variant font-medium">3 Cr</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Dr. Aris Thorne • Lecture Theatre C</span>
+</div>
+</div>
+</td>
+<td class="py-4 px-4 text-center font-data-tabular text-data-tabular font-medium text-on-surface" id="cond-MATH240">32</td>
+<td class="py-4 px-4 text-center font-data-tabular text-data-tabular font-semibold text-on-surface" id="pres-MATH240">28</td>
+<td class="py-4 px-4 text-center font-data-tabular text-data-tabular text-on-surface-variant" id="abs-MATH240">4</td>
+<td class="py-4 px-4 text-center">
+<span class="inline-flex items-center px-3 py-1 rounded-full font-data-tabular text-title-sm font-bold bg-surface-container-highest text-secondary" id="pct-MATH240">
+                  87.5%
+                </span>
+</td>
+<td class="py-4 px-space-lg">
+<div class="flex flex-col gap-1 max-w-xs">
+<div class="flex items-center gap-1.5 text-secondary font-semibold font-label-md text-label-md">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+<span id="forecast-MATH240">Safe to miss 5 more classes</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Will retain 75.6% after 5 bunks</span>
+</div>
+</td>
+<td class="py-4 px-space-lg text-right">
+<div class="inline-flex items-center gap-1.5">
+<button class="h-8 w-8 rounded-lg bg-surface-container hover:bg-surface-container-highest text-secondary flex items-center justify-center transition-all" onclick="quickLog('MATH240', 'present')" title="Mark Present" type="button">
+<span class="material-symbols-outlined text-[18px]">done</span>
+</button>
+<button class="h-8 w-8 rounded-lg bg-surface-container hover:bg-error-container text-on-surface-variant hover:text-error flex items-center justify-center transition-all" onclick="quickLog('MATH240', 'absent')" title="Mark Absent" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+<button class="h-8 w-8 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface-variant flex items-center justify-center transition-all" onclick="openSubjectDeepDive('MATH240')" title="Detailed Analytics" type="button">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 3: CS340 Operating Systems -->
+<tr class="hover:bg-surface-container-low/60 transition-colors group" data-status="safe" id="row-CS340">
+<td class="py-4 px-space-lg">
+<div class="flex items-center gap-3">
+<div class="w-2.5 h-10 rounded-full bg-secondary shrink-0"></div>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-title-sm text-title-sm text-on-surface font-bold">CS340 Operating Systems</span>
+<span class="px-2 py-0.5 rounded-full font-label-sm text-label-sm bg-surface-container text-on-surface-variant font-medium">4 Cr</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Prof. Daniel Wu • CS Lab 2</span>
+</div>
+</div>
+</td>
+<td class="py-4 px-4 text-center font-data-tabular text-data-tabular font-medium text-on-surface" id="cond-CS340">38</td>
+<td class="py-4 px-4 text-center font-data-tabular text-data-tabular font-semibold text-on-surface" id="pres-CS340">34</td>
+<td class="py-4 px-4 text-center font-data-tabular text-data-tabular text-on-surface-variant" id="abs-CS340">4</td>
+<td class="py-4 px-4 text-center">
+<span class="inline-flex items-center px-3 py-1 rounded-full font-data-tabular text-title-sm font-bold bg-surface-container-highest text-secondary" id="pct-CS340">
+                  89.5%
+                </span>
+</td>
+<td class="py-4 px-space-lg">
+<div class="flex flex-col gap-1 max-w-xs">
+<div class="flex items-center gap-1.5 text-secondary font-semibold font-label-md text-label-md">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+<span id="forecast-CS340">Safe to miss 6 more classes</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Buffer safe until midterm session 44</span>
+</div>
+</td>
+<td class="py-4 px-space-lg text-right">
+<div class="inline-flex items-center gap-1.5">
+<button class="h-8 w-8 rounded-lg bg-surface-container hover:bg-surface-container-highest text-secondary flex items-center justify-center transition-all" onclick="quickLog('CS340', 'present')" title="Mark Present" type="button">
+<span class="material-symbols-outlined text-[18px]">done</span>
+</button>
+<button class="h-8 w-8 rounded-lg bg-surface-container hover:bg-error-container text-on-surface-variant hover:text-error flex items-center justify-center transition-all" onclick="quickLog('CS340', 'absent')" title="Mark Absent" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+<button class="h-8 w-8 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface-variant flex items-center justify-center transition-all" onclick="openSubjectDeepDive('CS340')" title="Detailed Analytics" type="button">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 4: CS341 Distributed Systems Lab (Caution) -->
+<tr class="hover:bg-surface-container-low/60 transition-colors group bg-surface-container-low/30" data-status="safe" id="row-CS341">
+<td class="py-4 px-space-lg">
+<div class="flex items-center gap-3">
+<div class="w-2.5 h-10 rounded-full bg-outline-variant shrink-0"></div>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-title-sm text-title-sm text-on-surface font-bold">CS341 Distributed Systems Lab</span>
+<span class="px-2 py-0.5 rounded-full font-label-sm text-label-sm bg-surface-container text-on-surface-variant font-medium">2 Cr</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Eng. Samantha Ray • Server Room B</span>
+</div>
+</div>
+</td>
+<td class="py-4 px-4 text-center font-data-tabular text-data-tabular font-medium text-on-surface" id="cond-CS341">14</td>
+<td class="py-4 px-4 text-center font-data-tabular text-data-tabular font-semibold text-on-surface" id="pres-CS341">11</td>
+<td class="py-4 px-4 text-center font-data-tabular text-data-tabular text-on-surface-variant" id="abs-CS341">3</td>
+<td class="py-4 px-4 text-center">
+<span class="inline-flex items-center px-3 py-1 rounded-full font-data-tabular text-title-sm font-bold bg-surface-container text-on-surface" id="pct-CS341">
+                  78.6%
+                </span>
+</td>
+<td class="py-4 px-space-lg">
+<div class="flex flex-col gap-1 max-w-xs">
+<div class="flex items-center gap-1.5 text-on-surface font-semibold font-label-md text-label-md">
+<span class="material-symbols-outlined text-[16px] text-outline">hourglass_top</span>
+<span id="forecast-CS341">Attend next 2 labs for 80% mark</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">1 more absence puts subject at 73.3%</span>
+</div>
+</td>
+<td class="py-4 px-space-lg text-right">
+<div class="inline-flex items-center gap-1.5">
+<button class="h-8 w-8 rounded-lg bg-surface-container hover:bg-surface-container-highest text-secondary flex items-center justify-center transition-all" onclick="quickLog('CS341', 'present')" title="Mark Present" type="button">
+<span class="material-symbols-outlined text-[18px]">done</span>
+</button>
+<button class="h-8 w-8 rounded-lg bg-surface-container hover:bg-error-container text-on-surface-variant hover:text-error flex items-center justify-center transition-all" onclick="quickLog('CS341', 'absent')" title="Mark Absent" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+<button class="h-8 w-8 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface-variant flex items-center justify-center transition-all" onclick="openSubjectDeepDive('CS341')" title="Detailed Analytics" type="button">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 5: ENGR200 Engineering Ethics -->
+<tr class="hover:bg-surface-container-low/60 transition-colors group" data-status="safe" id="row-ENGR200">
+<td class="py-4 px-space-lg">
+<div class="flex items-center gap-3">
+<div class="w-2.5 h-10 rounded-full bg-secondary shrink-0"></div>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-title-sm text-title-sm text-on-surface font-bold">ENGR200 Engineering Ethics</span>
+<span class="px-2 py-0.5 rounded-full font-label-sm text-label-sm bg-surface-container text-on-surface-variant font-medium">2 Cr</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Prof. Eleanor Rigby • Auditorium 1</span>
+</div>
+</div>
+</td>
+<td class="py-4 px-4 text-center font-data-tabular text-data-tabular font-medium text-on-surface" id="cond-ENGR200">24</td>
+<td class="py-4 px-4 text-center font-data-tabular text-data-tabular font-semibold text-on-surface" id="pres-ENGR200">22</td>
+<td class="py-4 px-4 text-center font-data-tabular text-data-tabular text-on-surface-variant" id="abs-ENGR200">2</td>
+<td class="py-4 px-4 text-center">
+<span class="inline-flex items-center px-3 py-1 rounded-full font-data-tabular text-title-sm font-bold bg-surface-container-highest text-secondary" id="pct-ENGR200">
+                  91.7%
+                </span>
+</td>
+<td class="py-4 px-space-lg">
+<div class="flex flex-col gap-1 max-w-xs">
+<div class="flex items-center gap-1.5 text-secondary font-semibold font-label-md text-label-md">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+<span id="forecast-ENGR200">Safe to miss 5 more classes</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Outstanding margin (Top quartile)</span>
+</div>
+</td>
+<td class="py-4 px-space-lg text-right">
+<div class="inline-flex items-center gap-1.5">
+<button class="h-8 w-8 rounded-lg bg-surface-container hover:bg-surface-container-highest text-secondary flex items-center justify-center transition-all" onclick="quickLog('ENGR200', 'present')" title="Mark Present" type="button">
+<span class="material-symbols-outlined text-[18px]">done</span>
+</button>
+<button class="h-8 w-8 rounded-lg bg-surface-container hover:bg-error-container text-on-surface-variant hover:text-error flex items-center justify-center transition-all" onclick="quickLog('ENGR200', 'absent')" title="Mark Absent" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+<button class="h-8 w-8 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface-variant flex items-center justify-center transition-all" onclick="openSubjectDeepDive('ENGR200')" title="Detailed Analytics" type="button">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 6: HUM110 Academic Writing (Critical Under 75%) -->
+<tr class="hover:bg-error-container/20 transition-colors group bg-error-container/10" data-status="critical" id="row-HUM110">
+<td class="py-4 px-space-lg">
+<div class="flex items-center gap-3">
+<div class="w-2.5 h-10 rounded-full bg-error shrink-0"></div>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-title-sm text-title-sm text-on-surface font-bold">HUM110 Academic Writing</span>
+<span class="px-2 py-0.5 rounded-full font-label-sm text-label-sm bg-error-container text-on-error-container font-semibold">Shortage Alert</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Dr. Claire Belmont • Humanities 108</span>
+</div>
+</div>
+</td>
+<td class="py-4 px-4 text-center font-data-tabular text-data-tabular font-medium text-on-surface" id="cond-HUM110">23</td>
+<td class="py-4 px-4 text-center font-data-tabular text-data-tabular font-semibold text-error" id="pres-HUM110">17</td>
+<td class="py-4 px-4 text-center font-data-tabular text-data-tabular text-error font-medium" id="abs-HUM110">6</td>
+<td class="py-4 px-4 text-center">
+<span class="inline-flex items-center px-3 py-1 rounded-full font-data-tabular text-title-sm font-bold bg-error-container text-on-error-container" id="pct-HUM110">
+                  73.9%
+                </span>
+</td>
+<td class="py-4 px-space-lg">
+<div class="flex flex-col gap-1 max-w-xs">
+<div class="flex items-center gap-1.5 text-error font-semibold font-label-md text-label-md">
+<span class="material-symbols-outlined text-[16px]">priority_high</span>
+<span id="forecast-HUM110">Attend next 2 classes to reach 76.0%</span>
+</div>
+<span class="font-body-sm text-body-sm text-error/80">Disbarment risk for End-Sem Exam</span>
+</div>
+</td>
+<td class="py-4 px-space-lg text-right">
+<div class="inline-flex items-center gap-1.5">
+<button class="h-8 w-8 rounded-lg bg-surface-container hover:bg-surface-container-highest text-secondary flex items-center justify-center transition-all" onclick="quickLog('HUM110', 'present')" title="Mark Present" type="button">
+<span class="material-symbols-outlined text-[18px]">done</span>
+</button>
+<button class="h-8 w-8 rounded-lg bg-surface-container hover:bg-error-container text-on-surface-variant hover:text-error flex items-center justify-center transition-all" onclick="quickLog('HUM110', 'absent')" title="Mark Absent" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+<button class="h-8 w-8 rounded-lg bg-secondary text-on-secondary flex items-center justify-center shadow-sm transition-all" onclick="openSubjectDeepDive('HUM110')" title="Detailed Analytics" type="button">
+<span class="material-symbols-outlined text-[18px]">troubleshoot</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-space-md bg-surface-container-low flex flex-col sm:flex-row items-center justify-between gap-3 text-on-surface-variant">
+<span class="font-body-sm text-body-sm flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-secondary">info</span>
+          Calculations account for institutional 75% attendance policy for Semester End Examination hall ticket issuance.
+        </span>
+<div class="flex items-center gap-3">
+<span class="font-label-sm text-label-sm">Legitimate Excused Misses: <strong class="text-on-surface">3 Recorded</strong></span>
+<a class="font-label-md text-label-md text-secondary font-semibold hover:underline" href="#" onclick="openRecordModal(); return false;">Submit Medical Certificate →</a>
+</div>
+</div>
+</div>
+<!-- Live Subject Deep Dive Slide-Over Sheet (Right Drawer) -->
+<div class="fixed inset-0 bg-primary/40 backdrop-blur-sm z-50 hidden transition-opacity" id="deepDiveBackdrop" onclick="closeSubjectDeepDive()"></div>
+<div class="fixed top-0 right-0 bottom-0 w-full max-w-xl bg-surface-container-lowest shadow-2xl z-50 flex flex-col transform translate-x-full transition-transform duration-300 ease-in-out" id="deepDiveDrawer">
+<!-- Drawer Header -->
+<div class="p-space-lg bg-surface-container-lowest flex items-start justify-between">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-0.5 rounded-full font-label-sm text-label-sm bg-error-container text-on-error-container font-semibold" id="drawerSubjectCode">HUM110</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant" id="drawerInstructor">Dr. Claire Belmont</span>
+</div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-bold" id="drawerSubjectTitle">Academic Writing &amp; Discourse</h2>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Deep ledger log, calendar breakdown &amp; real-time attendance trajectory simulator.</span>
+</div>
+<button class="w-9 h-9 rounded-xl bg-surface-container-low hover:bg-surface-container text-on-surface-variant flex items-center justify-center transition-colors" onclick="closeSubjectDeepDive()" type="button">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<!-- Drawer Scrollable Body -->
+<div class="flex-1 overflow-y-auto p-space-lg flex flex-col gap-space-lg">
+<!-- Stats Overview Banner -->
+<div class="grid grid-cols-3 gap-3 p-space-md bg-surface-container-low rounded-xl">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Current Ratio</span>
+<span class="font-headline-sm text-headline-sm font-bold text-error" id="drawerPct">73.9%</span>
+<span class="font-label-sm text-label-sm text-error font-medium">Deficit Alert</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Attended / Total</span>
+<span class="font-headline-sm text-headline-sm font-bold text-on-surface">17 / 23</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">6 Absent</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Goal Delta</span>
+<span class="font-headline-sm text-headline-sm font-bold text-secondary">+2 req.</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">to breach 75%</span>
+</div>
+</div>
+<!-- Predictive Forecaster Slider Component -->
+<div class="bg-surface-container-low p-space-md rounded-2xl flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[20px]">calculate</span>
+<h3 class="font-title-sm text-title-sm text-on-surface font-bold">Interactive Trajectory Simulator</h3>
+</div>
+<span class="font-label-sm text-label-sm bg-surface-container text-secondary px-2 py-0.5 rounded-full font-semibold">Monte Carlo Forecast</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Slide right to simulate attending upcoming classes, or slide left to evaluate consequences of additional absences.</p>
+<div class="flex flex-col gap-2 bg-surface-container-lowest p-space-md rounded-xl shadow-sm">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Future Classes Attended in a Row:</span>
+<span class="font-headline-sm text-headline-sm text-secondary font-bold" id="futureClassesLabel">+3 Classes</span>
+</div>
+<input class="w-full h-2 bg-surface-container rounded-lg appearance-none cursor-pointer accent-secondary" id="futureSlider" max="12" min="0" oninput="updateSimulation(this.value)" type="range" value="3"/>
+<div class="flex justify-between font-label-sm text-label-sm text-on-surface-variant">
+<span>0 (Immediate Freeze)</span>
+<span>+6 Classes</span>
+<span>+12 Classes</span>
+</div>
+</div>
+<!-- Simulation Projection Result -->
+<div class="p-3 bg-surface-container rounded-xl flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Projected New Standing:</span>
+<div class="flex items-center gap-2 mt-0.5">
+<span class="font-headline-md text-headline-md font-bold text-on-surface" id="simResultPct">76.9%</span>
+<span class="font-label-md text-label-md px-2 py-0.5 rounded-full bg-surface-container-highest text-secondary font-semibold" id="simResultBadge">Eligible for Exam</span>
+</div>
+</div>
+<div class="text-right">
+<span class="font-label-sm text-label-sm text-on-surface-variant">New Ledger:</span>
+<div class="font-data-tabular text-data-tabular font-semibold text-on-surface" id="simRatio">20 attended / 26 total</div>
+</div>
+</div>
+</div>
+<!-- Heatmap Calendar Activity -->
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<h4 class="font-title-sm text-title-sm text-on-surface font-bold">Past 30 Days Session Heatmap</h4>
+<div class="flex items-center gap-3 font-label-sm text-label-sm">
+<span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-secondary"></span> Present</span>
+<span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-error"></span> Absent</span>
+<span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-outline"></span> Medical</span>
+</div>
+</div>
+<!-- Heatmap Matrix -->
+<div class="grid grid-cols-7 gap-2 p-3 bg-surface-container-low rounded-xl">
+<!-- Day labels -->
+<div class="text-center font-label-sm text-label-sm text-on-surface-variant">Mon</div>
+<div class="text-center font-label-sm text-label-sm text-on-surface-variant">Tue</div>
+<div class="text-center font-label-sm text-label-sm text-on-surface-variant">Wed</div>
+<div class="text-center font-label-sm text-label-sm text-on-surface-variant">Thu</div>
+<div class="text-center font-label-sm text-label-sm text-on-surface-variant">Fri</div>
+<div class="text-center font-label-sm text-label-sm text-on-surface-variant">Sat</div>
+<div class="text-center font-label-sm text-label-sm text-on-surface-variant">Sun</div>
+<!-- Heatmap days -->
+<div class="h-9 rounded-lg bg-surface-container-lowest flex items-center justify-center font-data-tabular text-label-sm text-on-surface-variant/40">28</div>
+<div class="h-9 rounded-lg bg-surface-container-highest text-secondary flex items-center justify-center font-data-tabular text-label-sm font-bold shadow-xs" title="Oct 29: Present">29</div>
+<div class="h-9 rounded-lg bg-surface-container-lowest flex items-center justify-center font-data-tabular text-label-sm text-on-surface-variant">30</div>
+<div class="h-9 rounded-lg bg-surface-container-highest text-secondary flex items-center justify-center font-data-tabular text-label-sm font-bold" title="Oct 31: Present">31</div>
+<div class="h-9 rounded-lg bg-error-container text-on-error-container flex items-center justify-center font-data-tabular text-label-sm font-bold" title="Nov 1: Absent">1</div>
+<div class="h-9 rounded-lg bg-surface-container-lowest flex items-center justify-center font-data-tabular text-label-sm text-on-surface-variant/30">2</div>
+<div class="h-9 rounded-lg bg-surface-container-lowest flex items-center justify-center font-data-tabular text-label-sm text-on-surface-variant/30">3</div>
+<div class="h-9 rounded-lg bg-surface-container-highest text-secondary flex items-center justify-center font-data-tabular text-label-sm font-bold" title="Nov 4: Present">4</div>
+<div class="h-9 rounded-lg bg-surface-container-lowest flex items-center justify-center font-data-tabular text-label-sm text-on-surface-variant">5</div>
+<div class="h-9 rounded-lg bg-surface-container-highest text-secondary flex items-center justify-center font-data-tabular text-label-sm font-bold" title="Nov 6: Present">6</div>
+<div class="h-9 rounded-lg bg-surface-container-lowest flex items-center justify-center font-data-tabular text-label-sm text-on-surface-variant">7</div>
+<div class="h-9 rounded-lg bg-error-container text-on-error-container flex items-center justify-center font-data-tabular text-label-sm font-bold" title="Nov 8: Absent">8</div>
+<div class="h-9 rounded-lg bg-surface-container-lowest flex items-center justify-center font-data-tabular text-label-sm text-on-surface-variant/30">9</div>
+<div class="h-9 rounded-lg bg-surface-container-lowest flex items-center justify-center font-data-tabular text-label-sm text-on-surface-variant/30">10</div>
+<div class="h-9 rounded-lg bg-surface-container-highest text-secondary flex items-center justify-center font-data-tabular text-label-sm font-bold" title="Nov 11: Present">11</div>
+<div class="h-9 rounded-lg bg-surface-container-lowest flex items-center justify-center font-data-tabular text-label-sm text-on-surface-variant">12</div>
+<div class="h-9 rounded-lg bg-surface-container-highest text-secondary flex items-center justify-center font-data-tabular text-label-sm font-bold" title="Nov 13: Present">13</div>
+<div class="h-9 rounded-lg bg-surface-container text-on-surface flex items-center justify-center font-data-tabular text-label-sm font-bold" title="Nov 14: Medical Exemption Approved">14</div>
+<div class="h-9 rounded-lg bg-error-container text-on-error-container flex items-center justify-center font-data-tabular text-label-sm font-bold" title="Nov 15: Absent">15</div>
+<div class="h-9 rounded-lg bg-surface-container-lowest flex items-center justify-center font-data-tabular text-label-sm text-on-surface-variant/30">16</div>
+<div class="h-9 rounded-lg bg-surface-container-lowest flex items-center justify-center font-data-tabular text-label-sm text-on-surface-variant/30">17</div>
+</div>
+</div>
+<!-- Medical Exemption Ledger & Pending Docket -->
+<div class="p-space-md bg-surface-container-low rounded-2xl flex flex-col gap-3">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-on-surface">medical_services</span>
+<h4 class="font-title-sm text-title-sm text-on-surface font-bold">Medical Leave Exemption Ticket</h4>
+</div>
+<span class="px-2 py-0.5 rounded-full font-label-sm text-label-sm bg-surface-container-high text-on-surface font-semibold">Under Review</span>
+</div>
+<div class="bg-surface-container-lowest p-3 rounded-xl flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-lg bg-surface-container flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[20px]">description</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-bold">Medical_Certificate_Nov14.pdf</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">2.4 MB • St. Jude Hospital ER Slip</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-label-sm text-label-sm text-secondary font-semibold">HoD Signature Pending</span>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Once approved by Dean of Academics, this session will shift to "Excused", raising your ratio to <strong class="text-on-surface font-semibold">77.2%</strong> automatically.</p>
+</div>
+</div>
+<!-- Drawer Footer Action -->
+<div class="p-space-md bg-surface-container-low flex items-center justify-between gap-3">
+<button class="px-4 py-2 bg-surface-container-lowest hover:bg-surface-container text-on-surface font-title-sm text-title-sm rounded-xl transition-colors" onclick="closeSubjectDeepDive()" type="button">
+          Close Window
+        </button>
+<button class="px-4 py-2 bg-secondary hover:bg-secondary-container text-on-secondary font-title-sm text-title-sm rounded-xl shadow-sm transition-colors flex items-center gap-1.5" onclick="alert('Notification dispatched to Course Coordinator Dr. Claire Belmont.'); closeSubjectDeepDive();" type="button">
+<span class="material-symbols-outlined text-[18px]">outgoing_mail</span>
+<span>Contact Dr. Belmont</span>
+</button>
+</div>
+</div>
+<!-- Quick Attendance Record Modal Dialog -->
+<div class="fixed inset-0 bg-primary/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4" id="recordModal">
+<div class="bg-surface-container-lowest w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+<div class="p-space-lg flex items-center justify-between bg-surface-container-lowest">
+<div class="flex items-center gap-2">
+<span class="w-8 h-8 rounded-lg bg-surface-container-highest text-secondary flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">edit_calendar</span>
+</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">Record Daily Ledger</h3>
+</div>
+<button class="w-8 h-8 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface-variant flex items-center justify-center" onclick="closeRecordModal()" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<div class="p-space-lg flex flex-col gap-space-md bg-surface-container-lowest">
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-on-surface font-semibold">Subject / Lecture Slot</label>
+<select class="h-10 px-3 bg-surface-container-low rounded-xl font-body-md text-body-md text-on-surface focus:outline-none focus:bg-surface-container-lowest" id="modalSubjectSelect">
+<option value="CS301">CS301 - Database Systems (09:00 AM)</option>
+<option value="MATH240">MATH240 - Linear Algebra (11:15 AM)</option>
+<option value="CS340">CS340 - Operating Systems (02:00 PM)</option>
+<option value="CS341">CS341 - Distributed Systems Lab (03:30 PM)</option>
+<option selected="" value="HUM110">HUM110 - Academic Writing (04:45 PM)</option>
+</select>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-on-surface font-semibold">Status Assessment</label>
+<div class="grid grid-cols-3 gap-2">
+<label class="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-surface-container-low hover:bg-surface-container cursor-pointer text-center has-[:checked]:bg-surface-container-highest has-[:checked]:text-secondary">
+<input checked="" class="hidden" name="modalStatus" type="radio" value="present"/>
+<span class="material-symbols-outlined text-[22px]">check_circle</span>
+<span class="font-label-md text-label-md font-semibold">Present</span>
+</label>
+<label class="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-surface-container-low hover:bg-surface-container cursor-pointer text-center has-[:checked]:bg-error-container has-[:checked]:text-on-error-container">
+<input class="hidden" name="modalStatus" type="radio" value="absent"/>
+<span class="material-symbols-outlined text-[22px]">cancel</span>
+<span class="font-label-md text-label-md font-semibold">Absent</span>
+</label>
+<label class="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-surface-container-low hover:bg-surface-container cursor-pointer text-center has-[:checked]:bg-surface-container-high has-[:checked]:text-on-surface">
+<input class="hidden" name="modalStatus" type="radio" value="excused"/>
+<span class="material-symbols-outlined text-[22px]">medical_information</span>
+<span class="font-label-md text-label-md font-semibold">Excused</span>
+</label>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-on-surface font-semibold">Session Notes (Optional)</label>
+<input class="h-10 px-3 bg-surface-container-low rounded-xl font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none" placeholder="e.g., Guest lecture on distributed consensus" type="text"/>
+</div>
+</div>
+<div class="p-space-md bg-surface-container-low flex items-center justify-end gap-2">
+<button class="px-4 py-2 bg-surface-container-lowest text-on-surface font-title-sm text-title-sm rounded-xl" onclick="closeRecordModal()" type="button">Cancel</button>
+<button class="px-5 py-2 bg-primary text-on-primary font-title-sm text-title-sm rounded-xl shadow-sm" onclick="commitModalRecord()" type="button">Save to Ledger</button>
+</div>
+</div>
+</div>
+<!-- Notification Toast Container -->
+<div class="fixed bottom-6 right-6 bg-primary text-on-primary px-4 py-3 rounded-xl shadow-xl flex items-center gap-2 transform translate-y-24 opacity-0 transition-all duration-300 z-50" id="toastNotification">
+<span class="material-symbols-outlined text-[20px] text-secondary-fixed">task_alt</span>
+<span class="font-body-sm text-body-sm" id="toastMessage">Ledger updated successfully.</span>
+</div>
+</div>
+</div>
+<script>
+  // Academic Attendance Data Store
+  const attendanceState = {
+    globalTarget: 75,
+    subjects: {
+      CS301: { name: "CS301 Database Systems", conducted: 36, attended: 33, missed: 3, targetRequiredPct: 75 },
+      MATH240: { name: "MATH240 Linear Algebra", conducted: 32, attended: 28, missed: 4, targetRequiredPct: 75 },
+      CS340: { name: "CS340 Operating Systems", conducted: 38, attended: 34, missed: 4, targetRequiredPct: 75 },
+      CS341: { name: "CS341 Distributed Systems Lab", conducted: 14, attended: 11, missed: 3, targetRequiredPct: 75 },
+      ENGR200: { name: "ENGR200 Engineering Ethics", conducted: 24, attended: 22, missed: 2, targetRequiredPct: 75 },
+      HUM110: { name: "HUM110 Academic Writing", conducted: 23, attended: 17, missed: 6, targetRequiredPct: 75 },
+    }
+  };
+
+  function setGlobalTarget(targetVal) {
+    attendanceState.globalTarget = targetVal;
+    [75, 80, 85].forEach(val => {
+      const btn = document.getElementById(`target-${val}`);
+      if (val === targetVal) {
+        btn.className = "px-2.5 py-1 rounded-md font-label-md text-label-md font-semibold bg-surface-container-lowest text-secondary shadow-sm transition-all";
+      } else {
+        btn.className = "px-2.5 py-1 rounded-md font-label-md text-label-md font-medium text-on-surface-variant hover:text-on-surface transition-all";
+      }
+    });
+    recalculateAllForecasting();
+    showToast(`Global Target shifted to ${targetVal}%. Projections refreshed.`);
+  }
+
+  function calculateForecast(attended, conducted, targetPct) {
+    const target = targetPct / 100;
+    const currentPct = (attended / conducted) * 100;
+
+    if (currentPct >= targetPct) {
+      // Safe to miss X classes: attended / (conducted + X) >= target
+      // X <= (attended / target) - conducted
+      const safeMisses = Math.floor((attended / target) - conducted);
+      return {
+        safe: true,
+        skips: Math.max(0, safeMisses),
+        needed: 0,
+        text: `Safe to miss ${Math.max(0, safeMisses)} more class${safeMisses === 1 ? '' : 'es'}`
+      };
+    } else {
+      // Must attend next Y consecutive classes: (attended + Y) / (conducted + Y) >= target
+      // attended + Y >= target*conducted + target*Y
+      // Y*(1 - target) >= target*conducted - attended
+      // Y = ceil( (target*conducted - attended) / (1 - target) )
+      const needed = Math.ceil((target * conducted - attended) / (1 - target));
+      return {
+        safe: false,
+        skips: 0,
+        needed: Math.max(1, needed),
+        text: `Attend next ${Math.max(1, needed)} consecutive class${needed === 1 ? '' : 'es'}`
+      };
+    }
+  }
+
+  function recalculateAllForecasting() {
+    let grandConducted = 0;
+    let grandAttended = 0;
+    let grandSafeSkips = 0;
+
+    for (const [code, item] of Object.entries(attendanceState.subjects)) {
+      grandConducted += item.conducted;
+      grandAttended += item.attended;
+
+      const pct = ((item.attended / item.conducted) * 100).toFixed(1);
+      const forecast = calculateForecast(item.attended, item.conducted, attendanceState.globalTarget);
+
+      // Update Table Cells if exist
+      const pctEl = document.getElementById(`pct-${code}`);
+      const condEl = document.getElementById(`cond-${code}`);
+      const presEl = document.getElementById(`pres-${code}`);
+      const absEl = document.getElementById(`abs-${code}`);
+      const forecastEl = document.getElementById(`forecast-${code}`);
+
+      if (condEl) condEl.innerText = item.conducted;
+      if (presEl) presEl.innerText = item.attended;
+      if (absEl) absEl.innerText = item.missed;
+      if (pctEl) {
+        pctEl.innerText = `${pct}%`;
+        if (parseFloat(pct) >= 80) {
+          pctEl.className = "inline-flex items-center px-3 py-1 rounded-full font-data-tabular text-title-sm font-bold bg-surface-container-highest text-secondary";
+        } else if (parseFloat(pct) >= 75) {
+          pctEl.className = "inline-flex items-center px-3 py-1 rounded-full font-data-tabular text-title-sm font-bold bg-surface-container text-on-surface";
+        } else {
+          pctEl.className = "inline-flex items-center px-3 py-1 rounded-full font-data-tabular text-title-sm font-bold bg-error-container text-on-error-container";
+        }
+      }
+
+      if (forecastEl) {
+        forecastEl.innerText = forecast.text;
+      }
+
+      if (forecast.safe) {
+        grandSafeSkips += forecast.skips;
+      }
+    }
+
+    const overallPct = ((grandAttended / grandConducted) * 100).toFixed(1);
+    const totalPercentageDisplay = document.getElementById("totalPercentageDisplay");
+    const safeSkipsTotal = document.getElementById("safeSkipsTotal");
+
+    if (totalPercentageDisplay) totalPercentageDisplay.innerText = `${overallPct}%`;
+    if (safeSkipsTotal) safeSkipsTotal.innerText = grandSafeSkips;
+  }
+
+  function quickLog(subjectCode, type) {
+    const s = attendanceState.subjects[subjectCode];
+    if (!s) return;
+
+    if (type === 'present') {
+      s.conducted += 1;
+      s.attended += 1;
+      showToast(`+1 Present recorded for ${subjectCode}. Attendance refreshed.`);
+    } else if (type === 'absent') {
+      s.conducted += 1;
+      s.missed += 1;
+      showToast(`+1 Absence marked for ${subjectCode}. Safe margins adjusted.`);
+    }
+    recalculateAllForecasting();
+  }
+
+  function openRecordModal() {
+    document.getElementById("recordModal").classList.remove("hidden");
+  }
+
+  function closeRecordModal() {
+    document.getElementById("recordModal").classList.add("hidden");
+  }
+
+  function commitModalRecord() {
+    const sub = document.getElementById("modalSubjectSelect").value;
+    const statusRadio = document.querySelector('input[name="modalStatus"]:checked');
+    const val = statusRadio ? statusRadio.value : 'present';
+
+    if (val === 'present') {
+      quickLog(sub, 'present');
+    } else if (val === 'absent') {
+      quickLog(sub, 'absent');
+    } else {
+      showToast(`Medical/Excused leave entry registered for ${sub}. Pending verification.`);
+    }
+    closeRecordModal();
+  }
+
+  function openSubjectDeepDive(code) {
+    const drawer = document.getElementById("deepDiveDrawer");
+    const backdrop = document.getElementById("deepDiveBackdrop");
+    const s = attendanceState.subjects[code];
+
+    if (s) {
+      document.getElementById("drawerSubjectCode").innerText = code;
+      document.getElementById("drawerSubjectTitle").innerText = s.name;
+      const pct = ((s.attended / s.conducted) * 100).toFixed(1);
+      document.getElementById("drawerPct").innerText = `${pct}%`;
+      updateSimulation(3);
+    }
+
+    backdrop.classList.remove("hidden");
+    setTimeout(() => {
+      drawer.classList.remove("translate-x-full");
+    }, 10);
+  }
+
+  function closeSubjectDeepDive() {
+    const drawer = document.getElementById("deepDiveDrawer");
+    const backdrop = document.getElementById("deepDiveBackdrop");
+    drawer.classList.add("translate-x-full");
+    setTimeout(() => {
+      backdrop.classList.add("hidden");
+    }, 300);
+  }
+
+  function updateSimulation(val) {
+    const extra = parseInt(val, 10);
+    document.getElementById("futureClassesLabel").innerText = `+${extra} Classes`;
+
+    // HUM110 current baseline: 17 attended, 23 conducted
+    const baseAttended = 17;
+    const baseConducted = 23;
+    const newAttended = baseAttended + extra;
+    const newConducted = baseConducted + extra;
+    const projected = ((newAttended / newConducted) * 100).toFixed(1);
+
+    document.getElementById("simResultPct").innerText = `${projected}%`;
+    document.getElementById("simRatio").innerText = `${newAttended} attended / ${newConducted} total`;
+
+    const badge = document.getElementById("simResultBadge");
+    if (projected >= 75) {
+      badge.innerText = "Exam Eligible (>=75%)";
+      badge.className = "font-label-md text-label-md px-2 py-0.5 rounded-full bg-surface-container-highest text-secondary font-semibold";
+    } else {
+      const shortage = (75 - projected).toFixed(1);
+      badge.innerText = `Shortage (${shortage}% deficit)`;
+      badge.className = "font-label-md text-label-md px-2 py-0.5 rounded-full bg-error-container text-on-error-container font-semibold";
+    }
+  }
+
+  function filterSubjects(criteria) {
+    const rows = document.querySelectorAll("#subjectRowsContainer tr");
+    rows.forEach(r => {
+      const status = r.getAttribute("data-status");
+      if (criteria === 'all') {
+        r.style.display = "";
+      } else if (criteria === 'critical' && status !== 'critical') {
+        r.style.display = "none";
+      } else if (criteria === 'safe' && status !== 'safe') {
+        r.style.display = "none";
+      } else {
+        r.style.display = "";
+      }
+    });
+  }
+
+  function triggerExportToast() {
+    showToast("Generating official Attendance Audit Report (PDF)... Download starting.");
+  }
+
+  function showToast(msg) {
+    const toast = document.getElementById("toastNotification");
+    const msgEl = document.getElementById("toastMessage");
+    msgEl.innerText = msg;
+    toast.classList.remove("translate-y-24", "opacity-0");
+    setTimeout(() => {
+      toast.classList.add("translate-y-24", "opacity-0");
+    }, 3200);
+  }
+</script></main></div><nav class="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-surface-container-lowest/95 backdrop-blur-xl shadow-[0_-1px_8px_rgba(0,0,0,0.04)] z-50 px-space-sm flex items-center justify-around" data-active-classes="text-secondary font-semibold"><a class="flex flex-col items-center gap-0.5 text-on-surface-variant hover:text-on-surface py-1" data-path="dashboard" href="#"><span class="material-symbols-outlined text-[22px]">grid_view</span><span class="font-label-sm text-[10px]">Home</span></a><a class="flex flex-col items-center gap-0.5 text-on-surface-variant hover:text-on-surface py-1" data-path="timetable" href="#"><span class="material-symbols-outlined text-[22px]">calendar_today</span><span class="font-label-sm text-[10px]">Timetable</span></a><a class="flex flex-col items-center gap-0.5 text-on-surface-variant hover:text-on-surface py-1" data-path="tasks" href="#"><span class="material-symbols-outlined text-[22px]">assignment_turned_in</span><span class="font-label-sm text-[10px]">Tasks</span></a><a class="flex flex-col items-center gap-0.5 text-on-surface-variant hover:text-on-surface py-1" data-path="data-vault" href="#"><span class="material-symbols-outlined text-[22px]">folder_shared</span><span class="font-label-sm text-[10px]">Vault</span></a><a class="flex flex-col items-center gap-0.5 text-on-surface-variant hover:text-on-surface py-1" data-path="settings" href="#"><span class="material-symbols-outlined text-[22px]">person</span><span class="font-label-sm text-[10px]">Profile</span></a></nav></body></html>

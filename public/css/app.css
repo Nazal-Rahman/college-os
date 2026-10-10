@@ -1,0 +1,66 @@
+/* College OS — High-Contrast Dark & White Mode Styling */
+
+:root {
+  --bg-main: #F4F6FB;
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #F8FAFC;
+  --bg-subtle: #EDF2F7;
+  --text-main: #0F172A;
+  --text-muted: #475467;
+  --border-color: #E2E8F0;
+  --color-primary: #101828;
+  --color-accent: #1D4ED8;
+  --color-emerald: #059669;
+  --color-amber: #D97706;
+  --color-red: #DC2626;
+  --color-purple: #7C3AED;
+}
+
+html.dark {
+  --bg-main: #0B0F17;
+  --bg-card: #131A29;
+  --bg-card-hover: #1A2336;
+  --bg-subtle: #1E283D;
+  --text-main: #F8FAFC;
+  --text-muted: #94A3B8;
+  --border-color: #243048;
+  --color-primary: #3B82F6;
+  --color-accent: #60A5FA;
+  --color-emerald: #10B981;
+  --color-amber: #FBBF24;
+  --color-red: #F87171;
+  --color-purple: #A78BFA;
+}
+
+body {
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.theme-card {
+  background-color: var(--bg-card);
+  border-color: var(--border-color);
+  color: var(--text-main);
+}
+
+.theme-subtle {
+  background-color: var(--bg-subtle);
+}
+
+.theme-border {
+  border-color: var(--border-color);
+}
+
+.theme-text-muted {
+  color: var(--text-muted);
+}
+
+/* Fullscreen Focus Room */
+#fullscreen-study-room:fullscreen {
+  background-color: #0B0F17;
+}
+
+#fullscreen-study-room:-webkit-full-screen {
+  background-color: #0B0F17;
+}

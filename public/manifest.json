@@ -1,0 +1,42 @@
+{
+  "name": "College OS — Student Academic Workspace",
+  "short_name": "College OS",
+  "description": "Student-owned personal academic workspace for timetables, attendance, homework, study timers, and document vault.",
+  "start_url": "/app",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#F5F7FC",
+  "theme_color": "#101828",
+  "categories": ["education", "productivity"],
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Today's Timetable",
+      "url": "/app#timetable",
+      "icons": [{ "src": "/icons/icon.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "Attendance Dials",
+      "url": "/app#attendance",
+      "icons": [{ "src": "/icons/icon.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "Focus Timer",
+      "url": "/app#study-timer",
+      "icons": [{ "src": "/icons/icon.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "Document Vault",
+      "url": "/app#vault",
+      "icons": [{ "src": "/icons/icon.svg", "sizes": "192x192" }]
+    }
+  ]
+}
