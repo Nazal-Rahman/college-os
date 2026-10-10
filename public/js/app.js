@@ -1579,27 +1579,23 @@ async function handleCreateSlot(e) {
   const customSubjectName = subjectId === 'CUSTOM' ? document.getElementById('slot-input-custom-name').value : null;
   const customSubjectCode = subjectId === 'CUSTOM' ? document.getElementById('slot-input-custom-code').value : null;
 
-  const startPeriod = Number(document.getElementById('slot-input-period').value) || 1;
-  const hours = Number(document.getElementById('slot-input-hours').value) || 1;
+  const periodNum = Number(document.getElementById('slot-input-period').value) || 1;
+  const startTime = document.getElementById('slot-input-start-time').value || '08:30';
+  const endTime = document.getElementById('slot-input-end-time').value || '09:30';
   const room = document.getElementById('slot-input-room').value || 'Lecture Hall';
   const faculty = document.getElementById('slot-input-faculty').value || 'Instructor';
 
-  for (let i = 0; i < hours; i++) {
-    const periodNum = startPeriod + i;
-    const startHour = 8 + periodNum;
-    const endHour = startHour + 1;
-    await API.createTimetableSlot({
-      subjectId,
-      customSubjectName,
-      customSubjectCode,
-      day,
-      periodNumber: periodNum,
-      startTime: `${String(startHour).padStart(2, '0')}:00`,
-      endTime: `${String(endHour).padStart(2, '0')}:00`,
-      classroom: room,
-      faculty
-    });
-  }
+  await API.createTimetableSlot({
+    subjectId,
+    customSubjectName,
+    customSubjectCode,
+    day,
+    periodNumber: periodNum,
+    startTime,
+    endTime,
+    classroom: room,
+    faculty
+  });
 
   closeModal('modal-add-slot');
   await refreshAllData();

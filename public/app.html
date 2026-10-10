@@ -538,9 +538,10 @@
           <!-- Study Timer Widget -->
           <div class="theme-card p-6 sm:p-8 rounded-3xl border theme-border shadow-xs max-w-xl mx-auto text-center">
             <div class="flex items-center justify-between mb-4">
-              <div class="flex gap-2">
+              <div class="flex items-center gap-2">
                 <button onclick="setTimerDuration(25, this)" class="timer-mode-btn px-3.5 py-1 rounded-full text-xs font-bold bg-blue-600 text-white">25m Pomodoro</button>
-                <button onclick="setTimerDuration(50, this)" class="timer-mode-btn px-3.5 py-1 rounded-full text-xs font-bold theme-subtle text-slate-600 dark:text-slate-300">50m Deep Work</button>
+                <button onclick="setTimerDuration(50, this)" class="timer-mode-btn px-3.5 py-1 rounded-full text-xs font-bold theme-subtle text-slate-600 dark:text-slate-300">50m</button>
+                <input type="number" id="custom-timer-mins" placeholder="Custom mins" class="w-24 h-6 px-2 rounded-full text-[11px] font-bold theme-subtle border theme-border outline-none text-center" onchange="setTimerDuration(this.value, null)">
               </div>
               
               <!-- Fullscreen Study Room Trigger Button -->
@@ -1114,33 +1115,18 @@
             <input type="text" id="slot-input-custom-code" placeholder="e.g. CS 508" class="w-full h-9 px-3 rounded-lg border theme-border theme-card outline-none">
           </div>
         </div>
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-3 gap-3">
           <div>
-            <label class="block font-semibold mb-1">Starting Period (1–13)</label>
-            <select id="slot-input-period" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none font-bold">
-              <option value="1">Period 1 (08:30)</option>
-              <option value="2">Period 2 (09:30)</option>
-              <option value="3">Period 3 (10:45)</option>
-              <option value="4">Period 4 (11:45)</option>
-              <option value="5">Period 5 (13:30)</option>
-              <option value="6">Period 6 (14:30)</option>
-              <option value="7">Period 7 (15:30)</option>
-              <option value="8">Period 8 (16:30)</option>
-              <option value="9">Period 9 (17:30)</option>
-              <option value="10">Period 10 (18:30)</option>
-              <option value="11">Period 11 (19:30)</option>
-              <option value="12">Period 12 (20:30)</option>
-              <option value="13">Period 13 (21:30)</option>
-            </select>
+            <label class="block font-semibold mb-1">Period No.</label>
+            <input type="number" id="slot-input-period" min="1" max="20" value="1" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none" required>
           </div>
           <div>
-            <label class="block font-semibold mb-1">Number of Hours</label>
-            <select id="slot-input-hours" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none font-bold">
-              <option value="1" selected>1 Hour (1 period)</option>
-              <option value="2">2 Hours (2 periods)</option>
-              <option value="3">3 Hours (3 periods)</option>
-              <option value="4">4 Hours (4 periods)</option>
-            </select>
+            <label class="block font-semibold mb-1">Start Time</label>
+            <input type="time" id="slot-input-start-time" value="08:30" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none" required>
+          </div>
+          <div>
+            <label class="block font-semibold mb-1">End Time</label>
+            <input type="time" id="slot-input-end-time" value="09:30" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none" required>
           </div>
         </div>
         <div class="grid grid-cols-2 gap-3">
