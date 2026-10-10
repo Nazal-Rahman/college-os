@@ -1488,7 +1488,7 @@ function populateSubjectSelects() {
   const select5 = document.getElementById('plan-input-subject');
 
   const baseOpts = state.subjects.map(s => `<option value="${s.id}">${s.code}: ${s.name}</option>`).join('');
-  const optsWithCustom = baseOpts + `<option value="CUSTOM">+ Custom Subject...</option>`;
+  const optsWithCustom = `<option value="" disabled selected>Select a subject...</option>` + baseOpts + `<option value="CUSTOM">+ Custom Subject...</option>`;
 
   if (select1) select1.innerHTML = optsWithCustom;
   if (select2) select2.innerHTML = baseOpts;
