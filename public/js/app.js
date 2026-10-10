@@ -1565,11 +1565,15 @@ async function handleCreateTask(e) {
   const customSubject = subjectId === 'CUSTOM' ? document.getElementById('task-input-custom-subject').value : null;
   const dueDate = document.getElementById('task-input-due').value;
 
-  await API.createTask({ title, type, priority, subjectId, customSubject, dueDate });
-  closeModal('modal-add-task');
-  state.tasks = (await API.getTasks()).tasks || [];
-  renderTasks();
-  renderDashboard();
+  try {
+    await API.createTask({ title, type, priority, subjectId, customSubject, dueDate });
+    closeModal('modal-add-task');
+    state.tasks = (await API.getTasks()).tasks || [];
+    renderTasks();
+    renderDashboard();
+  } catch (err) {
+    alert(err.message);
+  }
 }
 
 async function handleCreateSlot(e) {
@@ -1585,23 +1589,27 @@ async function handleCreateSlot(e) {
   const room = document.getElementById('slot-input-room').value || 'Lecture Hall';
   const faculty = document.getElementById('slot-input-faculty').value || 'Instructor';
 
-  await API.createTimetableSlot({
-    subjectId,
-    customSubjectName,
-    customSubjectCode,
-    day,
-    periodNumber: periodNum,
-    startTime,
-    endTime,
-    classroom: room,
-    faculty
-  });
+  try {
+    await API.createTimetableSlot({
+      subjectId,
+      customSubjectName,
+      customSubjectCode,
+      day,
+      periodNumber: periodNum,
+      startTime,
+      endTime,
+      classroom: room,
+      faculty
+    });
 
-  closeModal('modal-add-slot');
-  await refreshAllData();
-  renderDailyAttendanceSheet();
-  renderTimetableMatrix();
-  renderDashboard();
+    closeModal('modal-add-slot');
+    await refreshAllData();
+    renderDailyAttendanceSheet();
+    renderTimetableMatrix();
+    renderDashboard();
+  } catch (err) {
+    alert(err.message);
+  }
 }
 
 async function handleCreateLab(e) {
@@ -1620,11 +1628,15 @@ async function handleCreateLab(e) {
   const deadline = document.getElementById('lab-input-deadline').value;
   const recordStatus = document.getElementById('lab-input-status').value;
 
-  await API.createLab({ title, subjectId, customSubject, type: labType, description, sessionDate, deadline, recordStatus, status: 'In Progress' });
-  closeModal('modal-add-lab');
-  state.labs = (await API.getLabs()).labs || [];
-  renderLabs();
-  renderDashboard();
+  try {
+    await API.createLab({ title, subjectId, customSubject, type: labType, description, sessionDate, deadline, recordStatus, status: 'In Progress' });
+    closeModal('modal-add-lab');
+    state.labs = (await API.getLabs()).labs || [];
+    renderLabs();
+    renderDashboard();
+  } catch (err) {
+    alert(err.message);
+  }
 }
 
 async function handleCreateStudyPlan(e) {

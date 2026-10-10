@@ -373,6 +373,10 @@ app.post('/api/timetable', authenticate, (req, res) => {
     return res.status(400).json({ error: 'Day is required.' });
   }
 
+  if (typeof subjectId === 'string' && subjectId.toLowerCase() === 'custom' && !customSubjectName) {
+    return res.status(400).json({ error: 'Custom subject name is required.' });
+  }
+
   let finalSubjectId = subjectId;
 
   // Handle custom subject creation on the fly
@@ -744,6 +748,10 @@ app.post('/api/tasks', authenticate, (req, res) => {
   const { title, type, customType, subjectId, customSubject, dueDate, priority, description } = req.body;
   if (!title) return res.status(400).json({ error: 'Task title is required.' });
 
+  if (typeof subjectId === 'string' && subjectId.toLowerCase() === 'custom' && !customSubject) {
+    return res.status(400).json({ error: 'Custom subject name is required.' });
+  }
+
   let finalSubId = subjectId;
   if ((!subjectId || (typeof subjectId === 'string' && subjectId.toLowerCase() === 'custom')) && customSubject) {
     const existing = (req.user.subjects || []).find(s => s.name.toLowerCase() === customSubject.toLowerCase());
@@ -843,6 +851,10 @@ app.get('/api/labs', authenticate, (req, res) => {
 app.post('/api/labs', authenticate, (req, res) => {
   const { title, type, customType, subjectId, customSubject, sessionDate, deadline, description, recordStatus } = req.body;
   if (!title) return res.status(400).json({ error: 'Lab title is required.' });
+
+  if (typeof subjectId === 'string' && subjectId.toLowerCase() === 'custom' && !customSubject) {
+    return res.status(400).json({ error: 'Custom subject name is required.' });
+  }
 
   let finalSubId = subjectId;
   if ((!subjectId || (typeof subjectId === 'string' && subjectId.toLowerCase() === 'custom')) && customSubject) {
