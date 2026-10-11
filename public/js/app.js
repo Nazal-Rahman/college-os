@@ -39,18 +39,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   const savedTheme = localStorage.getItem('college_os_theme') || 'dark';
   setThemeMode(savedTheme, false);
 
-  // Check auth or auto-login as demo
+  // Check auth - require logged-in session
   let token = API.getToken();
   if (!token) {
-    try {
-      console.log('Auto-logging in as Demo Student for direct verification...');
-      const demoRes = await API.demoLogin();
-      token = demoRes.token;
-    } catch (e) {
-      console.error('Demo auto-login failed:', e);
-      window.location.href = '/';
-      return;
-    }
+    window.location.href = '/';
+    return;
   }
 
   try {
@@ -58,18 +51,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     state.user = user;
     renderUserProfile(user);
 
+    // Ensure Firebase is initialized
+    if (window.FirebaseSync) {
+      await window.FirebaseSync.init();
+    }
+
     // [Vercel Data Wipe Hydration]
-    // If Vercel wiped the backend store, the user's data will be empty.
-    // Try to load from Firebase Cloud or LocalStorage offline backup.
     let backupData = null;
     if (window.FirebaseSync && window.FirebaseSync.isAvailable()) {
       try {
         backupData = await window.FirebaseSync.loadUserData(user.id);
       } catch (e) { console.warn('Cloud restore check failed:', e); }
     }
-    if (!backupData) {
+    if (!backupData && user.email) {
       try {
-        const localCache = JSON.parse(localStorage.getItem(`college_os_backup_${user.email}`));
+        const lowerEmail = user.email.toLowerCase();
+        const localCache = JSON.parse(
+          localStorage.getItem(`college_os_backup_${lowerEmail}`) ||
+          localStorage.getItem(`college_os_backup_${user.email}`)
+        );
         if (localCache) backupData = localCache;
       } catch(e) {}
     }
@@ -128,6 +128,16 @@ function toggleThemeMode() {
 function renderUserProfile(user) {
   if (!user || !user.profile) return;
   const p = user.profile;
+
+  // Render Student Avatar
+  const defaultAvatar = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(p.name || 'Student')}`;
+  const avatarUrl = p.avatar || defaultAvatar;
+
+  const topAvatar = document.getElementById('top-student-avatar');
+  if (topAvatar) topAvatar.src = avatarUrl;
+
+  const settingsAvatar = document.getElementById('settings-avatar-preview');
+  if (settingsAvatar) settingsAvatar.src = avatarUrl;
 
   const nameEl = document.getElementById('top-student-name');
   if (nameEl) nameEl.textContent = p.name;
@@ -207,29 +217,47 @@ function navigateTo(viewName) {
   if (viewName === 'settings') renderSettings();
 }
 
-function syncCloudAndLocal() {
-  if (state.user) {
-    const exportData = {
-      subjects: state.subjects,
-      timetable: state.timetable,
-      attendanceData: state.attendanceData, // Full attendance state
-      periodAttendance: state.periodAttendanceRecords,
-      tasks: state.tasks,
-      labs: state.labs,
-      studyPlans: state.studyPlans,
-      studySessions: state.studySessions,
-      vaultFolders: state.vaultFolders,
-      vaultFiles: state.vaultFiles,
-      calendarEvents: state.calendarEvents
-    };
-    
-    if (window.FirebaseSync && window.FirebaseSync.isAvailable()) {
-      window.FirebaseSync.syncUserData(state.user.id, exportData);
-    }
-    
-    // Offline Local Storage Backup
-    localStorage.setItem(`college_os_backup_${state.user.email}`, JSON.stringify(exportData));
+function syncCloudAndLocal(force = false) {
+  if (!state.user) return;
+
+  const storageKey = `college_os_backup_${state.user.email.toLowerCase()}`;
+  const existingBackupRaw = localStorage.getItem(storageKey) || localStorage.getItem(`college_os_backup_${state.user.email}`);
+  const isStateEmpty = (!state.subjects || state.subjects.length === 0) &&
+                       (!state.timetable || state.timetable.length === 0) &&
+                       (!state.tasks || state.tasks.length === 0);
+
+  if (isStateEmpty && existingBackupRaw && !force) {
+    try {
+      const existing = JSON.parse(existingBackupRaw);
+      if (existing.subjects && existing.subjects.length > 0) {
+        console.log('[SafeSync] Retaining existing populated offline backup, skipping overwrite with empty state.');
+        return;
+      }
+    } catch(e) {}
   }
+
+  const exportData = {
+    profile: state.user.profile,
+    preferences: state.user.preferences,
+    subjects: state.subjects || [],
+    timetable: state.timetable || [],
+    attendanceData: state.attendanceData || {},
+    periodAttendance: state.periodAttendanceRecords || {},
+    tasks: state.tasks || [],
+    labs: state.labs || [],
+    studyPlans: state.studyPlans || [],
+    studySessions: state.studySessions || [],
+    vaultFolders: state.vaultFolders || [],
+    vaultFiles: state.vaultFiles || [],
+    calendarEvents: state.calendarEvents || []
+  };
+
+  if (window.FirebaseSync) {
+    window.FirebaseSync.syncUserData(state.user.id, exportData);
+  }
+
+  localStorage.setItem(storageKey, JSON.stringify(exportData));
+  updateCloudSyncStatusBadge();
 }
 
 async function refreshAllData() {
@@ -1778,11 +1806,197 @@ async function handleProfileUpdate(e) {
   const major = document.getElementById('settings-input-major').value;
   const studentId = document.getElementById('settings-input-id').value;
 
-  const res = await API.updateProfile({ name, college, semester, major, studentId });
+  const res = await API.updateProfile({
+    name,
+    college,
+    semester,
+    major,
+    studentId,
+    avatar: state.user?.profile?.avatar
+  });
   state.user = res.user;
   renderUserProfile(res.user);
+  syncCloudAndLocal(true);
   alert('Profile changes saved successfully!');
 }
 
 
 
+
+// -------------------------------------------------------------
+// PROFILE PICTURE & DATA MANAGEMENT HELPERS
+// -------------------------------------------------------------
+
+async function handleAvatarFileSelected(event) {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+
+  if (file.size > 10 * 1024 * 1024) {
+    alert('Image file is too large. Please select an image under 10MB.');
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const dataUrl = e.target.result;
+    const prevEl = document.getElementById('settings-avatar-preview');
+    if (prevEl) prevEl.src = dataUrl;
+    const topEl = document.getElementById('top-student-avatar');
+    if (topEl) topEl.src = dataUrl;
+
+    try {
+      const res = await API.uploadAvatar(file);
+      const newUrl = (res && res.avatarUrl) ? res.avatarUrl : dataUrl;
+      if (!state.user.profile) state.user.profile = {};
+      state.user.profile.avatar = newUrl;
+      renderUserProfile(state.user);
+      syncCloudAndLocal(true);
+      alert('Profile picture uploaded and saved successfully!');
+    } catch(err) {
+      console.warn('Upload fallback to data URL:', err.message);
+      const res = await API.updateProfile({ avatar: dataUrl });
+      state.user = res.user;
+      renderUserProfile(res.user);
+      syncCloudAndLocal(true);
+      alert('Profile picture saved successfully!');
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+async function promptAvatarUrl() {
+  const url = prompt('Enter public image URL for your profile avatar:');
+  if (!url || !url.trim()) return;
+  try {
+    const res = await API.updateProfile({ avatar: url.trim() });
+    state.user = res.user;
+    renderUserProfile(res.user);
+    syncCloudAndLocal(true);
+    alert('Profile picture updated successfully!');
+  } catch(err) {
+    alert('Failed to update avatar: ' + err.message);
+  }
+}
+
+async function resetToInitialAvatar() {
+  if (!state.user) return;
+  const name = state.user.profile?.name || 'Student';
+  const defaultAvatar = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}`;
+  try {
+    const res = await API.updateProfile({ avatar: defaultAvatar });
+    state.user = res.user;
+    renderUserProfile(res.user);
+    syncCloudAndLocal(true);
+    alert('Profile picture reset to initials.');
+  } catch(err) {
+    alert('Failed to reset avatar: ' + err.message);
+  }
+}
+
+function updateCloudSyncStatusBadge() {
+  const badge = document.getElementById('cloud-sync-status-badge');
+  const notice = document.getElementById('firestore-rules-notice');
+  if (!badge) return;
+
+  if (window.FirebaseSync) {
+    const status = window.FirebaseSync.getStatus();
+    if (status.lastSyncStatus && status.lastSyncStatus.success === true) {
+      badge.className = 'px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 shrink-0 flex items-center gap-1.5';
+      badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-500"></span><span>Cloud & Offline Synced</span>';
+      if (notice) notice.classList.add('hidden');
+    } else if (status.lastSyncStatus && status.lastSyncStatus.error) {
+      const err = status.lastSyncStatus.error;
+      badge.className = 'px-3 py-1 rounded-full text-[11px] font-bold bg-blue-500/10 text-blue-500 border border-blue-500/20 shrink-0 flex items-center gap-1.5';
+      badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-blue-500"></span><span>Offline Storage Active</span>';
+      if (notice && err.includes('permission')) {
+        notice.classList.remove('hidden');
+      }
+    } else if (status.available) {
+      badge.className = 'px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 shrink-0 flex items-center gap-1.5';
+      badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-500"></span><span>Cloud Connected</span>';
+    } else {
+      badge.className = 'px-3 py-1 rounded-full text-[11px] font-bold bg-slate-500/10 text-slate-500 border border-slate-500/20 shrink-0 flex items-center gap-1.5';
+      badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-slate-400"></span><span>Offline Only</span>';
+    }
+  }
+}
+
+window.addEventListener('cloud-sync-status', () => {
+  updateCloudSyncStatusBadge();
+});
+
+async function manualSyncToCloud() {
+  if (!state.user) return;
+  syncCloudAndLocal(true);
+  alert('Sync initiated! Data saved to offline storage and cloud.');
+}
+
+async function manualRestoreFromCloud() {
+  if (!state.user) return;
+  try {
+    let backupData = null;
+    if (window.FirebaseSync) {
+      backupData = await window.FirebaseSync.loadUserData(state.user.id);
+    }
+    if (!backupData) {
+      const storageKey = `college_os_backup_${state.user.email.toLowerCase()}`;
+      const localCache = localStorage.getItem(storageKey) || localStorage.getItem(`college_os_backup_${state.user.email}`);
+      if (localCache) backupData = JSON.parse(localCache);
+    }
+    if (backupData) {
+      await API.restoreCloudData(backupData);
+      await refreshAllData();
+      alert('Workspace successfully restored from backup!');
+    } else {
+      alert('No previous backup found.');
+    }
+  } catch(err) {
+    alert('Restore failed: ' + err.message);
+  }
+}
+
+function exportDataBackupJson() {
+  if (!state.user) return;
+  const exportData = {
+    profile: state.user.profile,
+    preferences: state.user.preferences,
+    subjects: state.subjects,
+    timetable: state.timetable,
+    attendanceData: state.attendanceData,
+    periodAttendance: state.periodAttendanceRecords,
+    tasks: state.tasks,
+    labs: state.labs,
+    studyPlans: state.studyPlans,
+    studySessions: state.studySessions,
+    vaultFolders: state.vaultFolders,
+    vaultFiles: state.vaultFiles,
+    calendarEvents: state.calendarEvents,
+    exportedAt: new Date().toISOString()
+  };
+  const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `college_os_backup_${state.user.email.split('@')[0]}_${new Date().toISOString().slice(0, 10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+async function importDataBackupJson(event) {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+  try {
+    const text = await file.text();
+    const data = JSON.parse(text);
+    if (!data.subjects && !data.timetable && !data.profile) {
+      throw new Error('Invalid backup file format.');
+    }
+    await API.restoreCloudData(data);
+    await refreshAllData();
+    syncCloudAndLocal(true);
+    alert('Workspace backup successfully imported and restored!');
+  } catch(err) {
+    alert('Failed to import backup: ' + err.message);
+  }
+  event.target.value = '';
+}

@@ -203,6 +203,27 @@ app.get('/api/auth/me', authenticate, (req, res) => {
   res.json({ user: sanitizeUser(req.user) });
 });
 
+app.post('/api/auth/profile/avatar', authenticate, upload.single('avatar'), async (req, res) => {
+  try {
+    let avatarUrl = '';
+    if (req.file) {
+      const uploadInfo = await uploadToCloudinaryOrLocal(req.file.path);
+      avatarUrl = uploadInfo.url;
+    } else if (req.body.avatarUrl) {
+      avatarUrl = req.body.avatarUrl;
+    } else {
+      return res.status(400).json({ error: 'No image file or URL provided.' });
+    }
+    const updated = store.updateUserData(req.user.id, (user) => {
+      user.profile = user.profile || {};
+      user.profile.avatar = avatarUrl;
+    });
+    res.json({ user: sanitizeUser(updated), avatarUrl });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.put('/api/auth/profile', authenticate, (req, res) => {
   try {
     const updated = store.updateUserData(req.user.id, (user) => {
@@ -237,11 +258,33 @@ app.post('/api/auth/factory-reset', authenticate, (req, res) => {
   }
 });
 
+// Sync Backup Endpoint (returns full user data snapshot)
+app.get('/api/sync/backup', authenticate, (req, res) => {
+  const u = req.user;
+  res.json({
+    profile: u.profile,
+    preferences: u.preferences,
+    subjects: u.subjects || [],
+    timetable: u.timetable || [],
+    attendanceData: { history: u.attendanceHistory || [] },
+    periodAttendance: u.periodAttendance || {},
+    tasks: u.tasks || [],
+    labs: u.labs || [],
+    studyPlans: u.studyPlans || [],
+    studySessions: u.studySessions || [],
+    vaultFiles: u.vaultFiles || [],
+    vaultFolders: u.vaultFolders || [],
+    calendarEvents: u.calendarEvents || []
+  });
+});
+
 // Sync Restore Endpoint (fixes Vercel stateless wipes)
 app.post('/api/sync/restore', authenticate, (req, res) => {
   try {
     store.updateUserData(req.user.id, (u) => {
       const data = req.body;
+      if (data.profile) u.profile = data.profile;
+      if (data.preferences) u.preferences = data.preferences;
       if (data.subjects) u.subjects = data.subjects;
       if (data.timetable) u.timetable = data.timetable;
       if (data.attendanceData && data.attendanceData.history) u.attendanceHistory = data.attendanceData.history;
@@ -252,6 +295,7 @@ app.post('/api/sync/restore', authenticate, (req, res) => {
       if (data.studySessions) u.studySessions = data.studySessions;
       if (data.vaultFiles) u.vaultFiles = data.vaultFiles;
       if (data.vaultFolders) u.vaultFolders = data.vaultFolders;
+      if (data.calendarEvents) u.calendarEvents = data.calendarEvents;
     });
     res.json({ success: true });
   } catch (err) {
@@ -1524,3 +1568,4 @@ app.listen(PORT, () => {
   console.log(`🎨 Stitch Gallery:      http://localhost:${PORT}/gallery`);
   console.log(`====================================================`);
 });
+

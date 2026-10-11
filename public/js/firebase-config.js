@@ -4,51 +4,111 @@ let firebaseConfig = null;
 let firebaseApp = null;
 let firebaseAuth = null;
 let firestoreDb = null;
+let _initPromise = null;
 
-// Initialize Firebase SDK dynamically
 async function initializeFirebase() {
-  try {
-    const res = await fetch('/api/config/firebase');
-    const config = await res.json();
-    if (!config.apiKey) {
-      console.error('[Firebase] Config missing! Did you add the FIREBASE_ variables to your Vercel Environment Variables?');
-      return;
+  if (_initPromise) return _initPromise;
+  
+  _initPromise = (async () => {
+    try {
+      const res = await fetch('/api/config/firebase');
+      const config = await res.json();
+      if (!config || !config.apiKey) {
+        console.warn('[Firebase] Config not found on server.');
+        return false;
+      }
+      if (typeof firebase !== 'undefined') {
+        firebaseConfig = config;
+        if (!firebase.apps.length) {
+          firebaseApp = firebase.initializeApp(firebaseConfig);
+        } else {
+          firebaseApp = firebase.app();
+        }
+        firebaseAuth = firebase.auth();
+        firestoreDb = firebase.firestore();
+        console.log('[Firebase] Initialized with project:', firebaseConfig.projectId);
+        window.firebaseConfig = firebaseConfig;
+        return true;
+      }
+    } catch (e) {
+      console.warn('[Firebase] Initialization notice:', e.message);
     }
-    if (typeof firebase !== 'undefined') {
-      firebaseConfig = config;
-      firebaseApp = firebase.initializeApp(firebaseConfig);
-      firebaseAuth = firebase.auth();
-      firestoreDb = firebase.firestore();
-      console.log('[Firebase] Initialized successfully with project:', firebaseConfig.projectId);
-      window.firebaseConfig = firebaseConfig;
-    }
-  } catch (e) {
-    console.warn('[Firebase] Initialization notice:', e.message);
-  }
+    return false;
+  })();
+
+  return _initPromise;
 }
 
-// Call init immediately
+// Start initialization immediately
 initializeFirebase();
 
 const FirebaseSync = {
+  lastSyncStatus: {
+    success: null,
+    timestamp: null,
+    error: null
+  },
+
+  async init() {
+    return initializeFirebase();
+  },
+
   isAvailable() {
     return !!(firebaseAuth && firestoreDb);
   },
 
-  async syncUserData(userId, data) {
-    if (!this.isAvailable() || !userId) return;
+  getStatus() {
+    return {
+      available: this.isAvailable(),
+      projectId: firebaseConfig ? firebaseConfig.projectId : null,
+      ...this.lastSyncStatus
+    };
+  },
+
+  // Strip all undefined properties to prevent Firestore "Function set() called with invalid data" errors
+  cleanPayload(obj) {
     try {
-      await firestoreDb.collection('students').doc(userId).set({
-        ...data,
-        lastSyncedAt: firebase.firestore.FieldValue.serverTimestamp()
-      }, { merge: true });
-      console.log('[Firebase Firestore] User data synced to cloud.');
+      return JSON.parse(JSON.stringify(obj, (key, value) => {
+        if (value === undefined) return null;
+        return value;
+      }));
+    } catch(e) {
+      return obj;
+    }
+  },
+
+  async syncUserData(userId, data) {
+    await this.init();
+    if (!this.isAvailable() || !userId) return false;
+    
+    try {
+      const cleanData = this.cleanPayload(data);
+      cleanData.lastSyncedAt = firebase.firestore.FieldValue.serverTimestamp();
+
+      await firestoreDb.collection('students').doc(userId).set(cleanData, { merge: true });
+      
+      this.lastSyncStatus = {
+        success: true,
+        timestamp: new Date(),
+        error: null
+      };
+      console.log('[Firebase Firestore] User data synced to cloud successfully.');
+      window.dispatchEvent(new CustomEvent('cloud-sync-status', { detail: this.lastSyncStatus }));
+      return true;
     } catch (err) {
-      console.warn('[Firebase Firestore] Sync warning:', err.message);
+      this.lastSyncStatus = {
+        success: false,
+        timestamp: new Date(),
+        error: err.message
+      };
+      console.warn('[Firebase Firestore] Sync notice:', err.message);
+      window.dispatchEvent(new CustomEvent('cloud-sync-status', { detail: this.lastSyncStatus }));
+      return false;
     }
   },
 
   async loadUserData(userId) {
+    await this.init();
     if (!this.isAvailable() || !userId) return null;
     try {
       const doc = await firestoreDb.collection('students').doc(userId).get();
@@ -58,14 +118,16 @@ const FirebaseSync = {
       }
       return null;
     } catch (err) {
-      console.warn('[Firebase Firestore] Load warning:', err.message);
+      console.warn('[Firebase Firestore] Load notice:', err.message);
       return null;
     }
   },
 
   async loginWithGoogle() {
-    if (!this.isAvailable()) throw new Error('Firebase Auth not available');
+    await this.init();
+    if (!this.isAvailable()) throw new Error('Firebase Auth not available. Please check network connection.');
     const provider = new firebase.auth.GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
     const result = await firebaseAuth.signInWithPopup(provider);
     return result.user;
   }

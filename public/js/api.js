@@ -21,7 +21,7 @@ const API = {
   },
   logout() {
     this.setToken(null);
-    const user = this.getUser(); if(user && user.email) localStorage.removeItem('college_os_backup_' + user.email); this.setUser(null);
+    this.setUser(null);
     window.location.href = '/';
   },
 
@@ -41,7 +41,7 @@ const API = {
         // Token expired or invalid
         if (window.location.pathname.startsWith('/app')) {
           this.setToken(null);
-          const user = this.getUser(); if(user && user.email) localStorage.removeItem('college_os_backup_' + user.email); this.setUser(null);
+          this.setUser(null);
           window.location.href = '/';
         }
         throw new Error('Unauthorized');
@@ -125,6 +125,22 @@ const API = {
       method: 'PUT',
       body: JSON.stringify(profile)
     });
+  },
+
+  async uploadAvatar(fileOrUrl) {
+    if (typeof fileOrUrl === 'string') {
+      return this.updateProfile({ avatar: fileOrUrl });
+    }
+    const formData = new FormData();
+    formData.append('avatar', fileOrUrl);
+    return this.request('/api/auth/profile/avatar', {
+      method: 'POST',
+      body: formData
+    });
+  },
+
+  async getBackupData() {
+    return this.request('/api/sync/backup');
   },
 
   async firebaseLogin(firebaseUser) {

@@ -736,15 +736,26 @@
       const errBox = document.getElementById('auth-error');
       errBox.classList.add('hidden');
       try {
+        if (window.FirebaseSync) {
+          await window.FirebaseSync.init();
+        }
         if (!window.FirebaseSync || !window.FirebaseSync.isAvailable()) {
-          throw new Error('Firebase Auth is initializing or network restricted. Try 1-Click Launch.');
+          throw new Error('Firebase Authentication is initializing. Please wait a moment and try again.');
         }
         const user = await window.FirebaseSync.loginWithGoogle();
         await API.firebaseLogin(user);
         window.location.href = '/app';
       } catch (err) {
         console.warn('Google sign-in notice:', err);
-        errBox.textContent = err.message || 'Google Sign-in failed. Please try again.';
+        let msg = err.message || 'Google Sign-in failed. Please try again.';
+        if (err.code === 'auth/unauthorized-domain') {
+          msg = 'Domain not authorized in Firebase! Go to Firebase Console -> Authentication -> Settings -> Authorized Domains and add: ' + window.location.hostname;
+        } else if (err.code === 'auth/popup-blocked') {
+          msg = 'Google Sign-in popup was blocked by your browser. Please allow popups for this site.';
+        } else if (err.code === 'auth/popup-closed-by-user') {
+          msg = 'Google Sign-in was closed before completion. Please try again.';
+        }
+        errBox.textContent = msg;
         errBox.classList.remove('hidden');
       }
     }
@@ -789,15 +800,6 @@
       } catch (err) {
         errBox.textContent = err.message || 'Authentication failed. Please check credentials.';
         errBox.classList.remove('hidden');
-      }
-    }
-
-    async function quickDemoLogin() {
-      try {
-        await API.demoLogin();
-        window.location.href = '/app';
-      } catch (e) {
-        alert('Could not start demo: ' + e.message);
       }
     }
   </script>
