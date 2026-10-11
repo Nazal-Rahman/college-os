@@ -168,6 +168,7 @@ const API = {
   // Subjects
   getSubjects() { return this.request('/api/subjects'); },
   createSubject(data) { return this.request('/api/subjects', { method: 'POST', body: JSON.stringify(data) }); },
+  updateSubject(id, data) { return this.request(`/api/subjects/${id}`, { method: 'PUT', body: JSON.stringify(data) }); },
   deleteSubject(id) { return this.request(`/api/subjects/${id}`, { method: 'DELETE' }); },
 
   // Timetable

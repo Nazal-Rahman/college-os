@@ -381,6 +381,35 @@
           </div>
         </div>
 
+        <!-- Total Attendance Executive Header on Timetable & Attendance -->
+        <div id="timetable-overall-attendance-banner" class="theme-card p-6 rounded-3xl border theme-border shadow-xs">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-center">
+            <div class="flex items-center gap-4 sm:col-span-2">
+              <div class="w-14 h-14 rounded-2xl bg-blue-600/10 text-blue-600 flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-3xl">fact_check</span>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-3xl font-black text-blue-600 dark:text-blue-400" id="tt-overall-pct">0.0%</span>
+                  <span id="tt-overall-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">On Track</span>
+                </div>
+                <span class="text-xs text-slate-500 font-inter block mt-0.5" id="tt-overall-ratio">0 of 0 classes attended</span>
+                <span class="text-[11px] text-slate-400 font-inter" id="tt-overall-target">Minimum Goal: 75% Target</span>
+              </div>
+            </div>
+            <div class="p-3.5 rounded-2xl theme-subtle border theme-border text-center">
+              <span class="text-[10px] text-slate-400 uppercase tracking-wider font-bold block">Safe Bunk Status</span>
+              <span class="text-base font-extrabold text-blue-600 dark:text-blue-400 block mt-0.5" id="tt-overall-bunk-status">Safe to skip 0 hrs</span>
+              <span class="text-[10px] text-slate-500 font-inter" id="tt-overall-bunk-sub">above 75% threshold</span>
+            </div>
+            <div class="p-3.5 rounded-2xl theme-subtle border theme-border text-center">
+              <span class="text-[10px] text-slate-400 uppercase tracking-wider font-bold block">Enrolled Subjects</span>
+              <span class="text-base font-extrabold text-purple-600 dark:text-purple-400 block mt-0.5" id="tt-overall-subjects-count">0 Subjects</span>
+              <span class="text-[10px] text-slate-500 font-inter cursor-pointer text-blue-500 hover:underline" onclick="navigateTo('settings'); switchSettingsSubTab('subjects-catalog', document.querySelectorAll('.settings-subtab-btn')[1])">Course Catalog →</span>
+            </div>
+          </div>
+        </div>
+
         <!-- Sub Navigation Tabs for Timetable & Attendance -->
         <div class="flex flex-wrap gap-2 border-b theme-border pb-3 font-inter text-xs font-bold">
           <button onclick="switchTimetableSubTab('daily-sheet', this)" class="tt-subtab-btn px-4 py-2 rounded-xl bg-blue-600 text-white shadow-xs">
@@ -414,7 +443,11 @@
                 <span id="sun-holiday-badge" class="text-[9px] bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-200 px-1 py-0.2 rounded font-mono">Holiday</span>
               </button>
             </div>
-            <div class="flex items-center gap-2 font-inter text-xs">
+            <div class="flex flex-wrap items-center gap-2 font-inter text-xs">
+              <button onclick="openAddSlotForActiveDay()" class="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold transition flex items-center gap-1 shadow-xs active:scale-95">
+                <span class="material-symbols-outlined text-[16px]">add</span>
+                <span id="btn-add-class-day-label">Add Class to Day</span>
+              </button>
               <button onclick="toggleActiveDayHoliday()" id="btn-toggle-day-holiday" class="px-3 py-1.5 rounded-lg theme-subtle border theme-border font-bold hover:opacity-80 transition flex items-center gap-1">
                 <span class="material-symbols-outlined text-[16px]">beach_access</span>
                 <span id="btn-holiday-label">Toggle Holiday</span>
@@ -668,14 +701,18 @@
           <button onclick="switchSettingsSubTab('student-profile', this)" class="settings-subtab-btn px-4 py-2 rounded-xl bg-blue-600 text-white shadow-xs">
             1. Student Profile & Bio
           </button>
+          <button onclick="switchSettingsSubTab('subjects-catalog', this)" class="settings-subtab-btn px-4 py-2 rounded-xl theme-card border theme-border hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-base text-blue-500">menu_book</span>
+            <span>2. Course Subjects Catalog</span>
+          </button>
           <button onclick="switchSettingsSubTab('grade-calculator', this)" class="settings-subtab-btn px-4 py-2 rounded-xl theme-card border theme-border hover:bg-slate-100 dark:hover:bg-slate-800">
-            2. SGPA & CGPA Calculator
+            3. SGPA & CGPA Calculator
           </button>
           <button onclick="switchSettingsSubTab('unified-calendar', this)" class="settings-subtab-btn px-4 py-2 rounded-xl theme-card border theme-border hover:bg-slate-100 dark:hover:bg-slate-800">
-            3. Unified Academic Calendar
+            4. Unified Academic Calendar
           </button>
           <button onclick="switchSettingsSubTab('preferences-reset', this)" class="settings-subtab-btn px-4 py-2 rounded-xl theme-card border theme-border hover:bg-slate-100 dark:hover:bg-slate-800">
-            4. Preferences & Factory Reset
+            5. Preferences, Cloud & Backup
           </button>
         </div>
 
@@ -743,7 +780,31 @@
           </form>
         </div>
 
-        <!-- Subtab 2: SGPA & CGPA Grade Calculator -->
+        <!-- Subtab 2: Enrolled Subjects Catalog (Master Subject List) -->
+        <div id="subtab-subjects-catalog" class="hidden space-y-6">
+          <div class="theme-card p-6 sm:p-8 rounded-3xl border theme-border shadow-xs">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b theme-border">
+              <div>
+                <h2 class="text-base font-bold flex items-center gap-2">
+                  <span class="material-symbols-outlined text-blue-600">menu_book</span>
+                  <span>My Enrolled Subjects (Course List)</span>
+                </h2>
+                <p class="text-xs text-slate-500 font-inter mt-0.5">Add all your semester subjects here. They will be immediately available in your weekly timetable and attendance tracking.</p>
+              </div>
+              <button onclick="openAddSubjectModal()" class="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs flex items-center gap-1.5 transition active:scale-95 shrink-0">
+                <span class="material-symbols-outlined text-[18px]">add_circle</span>
+                <span>+ Add Course Subject</span>
+              </button>
+            </div>
+
+            <!-- Subject Cards Grid -->
+            <div id="settings-subjects-list" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pt-5">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Subtab 3: SGPA & CGPA Grade Calculator -->
         <div id="subtab-grade-calculator" class="hidden space-y-6">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="theme-card p-6 rounded-3xl border theme-border shadow-xs text-center flex flex-col items-center justify-center">
@@ -1211,6 +1272,59 @@
         </div>
         <button type="submit" class="w-full py-3 rounded-xl bg-blue-600 text-white font-bold text-xs shadow-xs hover:bg-blue-700 transition mt-2">
           Save Class to Timetable & Attendance Sheet
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Add / Edit Course Subject -->
+  <div id="modal-add-subject" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs hidden flex items-center justify-center p-4">
+    <div class="theme-card rounded-3xl p-6 w-full max-w-md shadow-2xl border theme-border">
+      <div class="flex items-center justify-between mb-4 pb-3 border-b theme-border">
+        <div>
+          <h3 class="text-base font-bold" id="modal-subject-title">Add Course Subject</h3>
+          <p class="text-[11px] text-slate-500 font-inter">Add to your master subjects catalog</p>
+        </div>
+        <button onclick="closeModal('modal-add-subject')" class="text-slate-400 hover:text-slate-600 text-lg">✕</button>
+      </div>
+      <form onsubmit="handleSaveSubjectForm(event)" class="space-y-3 font-inter text-xs">
+        <input type="hidden" id="subject-input-id" value="">
+        <div>
+          <label class="block font-semibold mb-1">Subject Name <span class="text-red-500">*</span></label>
+          <input type="text" id="subject-input-name" placeholder="e.g. Distributed Systems & AI" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none focus:ring-2 focus:ring-blue-500/20" required>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold mb-1">Subject Code <span class="text-red-500">*</span></label>
+            <input type="text" id="subject-input-code" placeholder="e.g. CS 502" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none focus:ring-2 focus:ring-blue-500/20" required>
+          </div>
+          <div>
+            <label class="block font-semibold mb-1">Credits</label>
+            <input type="number" id="subject-input-credits" min="1" max="10" value="4" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none focus:ring-2 focus:ring-blue-500/20">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold mb-1">Faculty / Instructor</label>
+            <input type="text" id="subject-input-faculty" placeholder="e.g. Prof. Vance" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none focus:ring-2 focus:ring-blue-500/20">
+          </div>
+          <div>
+            <label class="block font-semibold mb-1">Default Classroom</label>
+            <input type="text" id="subject-input-classroom" placeholder="e.g. Hall B-204" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none focus:ring-2 focus:ring-blue-500/20">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold mb-1">Target Attendance %</label>
+            <input type="number" id="subject-input-target" min="50" max="100" value="75" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none focus:ring-2 focus:ring-blue-500/20">
+          </div>
+          <div>
+            <label class="block font-semibold mb-1">Color Tag</label>
+            <input type="color" id="subject-input-color" value="#2563EB" class="w-full h-10 p-1 rounded-xl border theme-border theme-subtle cursor-pointer">
+          </div>
+        </div>
+        <button type="submit" id="btn-save-subject-modal" class="w-full py-3 rounded-xl bg-blue-600 text-white font-bold text-xs shadow-xs hover:bg-blue-700 transition mt-2">
+          Save Subject to Catalog
         </button>
       </form>
     </div>

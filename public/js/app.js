@@ -263,6 +263,147 @@ function syncCloudAndLocal(force = false) {
   updateCloudSyncStatusBadge();
 }
 
+function persistOfflineImmediately() {
+  if (!state.user) return;
+  const storageKey = `college_os_backup_${state.user.email.toLowerCase()}`;
+  const exportData = {
+    email: state.user.email,
+    userId: state.user.id,
+    firebaseUid: state.user.firebaseUid || (window.firebase && firebase.auth() && firebase.auth().currentUser ? firebase.auth().currentUser.uid : null),
+    profile: state.user.profile,
+    preferences: state.user.preferences,
+    subjects: state.subjects || [],
+    timetable: state.timetable || [],
+    attendanceData: state.attendanceData || {},
+    periodAttendance: state.periodAttendanceRecords || {},
+    tasks: state.tasks || [],
+    labs: state.labs || [],
+    studyPlans: state.studyPlans || [],
+    studySessions: state.studySessions || [],
+    vaultFolders: state.vaultFolders || [],
+    vaultFiles: state.vaultFiles || [],
+    calendarEvents: state.calendarEvents || []
+  };
+  localStorage.setItem(storageKey, JSON.stringify(exportData));
+}
+
+function recalculateLocalAttendance() {
+  if (!state.subjects || state.subjects.length === 0) {
+    updateAttendanceUIElements(0, 0, 100.0);
+    return;
+  }
+
+  const defaultTarget = state.defaultAttendanceTarget || 75;
+
+  state.subjects.forEach(sub => {
+    let attended = 0;
+    let total = 0;
+
+    // Count all marked periods for this subject across all days
+    Object.entries(state.periodAttendanceRecords || {}).forEach(([key, status]) => {
+      if (key.includes(`_${sub.id}_period_`)) {
+        if (status === 'Present') {
+          attended++;
+          total++;
+        } else if (status === 'Absent') {
+          total++;
+        }
+      }
+    });
+
+    sub.attended = attended;
+    sub.total = total;
+    const target = sub.targetAttendance || defaultTarget;
+    const percentage = total > 0 ? Number(((attended / total) * 100).toFixed(1)) : 100.0;
+    sub.percentage = percentage;
+    sub.target = target;
+    sub.isAtRisk = total > 0 && percentage < target;
+
+    if (total > 0 && percentage >= target) {
+      sub.safeToSkip = Math.floor((attended - (target / 100) * total) / (target / 100));
+      sub.neededToReach = 0;
+    } else if (total > 0) {
+      sub.neededToReach = Math.ceil(((target / 100) * total - attended) / (1 - (target / 100)));
+      sub.safeToSkip = 0;
+    } else {
+      sub.safeToSkip = 0;
+      sub.neededToReach = 0;
+    }
+  });
+
+  const totAttended = state.subjects.reduce((sum, s) => sum + (s.attended || 0), 0);
+  const totConducted = state.subjects.reduce((sum, s) => sum + (s.total || 0), 0);
+  const ovPercentage = totConducted > 0 ? Number(((totAttended / totConducted) * 100).toFixed(1)) : 100.0;
+
+  state.attendanceData = {
+    ...state.attendanceData,
+    overall: {
+      attended: totAttended,
+      total: totConducted,
+      percentage: ovPercentage
+    },
+    subjects: state.subjects
+  };
+
+  updateAttendanceUIElements(totAttended, totConducted, ovPercentage);
+}
+
+function updateAttendanceUIElements(attended, conducted, percentage) {
+  // 1. Dashboard Total Attendance Metrics
+  const dashPct = document.getElementById('metric-attendance-pct');
+  if (dashPct) {
+    dashPct.textContent = `${percentage}%`;
+    dashPct.className = `text-3xl font-extrabold ${percentage >= 75 ? 'text-emerald-600' : 'text-red-600'}`;
+  }
+  const dashRatio = document.getElementById('metric-attendance-ratio');
+  if (dashRatio) dashRatio.textContent = `${attended} / ${conducted} hours attended`;
+
+  // 2. Timetable & Attendance Executive Banner
+  const ttPct = document.getElementById('tt-overall-pct');
+  if (ttPct) {
+    ttPct.textContent = `${percentage}%`;
+    ttPct.className = `text-3xl font-black ${percentage >= 75 ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400'}`;
+  }
+  const ttRatio = document.getElementById('tt-overall-ratio');
+  if (ttRatio) ttRatio.textContent = `${attended} of ${conducted} classes attended`;
+
+  const ttBadge = document.getElementById('tt-overall-badge');
+  if (ttBadge) {
+    if (conducted === 0) {
+      ttBadge.textContent = 'Ready';
+      ttBadge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-600 border border-blue-500/20';
+    } else if (percentage >= 75) {
+      ttBadge.textContent = 'On Track (Safe)';
+      ttBadge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20';
+    } else {
+      ttBadge.textContent = 'Attendance Low';
+      ttBadge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-red-500/10 text-red-600 border border-red-500/20';
+    }
+  }
+
+  const ttBunk = document.getElementById('tt-overall-bunk-status');
+  const ttBunkSub = document.getElementById('tt-overall-bunk-sub');
+  if (ttBunk) {
+    if (conducted === 0) {
+      ttBunk.textContent = 'No classes yet';
+      if (ttBunkSub) ttBunkSub.textContent = 'record classes to track';
+    } else if (percentage >= 75) {
+      const safe = Math.floor((attended - 0.75 * conducted) / 0.75);
+      ttBunk.textContent = `Safe to skip ${Math.max(0, safe)} hrs`;
+      ttBunk.className = 'text-base font-extrabold text-blue-600 dark:text-blue-400 block mt-0.5';
+      if (ttBunkSub) ttBunkSub.textContent = 'above 75% target';
+    } else {
+      const needed = Math.ceil((0.75 * conducted - attended) / 0.25);
+      ttBunk.textContent = `Need ${Math.max(1, needed)} more classes`;
+      ttBunk.className = 'text-base font-extrabold text-red-600 dark:text-red-400 block mt-0.5';
+      if (ttBunkSub) ttBunkSub.textContent = 'consecutively to reach 75%';
+    }
+  }
+
+  const ttSubCount = document.getElementById('tt-overall-subjects-count');
+  if (ttSubCount) ttSubCount.textContent = `${state.subjects ? state.subjects.length : 0} Subjects`;
+}
+
 async function refreshAllData() {
   try {
     const [subRes, ttRes, attRes, periodRecRes, taskRes, labRes, planRes, studyRes, vaultFldRes, vaultFileRes, calRes, calPdfRes] = await Promise.all([
@@ -319,6 +460,7 @@ async function refreshAllData() {
 // -------------------------------------------------------------
 
 function renderDashboard() {
+  recalculateLocalAttendance();
   const dateStr = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' });
   const dateEl = document.getElementById('dash-date-str');
   if (dateEl) dateEl.textContent = dateStr;
@@ -627,22 +769,30 @@ function getOrdinal(n) {
 async function markPeriodStatus(subjectId, periodNumber, isPresent) {
   const dayKey = state.selectedSheetDay;
   const slotKey = `${dayKey}_${subjectId}_period_${periodNumber}`;
-  state.periodAttendanceRecords[slotKey] = isPresent ? 'Present' : 'Absent';
+  const prev = state.periodAttendanceRecords[slotKey];
+  const next = isPresent ? 'Present' : 'Absent';
 
-  await API.markPeriod({ subjectId, date: dayKey, periodNumber, isPresent });
+  // Toggle off if clicking the already active state
+  if (prev === next) {
+    delete state.periodAttendanceRecords[slotKey];
+  } else {
+    state.periodAttendanceRecords[slotKey] = next;
+  }
 
-  // Refresh attendance statistics in real-time
-  const [attRes, subRes] = await Promise.all([
-    API.getAttendance(),
-    API.getSubjects()
-  ]);
-  state.attendanceData = attRes;
-  state.subjects = subRes.subjects || [];
-  
+  // Instant offline recalculation & local persistence
+  recalculateLocalAttendance();
+  persistOfflineImmediately();
+
+  try {
+    await API.markPeriod({ subjectId, date: dayKey, periodNumber, isPresent: state.periodAttendanceRecords[slotKey] === 'Present' });
+  } catch(e) {
+    console.warn('Offline attendance mark queued:', e.message);
+  }
+
   syncCloudAndLocal();
-
   renderDailyAttendanceSheet();
   renderDashboard();
+  renderAttendanceAnalytics();
 }
 
 async function markAllPeriodsForDay(present) {
@@ -705,8 +855,14 @@ function renderTimetableMatrix() {
 
 async function deleteTimetableSlot(id) {
   if (!confirm('Delete this class slot?')) return;
-  await API.deleteTimetableSlot(id);
   state.timetable = state.timetable.filter(s => s.id !== id);
+  persistOfflineImmediately();
+  try {
+    await API.deleteTimetableSlot(id);
+  } catch(e) {
+    console.warn('Offline slot delete queued:', e.message);
+  }
+  recalculateLocalAttendance();
   renderTimetableMatrix();
   renderDailyAttendanceSheet();
   renderDashboard();
@@ -1292,23 +1448,23 @@ async function restoreVaultFile(id) {
 // -------------------------------------------------------------
 
 function switchSettingsSubTab(tabId, btn) {
-  ['student-profile', 'grade-calculator', 'unified-calendar', 'preferences-reset'].forEach(id => {
+  ['student-profile', 'subjects-catalog', 'grade-calculator', 'unified-calendar', 'preferences-reset'].forEach(id => {
     const el = document.getElementById(`subtab-${id}`);
     if (el) el.classList.toggle('hidden', id !== tabId);
   });
   document.querySelectorAll('.settings-subtab-btn').forEach(b => {
-    b.className = 'settings-subtab-btn px-4 py-2 rounded-xl theme-card border theme-border hover:bg-slate-100 dark:hover:bg-slate-800';
+    b.className = 'settings-subtab-btn px-4 py-2 rounded-xl theme-card border theme-border hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-1.5';
   });
-  btn.className = 'settings-subtab-btn px-4 py-2 rounded-xl bg-blue-600 text-white shadow-xs';
+  btn.className = 'settings-subtab-btn px-4 py-2 rounded-xl bg-blue-600 text-white shadow-xs flex items-center gap-1.5';
 
+  if (tabId === 'subjects-catalog') renderSettingsSubjects();
   if (tabId === 'grade-calculator') renderGradeCalculator();
-  if (tabId === 'unified-calendar') {
-    renderCalendar();
-  }
+  if (tabId === 'unified-calendar') renderCalendar();
 }
 
 function renderSettings() {
   renderUserProfile(state.user);
+  renderSettingsSubjects();
 }
 
 function renderGradeCalculator() {
@@ -1682,11 +1838,20 @@ async function handleCreateSlot(e) {
   const periodNum = Number(document.getElementById('slot-input-period').value) || 1;
   const startTime = document.getElementById('slot-input-start-time').value || '08:30';
   const endTime = document.getElementById('slot-input-end-time').value || '09:30';
-  const room = document.getElementById('slot-input-room').value || 'Lecture Hall';
-  const faculty = document.getElementById('slot-input-faculty').value || 'Instructor';
+  let room = document.getElementById('slot-input-room').value;
+  let faculty = document.getElementById('slot-input-faculty').value;
+
+  const selectedSub = state.subjects.find(s => s.id === subjectId);
+  if (selectedSub) {
+    if (!room) room = selectedSub.classroom || 'Lecture Hall';
+    if (!faculty) faculty = selectedSub.faculty || 'Instructor';
+  } else {
+    if (!room) room = 'Lecture Hall';
+    if (!faculty) faculty = 'Instructor';
+  }
 
   try {
-    await API.createTimetableSlot({
+    const res = await API.createTimetableSlot({
       subjectId,
       customSubjectName,
       customSubjectCode,
@@ -1698,11 +1863,32 @@ async function handleCreateSlot(e) {
       faculty
     });
 
+    const newSlot = res?.slot || {
+      id: 'tt_' + Date.now(),
+      subjectId: subjectId === 'CUSTOM' ? null : subjectId,
+      subjectName: selectedSub ? selectedSub.name : (customSubjectName || 'Course'),
+      subjectCode: selectedSub ? selectedSub.code : (customSubjectCode || 'SUB'),
+      day,
+      periodNumber: periodNum,
+      startTime,
+      endTime,
+      classroom: room,
+      faculty,
+      status: 'pending'
+    };
+
+    if (!state.timetable.some(s => s.id === newSlot.id)) {
+      state.timetable.push(newSlot);
+    }
+    persistOfflineImmediately();
+
     closeModal('modal-add-slot');
-    await refreshAllData();
+    try { await refreshAllData(); } catch (err) {}
     renderDailyAttendanceSheet();
     renderTimetableMatrix();
+    recalculateLocalAttendance();
     renderDashboard();
+    if (window.showToast) window.showToast('Class scheduled successfully!', 'success');
   } catch (err) {
     alert(err.message);
   }
@@ -2002,4 +2188,231 @@ async function importDataBackupJson(event) {
     alert('Failed to import backup: ' + err.message);
   }
   event.target.value = '';
+}
+
+// -------------------------------------------------------------
+// COURSE SUBJECTS CATALOG (SETTINGS & TIMETABLE MASTER)
+// -------------------------------------------------------------
+
+function renderSettingsSubjects() {
+  const container = document.getElementById('settings-subjects-list');
+  if (!container) return;
+
+  if (!state.subjects || state.subjects.length === 0) {
+    container.innerHTML = `
+      <div class="col-span-full p-8 text-center text-xs text-slate-400 font-inter border-2 border-dashed theme-border rounded-3xl flex flex-col items-center justify-center gap-3">
+        <span class="material-symbols-outlined text-4xl text-blue-500">menu_book</span>
+        <div>
+          <h4 class="font-bold text-sm text-slate-700 dark:text-slate-200">No Course Subjects Added Yet</h4>
+          <p class="text-xs text-slate-500 mt-1">Add all your semester courses here once. They will appear in your Timetable to schedule on each day.</p>
+        </div>
+        <button onclick="openAddSubjectModal()" class="px-5 py-2.5 rounded-xl bg-blue-600 text-white font-bold text-xs shadow-xs hover:bg-blue-700 transition">
+          + Add Your First Course Subject
+        </button>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = state.subjects.map(sub => {
+    const color = sub.color || '#2563EB';
+    const attended = sub.attended || 0;
+    const total = sub.total || 0;
+    const pct = total > 0 ? ((attended / total) * 100).toFixed(1) : '100.0';
+    const target = sub.targetAttendance || 75;
+    const isAtRisk = total > 0 && Number(pct) < target;
+
+    return `
+      <div class="theme-card p-5 rounded-2xl border theme-border shadow-xs hover:border-blue-500/30 transition flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <span class="w-3.5 h-3.5 rounded-full ring-2 ring-white/20" style="background: ${color}"></span>
+              <span class="text-xs font-mono font-extrabold uppercase px-2 py-0.5 rounded-md bg-blue-100 text-blue-800 dark:bg-blue-900/60 dark:text-blue-200">${sub.code}</span>
+            </div>
+            <div class="flex items-center gap-1">
+              <button onclick="openAddSubjectModal('${sub.id}')" title="Edit Subject" class="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition">
+                <span class="material-symbols-outlined text-base">edit</span>
+              </button>
+              <button onclick="deleteSubject('${sub.id}')" title="Delete Subject" class="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition">
+                <span class="material-symbols-outlined text-base">delete</span>
+              </button>
+            </div>
+          </div>
+          <h3 class="font-extrabold text-sm text-slate-800 dark:text-slate-100 mb-1">${sub.name}</h3>
+          <div class="space-y-1 font-inter text-xs text-slate-500">
+            <div class="flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[15px] text-slate-400">person</span>
+              <span>${sub.faculty || 'Instructor TBD'}</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[15px] text-slate-400">location_on</span>
+              <span>${sub.classroom || 'Main Lecture Hall'}</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[15px] text-slate-400">school</span>
+              <span>${sub.credits || 3} Credits • Target: ${target}%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-3 border-t theme-border">
+          <div class="flex items-center justify-between text-xs font-inter mb-1.5">
+            <span class="text-slate-500">Attendance:</span>
+            <span class="font-bold ${isAtRisk ? 'text-red-600' : 'text-emerald-600'}">${attended}/${total} hrs (${pct}%)</span>
+          </div>
+          <div class="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
+            <div class="${isAtRisk ? 'bg-red-500' : 'bg-emerald-500'} h-full rounded-full transition-all" style="width: ${Math.min(100, Number(pct))}%"></div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function openAddSubjectModal(subjectId = null) {
+  const form = document.querySelector('#modal-add-subject form');
+  if (form) form.reset();
+
+  const titleEl = document.getElementById('modal-subject-title');
+  const btnEl = document.getElementById('btn-save-subject-modal');
+  const idInput = document.getElementById('subject-input-id');
+
+  if (subjectId) {
+    const sub = state.subjects.find(s => s.id === subjectId);
+    if (sub) {
+      if (titleEl) titleEl.textContent = 'Edit Course Subject';
+      if (btnEl) btnEl.textContent = 'Update Subject';
+      if (idInput) idInput.value = sub.id;
+      document.getElementById('subject-input-name').value = sub.name || '';
+      document.getElementById('subject-input-code').value = sub.code || '';
+      document.getElementById('subject-input-credits').value = sub.credits || 3;
+      document.getElementById('subject-input-faculty').value = sub.faculty || '';
+      document.getElementById('subject-input-classroom').value = sub.classroom || '';
+      document.getElementById('subject-input-target').value = sub.targetAttendance || 75;
+      document.getElementById('subject-input-color').value = sub.color || '#2563EB';
+    }
+  } else {
+    if (titleEl) titleEl.textContent = 'Add Course Subject';
+    if (btnEl) btnEl.textContent = 'Save Subject to Catalog';
+    if (idInput) idInput.value = '';
+    document.getElementById('subject-input-credits').value = 4;
+    document.getElementById('subject-input-target').value = 75;
+    document.getElementById('subject-input-color').value = '#2563EB';
+  }
+
+  openModal('modal-add-subject');
+}
+
+async function handleSaveSubjectForm(e) {
+  e.preventDefault();
+  const id = document.getElementById('subject-input-id').value;
+  const name = document.getElementById('subject-input-name').value.trim();
+  const code = document.getElementById('subject-input-code').value.trim();
+  const credits = Number(document.getElementById('subject-input-credits').value) || 3;
+  const faculty = document.getElementById('subject-input-faculty').value.trim() || 'Instructor';
+  const classroom = document.getElementById('subject-input-classroom').value.trim() || 'Lecture Hall';
+  const targetAttendance = Number(document.getElementById('subject-input-target').value) || 75;
+  const color = document.getElementById('subject-input-color').value || '#2563EB';
+
+  if (!name || !code) {
+    alert('Subject Name and Code are required.');
+    return;
+  }
+
+  const payload = { name, code, credits, faculty, classroom, targetAttendance, color };
+
+  if (id) {
+    // 1. Update in local state immediately (offline support!)
+    const idx = state.subjects.findIndex(s => s.id === id);
+    if (idx !== -1) {
+      state.subjects[idx] = { ...state.subjects[idx], ...payload };
+    }
+    // Also update any timetable slots with this subject
+    state.timetable.forEach(t => {
+      if (t.subjectId === id) {
+        t.subjectName = name;
+        t.subjectCode = code;
+        t.color = color;
+      }
+    });
+    persistOfflineImmediately();
+
+    try {
+      await API.updateSubject(id, payload);
+    } catch(err) {
+      console.warn('Subject update queued offline:', err.message);
+    }
+  } else {
+    // 1. Create new subject locally immediately
+    const newSub = {
+      id: 'sub_' + Date.now(),
+      ...payload,
+      attended: 0,
+      total: 0
+    };
+    state.subjects.push(newSub);
+    persistOfflineImmediately();
+
+    try {
+      const res = await API.createSubject(payload);
+      if (res && res.subject) {
+        newSub.id = res.subject.id;
+      }
+    } catch(err) {
+      console.warn('Subject creation queued offline:', err.message);
+    }
+  }
+
+  closeModal('modal-add-subject');
+  populateSubjectSelects();
+  recalculateLocalAttendance();
+  persistOfflineImmediately();
+  syncCloudAndLocal();
+
+  renderSettingsSubjects();
+  renderDailyAttendanceSheet();
+  renderTimetableMatrix();
+  renderDashboard();
+  renderAttendanceAnalytics();
+  alert(id ? 'Course subject updated successfully!' : 'Course subject added to catalog!');
+}
+
+async function deleteSubject(subjectId) {
+  if (!confirm('Are you sure you want to remove this subject? Associated timetable classes and attendance marks will also be removed.')) return;
+
+  // 1. Remove locally immediately (100% offline support!)
+  state.subjects = state.subjects.filter(s => s.id !== subjectId);
+  state.timetable = state.timetable.filter(t => t.subjectId !== subjectId);
+  
+  // Clean attendance records
+  Object.keys(state.periodAttendanceRecords || {}).forEach(key => {
+    if (key.includes(`_${subjectId}_period_`)) {
+      delete state.periodAttendanceRecords[key];
+    }
+  });
+
+  populateSubjectSelects();
+  recalculateLocalAttendance();
+  persistOfflineImmediately();
+
+  try {
+    await API.deleteSubject(subjectId);
+  } catch(err) {
+    console.warn('Subject deletion queued offline:', err.message);
+  }
+
+  syncCloudAndLocal();
+  renderSettingsSubjects();
+  renderDailyAttendanceSheet();
+  renderTimetableMatrix();
+  renderDashboard();
+  renderAttendanceAnalytics();
+}
+
+function openAddSlotForActiveDay() {
+  const day = state.selectedSheetDay || 'Monday';
+  const daySelect = document.getElementById('slot-input-day');
+  if (daySelect) daySelect.value = day;
+  openModal('modal-add-slot');
 }
