@@ -671,7 +671,13 @@ app.post('/api/attendance/mark-period', authenticate, (req, res) => {
   if (!subjectId || periodNumber === undefined) {
     return res.status(400).json({ error: 'Subject ID and period number are required.' });
   }
-  const targetDay = dayKey || 'Monday';
+  const validDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+  let targetDay = dayKey;
+  if (!targetDay && date) {
+    const match = validDays.find(d => d.toLowerCase() === date.toLowerCase());
+    if (match) targetDay = match;
+  }
+  if (!targetDay) targetDay = 'Monday';
   const targetDate = date || new Date().toISOString().split('T')[0];
   const slotKey = `${targetDay}_${subjectId}_period_${periodNumber}`;
 

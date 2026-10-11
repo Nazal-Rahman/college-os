@@ -56,11 +56,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       await window.FirebaseSync.init();
     }
 
-    // [Vercel Data Wipe Hydration]
+    // [Cloud & Multi-Device Data Hydration]
     let backupData = null;
     if (window.FirebaseSync && window.FirebaseSync.isAvailable()) {
       try {
-        backupData = await window.FirebaseSync.loadUserData(user.id);
+        backupData = await window.FirebaseSync.loadUserData(user.id, user.email);
       } catch (e) { console.warn('Cloud restore check failed:', e); }
     }
     if (!backupData && user.email) {
@@ -75,11 +75,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     if (backupData && Object.keys(backupData).length > 0) {
-       const { subjects } = await API.getSubjects();
-       if (!subjects || subjects.length === 0) {
-          console.log('[Hydration] Backend appears empty (Vercel cold start). Restoring state...');
+      try {
+        const [backendSubRes, backendTtRes] = await Promise.all([
+          API.getSubjects().catch(() => ({ subjects: [] })),
+          API.getTimetable().catch(() => ({ timetable: [] }))
+        ]);
+        const bSubs = backendSubRes?.subjects || [];
+        const bSlots = backendTtRes?.timetable || [];
+        const bkSubs = backupData.subjects || [];
+        const bkSlots = backupData.timetable || [];
+
+        // If backup has subjects or timetable slots missing in backend, restore to backend!
+        if (bSubs.length === 0 || bSlots.length === 0 || bkSubs.length > bSubs.length || bkSlots.length > bSlots.length || Object.keys(backupData.periodAttendance || {}).length > 0) {
+          console.log('[Hydration] Syncing cloud/backup data to backend workspace...');
           await API.restoreCloudData(backupData);
-       }
+        }
+      } catch(e) {
+        console.warn('Hydration sync check warning:', e.message);
+      }
     }
 
     // Initial load
@@ -407,35 +420,44 @@ function updateAttendanceUIElements(attended, conducted, percentage) {
 async function refreshAllData() {
   try {
     const [subRes, ttRes, attRes, periodRecRes, taskRes, labRes, planRes, studyRes, vaultFldRes, vaultFileRes, calRes, calPdfRes] = await Promise.all([
-      API.getSubjects(),
-      API.getTimetable(),
-      API.getAttendance(),
-      API.request('/api/attendance/period-records'),
-      API.getTasks(),
-      API.getLabs(),
-      API.getStudyPlans(),
-      API.getStudySessions(),
-      API.getFolders(),
-      API.getFiles(),
-      API.getCalendar(),
+      API.getSubjects().catch(() => ({ subjects: state.subjects })),
+      API.getTimetable().catch(() => ({ timetable: state.timetable })),
+      API.getAttendance().catch(() => ({})),
+      API.request('/api/attendance/period-records').catch(() => ({ records: state.periodAttendanceRecords })),
+      API.getTasks().catch(() => ({ tasks: state.tasks })),
+      API.getLabs().catch(() => ({ labs: state.labs })),
+      API.getStudyPlans().catch(() => ({ plans: state.studyPlans })),
+      API.getStudySessions().catch(() => ({ sessions: state.studySessions })),
+      API.getFolders().catch(() => ({ folders: state.vaultFolders })),
+      API.getFiles().catch(() => ({ files: state.vaultFiles })),
+      API.getCalendar().catch(() => ({ events: state.calendarEvents })),
       API.getCalendarPdf().catch(() => ({ file: null }))
     ]);
 
-    state.subjects = subRes.subjects || [];
-    state.timetable = ttRes.timetable || [];
-    state.holidayDays = ttRes.holidayDays || ['Saturday', 'Sunday'];
-    state.attendanceData = attRes;
-    state.defaultAttendanceTarget = attRes.defaultTarget || 75;
-    state.customTargetsEnabled = attRes.customTargetsEnabled || false;
-    state.periodAttendanceRecords = periodRecRes.records || {};
-    state.tasks = taskRes.tasks || [];
-    state.labs = labRes.labs || [];
-    state.studyPlans = planRes.plans || [];
-    state.studySessions = studyRes.sessions || [];
-    state.vaultFolders = vaultFldRes.folders || [];
-    state.vaultFiles = vaultFileRes.files || [];
-    state.calendarEvents = calRes.events || [];
-    state.academicCalendarPdf = calPdfRes ? calPdfRes.file : null;
+    // Safeguard: do not let an empty array from a fresh cold-start backend wipe populated local state!
+    if (subRes && Array.isArray(subRes.subjects) && (subRes.subjects.length > 0 || state.subjects.length === 0)) {
+      state.subjects = subRes.subjects;
+    }
+    if (ttRes && Array.isArray(ttRes.timetable) && (ttRes.timetable.length > 0 || state.timetable.length === 0)) {
+      state.timetable = ttRes.timetable;
+    }
+    if (periodRecRes && periodRecRes.records && Object.keys(periodRecRes.records).length > 0) {
+      state.periodAttendanceRecords = { ...state.periodAttendanceRecords, ...periodRecRes.records };
+    }
+    state.holidayDays = ttRes?.holidayDays || state.holidayDays || ['Saturday', 'Sunday'];
+    if (attRes) {
+      state.attendanceData = attRes;
+      state.defaultAttendanceTarget = attRes.defaultTarget || state.defaultAttendanceTarget || 75;
+      state.customTargetsEnabled = attRes.customTargetsEnabled || false;
+    }
+    if (taskRes?.tasks) state.tasks = taskRes.tasks;
+    if (labRes?.labs) state.labs = labRes.labs;
+    if (planRes?.plans) state.studyPlans = planRes.plans;
+    if (studyRes?.sessions) state.studySessions = studyRes.sessions;
+    if (vaultFldRes?.folders) state.vaultFolders = vaultFldRes.folders;
+    if (vaultFileRes?.files) state.vaultFiles = vaultFileRes.files;
+    if (calRes?.events) state.calendarEvents = calRes.events;
+    if (calPdfRes?.file) state.academicCalendarPdf = calPdfRes.file;
 
     // Sync settings UI inputs
     const prefGlobal = document.getElementById('pref-global-target');
@@ -444,6 +466,7 @@ async function refreshAllData() {
     const prefCustomSwitch = document.getElementById('pref-custom-target-switch');
     if (prefCustomSwitch) prefCustomSwitch.checked = !!state.customTargetsEnabled;
 
+    recalculateLocalAttendance();
     renderDashboard();
     populateSubjectSelects();
     updateDayHolidayBadges();
@@ -880,8 +903,8 @@ async function markPeriodStatus(subjectId, periodNumber, isPresent) {
   persistOfflineImmediately();
 
   try {
-    await API.markPeriod({ subjectId, date: dayKey, periodNumber, isPresent: state.periodAttendanceRecords[slotKey] === 'Present' });
-  } catch(e) {
+    await API.markPeriod({ subjectId, dayKey, date: dayKey, periodNumber, isPresent: state.periodAttendanceRecords[slotKey] === 'Present' });
+  } catch (e) {
     console.warn('Offline attendance mark queued:', e.message);
   }
 
@@ -2023,6 +2046,7 @@ async function handleCreateSlot(e) {
 
   state.timetable.push(newSlot);
   persistOfflineImmediately();
+  syncCloudAndLocal(true);
 
   closeModal('modal-add-slot');
   state.selectedSheetDay = day;
@@ -2036,7 +2060,7 @@ async function handleCreateSlot(e) {
   // 2. Dispatch to API / Cloud in background
   try {
     const res = await API.createTimetableSlot({
-      subjectId,
+      subjectId: finalSubjectId,
       customSubjectName,
       customSubjectCode,
       day,
@@ -2049,6 +2073,7 @@ async function handleCreateSlot(e) {
     if (res && res.slot && res.slot.id) {
       newSlot.id = res.slot.id;
       persistOfflineImmediately();
+      syncCloudAndLocal(true);
     }
   } catch (err) {
     console.warn('Class slot saved locally; queued for cloud sync:', err.message);

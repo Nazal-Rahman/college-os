@@ -81,30 +81,37 @@ const FirebaseSync = {
     await this.init();
     if (!this.isAvailable()) return false;
 
-    // Use Firebase Auth UID as primary doc ID (ensures Flutter mobile app & Web share exact same doc)
+    const email = (data?.email || (firebaseAuth && firebaseAuth.currentUser ? firebaseAuth.currentUser.email : '') || '').toLowerCase().trim();
     const primaryUid = (firebaseAuth && firebaseAuth.currentUser && firebaseAuth.currentUser.uid)
       ? firebaseAuth.currentUser.uid
       : (data?.firebaseUid || userId);
 
-    if (!primaryUid) return false;
-    
+    if (!primaryUid && !email) return false;
+
     try {
       const cleanData = this.cleanPayload(data);
       cleanData.lastSyncedAt = firebase.firestore.FieldValue.serverTimestamp();
       cleanData.uid = primaryUid;
-      cleanData.firebaseUid = primaryUid;
-      if (firebaseAuth && firebaseAuth.currentUser && firebaseAuth.currentUser.email) {
-        cleanData.email = cleanData.email || firebaseAuth.currentUser.email;
+      cleanData.email = email;
+      cleanData.userId = userId;
+
+      // 1. Primary UID document (for Flutter & Firebase Auth)
+      if (primaryUid) {
+        await firestoreDb.collection('students').doc(primaryUid).set(cleanData, { merge: true });
       }
 
-      await firestoreDb.collection('students').doc(primaryUid).set(cleanData, { merge: true });
-      
+      // 2. Deterministic Email document (for multi-device sync with same email)
+      if (email) {
+        const emailDocId = 'email_' + btoa(email).replace(/[^a-zA-Z0-9]/g, '');
+        await firestoreDb.collection('students').doc(emailDocId).set(cleanData, { merge: true });
+      }
+
       this.lastSyncStatus = {
         success: true,
         timestamp: new Date(),
         error: null
       };
-      console.log('[Firebase Firestore] User data synced for cross-platform linking (UID: ' + primaryUid + ').');
+      console.log('[Firebase Firestore] User data synced for cross-platform linking.');
       window.dispatchEvent(new CustomEvent('cloud-sync-status', { detail: this.lastSyncStatus }));
       return true;
     } catch (err) {
@@ -119,30 +126,52 @@ const FirebaseSync = {
     }
   },
 
-  async loadUserData(userId) {
+  async loadUserData(userId, userEmail) {
     await this.init();
     if (!this.isAvailable()) return null;
 
-    // Standard cross-platform lookup by Firebase Auth UID first
+    const email = (userEmail || (firebaseAuth && firebaseAuth.currentUser ? firebaseAuth.currentUser.email : '') || '').toLowerCase().trim();
     const primaryUid = (firebaseAuth && firebaseAuth.currentUser && firebaseAuth.currentUser.uid)
       ? firebaseAuth.currentUser.uid
       : userId;
 
     try {
+      // 1. Check primary UID doc
       if (primaryUid) {
         const doc = await firestoreDb.collection('students').doc(primaryUid).get();
-        if (doc.exists) {
-          console.log('[Firebase Firestore] Cloud data restored (UID: ' + primaryUid + ').');
+        if (doc.exists && doc.data()) {
+          console.log('[Firebase Firestore] Cloud data restored by UID:', primaryUid);
           return doc.data();
         }
       }
-      if (userId && userId !== primaryUid) {
-        const doc2 = await firestoreDb.collection('students').doc(userId).get();
-        if (doc2.exists) {
-          console.log('[Firebase Firestore] Cloud data restored from fallback ID: ' + userId);
-          return doc2.data();
+
+      // 2. Check deterministic email doc (restores data across different devices using same email!)
+      if (email) {
+        const emailDocId = 'email_' + btoa(email).replace(/[^a-zA-Z0-9]/g, '');
+        const docEmail = await firestoreDb.collection('students').doc(emailDocId).get();
+        if (docEmail.exists && docEmail.data()) {
+          console.log('[Firebase Firestore] Cloud data restored by email doc:', emailDocId);
+          return docEmail.data();
+        }
+
+        // 3. Query collection by email field
+        const querySnap = await firestoreDb.collection('students').where('email', '==', email).limit(1).get();
+        if (!querySnap.empty) {
+          const docData = querySnap.docs[0].data();
+          console.log('[Firebase Firestore] Cloud data restored by email query');
+          return docData;
         }
       }
+
+      // 4. Check fallback userId doc
+      if (userId && userId !== primaryUid) {
+        const docFallback = await firestoreDb.collection('students').doc(userId).get();
+        if (docFallback.exists && docFallback.data()) {
+          console.log('[Firebase Firestore] Cloud data restored by fallback ID:', userId);
+          return docFallback.data();
+        }
+      }
+
       return null;
     } catch (err) {
       console.warn('[Firebase Firestore] Load notice:', err.message);
