@@ -79,20 +79,32 @@ const FirebaseSync = {
 
   async syncUserData(userId, data) {
     await this.init();
-    if (!this.isAvailable() || !userId) return false;
+    if (!this.isAvailable()) return false;
+
+    // Use Firebase Auth UID as primary doc ID (ensures Flutter mobile app & Web share exact same doc)
+    const primaryUid = (firebaseAuth && firebaseAuth.currentUser && firebaseAuth.currentUser.uid)
+      ? firebaseAuth.currentUser.uid
+      : (data?.firebaseUid || userId);
+
+    if (!primaryUid) return false;
     
     try {
       const cleanData = this.cleanPayload(data);
       cleanData.lastSyncedAt = firebase.firestore.FieldValue.serverTimestamp();
+      cleanData.uid = primaryUid;
+      cleanData.firebaseUid = primaryUid;
+      if (firebaseAuth && firebaseAuth.currentUser && firebaseAuth.currentUser.email) {
+        cleanData.email = cleanData.email || firebaseAuth.currentUser.email;
+      }
 
-      await firestoreDb.collection('students').doc(userId).set(cleanData, { merge: true });
+      await firestoreDb.collection('students').doc(primaryUid).set(cleanData, { merge: true });
       
       this.lastSyncStatus = {
         success: true,
         timestamp: new Date(),
         error: null
       };
-      console.log('[Firebase Firestore] User data synced to cloud successfully.');
+      console.log('[Firebase Firestore] User data synced for cross-platform linking (UID: ' + primaryUid + ').');
       window.dispatchEvent(new CustomEvent('cloud-sync-status', { detail: this.lastSyncStatus }));
       return true;
     } catch (err) {
@@ -109,12 +121,27 @@ const FirebaseSync = {
 
   async loadUserData(userId) {
     await this.init();
-    if (!this.isAvailable() || !userId) return null;
+    if (!this.isAvailable()) return null;
+
+    // Standard cross-platform lookup by Firebase Auth UID first
+    const primaryUid = (firebaseAuth && firebaseAuth.currentUser && firebaseAuth.currentUser.uid)
+      ? firebaseAuth.currentUser.uid
+      : userId;
+
     try {
-      const doc = await firestoreDb.collection('students').doc(userId).get();
-      if (doc.exists) {
-        console.log('[Firebase Firestore] Cloud data restored.');
-        return doc.data();
+      if (primaryUid) {
+        const doc = await firestoreDb.collection('students').doc(primaryUid).get();
+        if (doc.exists) {
+          console.log('[Firebase Firestore] Cloud data restored (UID: ' + primaryUid + ').');
+          return doc.data();
+        }
+      }
+      if (userId && userId !== primaryUid) {
+        const doc2 = await firestoreDb.collection('students').doc(userId).get();
+        if (doc2.exists) {
+          console.log('[Firebase Firestore] Cloud data restored from fallback ID: ' + userId);
+          return doc2.data();
+        }
       }
       return null;
     } catch (err) {

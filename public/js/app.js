@@ -237,6 +237,9 @@ function syncCloudAndLocal(force = false) {
   }
 
   const exportData = {
+    email: state.user.email,
+    userId: state.user.id,
+    firebaseUid: state.user.firebaseUid || (window.firebase && firebase.auth() && firebase.auth().currentUser ? firebase.auth().currentUser.uid : null),
     profile: state.user.profile,
     preferences: state.user.preferences,
     subjects: state.subjects || [],
