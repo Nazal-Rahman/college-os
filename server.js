@@ -285,17 +285,19 @@ app.post('/api/sync/restore', authenticate, (req, res) => {
       const data = req.body;
       if (data.profile) u.profile = data.profile;
       if (data.preferences) u.preferences = data.preferences;
-      if (data.subjects) u.subjects = data.subjects;
-      if (data.timetable) u.timetable = data.timetable;
+      if (Array.isArray(data.subjects) && data.subjects.length > 0) u.subjects = data.subjects;
+      if (Array.isArray(data.timetable) && data.timetable.length > 0) u.timetable = data.timetable;
       if (data.attendanceData && data.attendanceData.history) u.attendanceHistory = data.attendanceData.history;
-      if (data.periodAttendance) u.periodAttendance = data.periodAttendance;
-      if (data.tasks) u.tasks = data.tasks;
-      if (data.labs) u.labs = data.labs;
-      if (data.studyPlans) u.studyPlans = data.studyPlans;
-      if (data.studySessions) u.studySessions = data.studySessions;
-      if (data.vaultFiles) u.vaultFiles = data.vaultFiles;
-      if (data.vaultFolders) u.vaultFolders = data.vaultFolders;
-      if (data.calendarEvents) u.calendarEvents = data.calendarEvents;
+      if (data.periodAttendance && Object.keys(data.periodAttendance).length > 0) {
+        u.periodAttendance = { ...(u.periodAttendance || {}), ...data.periodAttendance };
+      }
+      if (Array.isArray(data.tasks) && data.tasks.length > 0) u.tasks = data.tasks;
+      if (Array.isArray(data.labs) && data.labs.length > 0) u.labs = data.labs;
+      if (Array.isArray(data.studyPlans) && data.studyPlans.length > 0) u.studyPlans = data.studyPlans;
+      if (Array.isArray(data.studySessions) && data.studySessions.length > 0) u.studySessions = data.studySessions;
+      if (Array.isArray(data.vaultFiles) && data.vaultFiles.length > 0) u.vaultFiles = data.vaultFiles;
+      if (Array.isArray(data.vaultFolders) && data.vaultFolders.length > 0) u.vaultFolders = data.vaultFolders;
+      if (Array.isArray(data.calendarEvents) && data.calendarEvents.length > 0) u.calendarEvents = data.calendarEvents;
     });
     res.json({ success: true });
   } catch (err) {
@@ -841,6 +843,10 @@ app.post('/api/tasks', authenticate, (req, res) => {
   };
 
   store.updateUserData(req.user.id, (u) => {
+    const sub = (u.subjects || []).find(s => s.id === newTask.subjectId);
+    newTask.subjectCode = sub ? sub.code : 'GEN';
+    newTask.subjectName = sub ? sub.name : 'General Task';
+    newTask.color = sub ? sub.color : '#4776F6';
     u.tasks.unshift(newTask);
   });
   res.json({ task: newTask });
@@ -946,6 +952,10 @@ app.post('/api/labs', authenticate, (req, res) => {
   };
 
   store.updateUserData(req.user.id, (u) => {
+    const sub = (u.subjects || []).find(s => s.id === newLab.subjectId);
+    newLab.subjectCode = sub ? sub.code : 'LAB';
+    newLab.subjectName = sub ? sub.name : 'Laboratory';
+    newLab.color = sub ? sub.color : '#F04438';
     u.labs.unshift(newLab);
   });
   res.json({ lab: newLab });

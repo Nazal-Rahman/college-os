@@ -31,6 +31,71 @@ let state = {
 };
 
 // -------------------------------------------------------------
+// -------------------------------------------------------------
+// OFFLINE & CLOUD STATE HYDRATION HELPERS
+// -------------------------------------------------------------
+
+function applyBackupToState(backup) {
+  if (!backup || typeof backup !== 'object') return;
+  if (Array.isArray(backup.subjects) && backup.subjects.length > 0) {
+    state.subjects = backup.subjects;
+  }
+  if (Array.isArray(backup.timetable) && backup.timetable.length > 0) {
+    state.timetable = backup.timetable;
+  }
+  if (Array.isArray(backup.tasks) && backup.tasks.length > 0) {
+    state.tasks = backup.tasks;
+  }
+  if (Array.isArray(backup.labs) && backup.labs.length > 0) {
+    state.labs = backup.labs;
+  }
+  if (backup.periodAttendance && typeof backup.periodAttendance === 'object' && Object.keys(backup.periodAttendance).length > 0) {
+    state.periodAttendanceRecords = { ...state.periodAttendanceRecords, ...backup.periodAttendance };
+  }
+  if (Array.isArray(backup.studyPlans) && backup.studyPlans.length > 0) {
+    state.studyPlans = backup.studyPlans;
+  }
+  if (Array.isArray(backup.studySessions) && backup.studySessions.length > 0) {
+    state.studySessions = backup.studySessions;
+  }
+  if (Array.isArray(backup.vaultFolders) && backup.vaultFolders.length > 0) {
+    state.vaultFolders = backup.vaultFolders;
+  }
+  if (Array.isArray(backup.vaultFiles) && backup.vaultFiles.length > 0) {
+    state.vaultFiles = backup.vaultFiles;
+  }
+  if (Array.isArray(backup.calendarEvents) && backup.calendarEvents.length > 0) {
+    state.calendarEvents = backup.calendarEvents;
+  }
+  if (backup.attendanceData) {
+    state.attendanceData = { ...state.attendanceData, ...backup.attendanceData };
+  }
+}
+
+function hydrateStateFromCache(email) {
+  if (!email) return false;
+  try {
+    const lowerEmail = email.toLowerCase().trim();
+    const raw = localStorage.getItem('college_os_backup_' + lowerEmail) || localStorage.getItem('college_os_backup_' + email);
+    if (!raw) return false;
+    const backup = JSON.parse(raw);
+    if (!backup) return false;
+
+    applyBackupToState(backup);
+    recalculateLocalAttendance();
+    renderDashboard();
+    renderDailyAttendanceSheet();
+    renderTasks();
+    renderLabs();
+    renderStudyPlanner();
+    populateSubjectSelects();
+    return true;
+  } catch(e) {
+    console.warn('hydrateStateFromCache notice:', e);
+    return false;
+  }
+}
+
 // INITIALIZATION & THEME MANAGER
 // -------------------------------------------------------------
 
@@ -38,6 +103,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Apply saved theme (Default to dark for high contrast)
   const savedTheme = localStorage.getItem('college_os_theme') || 'dark';
   setThemeMode(savedTheme, false);
+
+  // Instant offline hydration from local cache (Zero blank flash on reload!)
+  const cachedUser = API.getUser();
+  if (cachedUser) {
+    state.user = cachedUser;
+    renderUserProfile(cachedUser);
+    hydrateStateFromCache(cachedUser.email);
+  }
 
   // Check auth - require logged-in session
   let token = API.getToken();
@@ -51,51 +124,50 @@ document.addEventListener('DOMContentLoaded', async () => {
     state.user = user;
     renderUserProfile(user);
 
-    // Ensure Firebase is initialized
+    // Hydrate offline cache with confirmed user email
+    hydrateStateFromCache(user.email);
+
+    // [Cloud & Multi-Device Data Hydration from Firebase Firestore]
+    let cloudData = null;
     if (window.FirebaseSync) {
       await window.FirebaseSync.init();
-    }
-
-    // [Cloud & Multi-Device Data Hydration]
-    let backupData = null;
-    if (window.FirebaseSync && window.FirebaseSync.isAvailable()) {
-      try {
-        backupData = await window.FirebaseSync.loadUserData(user.id, user.email);
-      } catch (e) { console.warn('Cloud restore check failed:', e); }
-    }
-    if (!backupData && user.email) {
-      try {
-        const lowerEmail = user.email.toLowerCase();
-        const localCache = JSON.parse(
-          localStorage.getItem(`college_os_backup_${lowerEmail}`) ||
-          localStorage.getItem(`college_os_backup_${user.email}`)
-        );
-        if (localCache) backupData = localCache;
-      } catch(e) {}
-    }
-
-    if (backupData && Object.keys(backupData).length > 0) {
-      try {
-        const [backendSubRes, backendTtRes] = await Promise.all([
-          API.getSubjects().catch(() => ({ subjects: [] })),
-          API.getTimetable().catch(() => ({ timetable: [] }))
-        ]);
-        const bSubs = backendSubRes?.subjects || [];
-        const bSlots = backendTtRes?.timetable || [];
-        const bkSubs = backupData.subjects || [];
-        const bkSlots = backupData.timetable || [];
-
-        // If backup has subjects or timetable slots missing in backend, restore to backend!
-        if (bSubs.length === 0 || bSlots.length === 0 || bkSubs.length > bSubs.length || bkSlots.length > bSlots.length || Object.keys(backupData.periodAttendance || {}).length > 0) {
-          console.log('[Hydration] Syncing cloud/backup data to backend workspace...');
-          await API.restoreCloudData(backupData);
+      if (window.FirebaseSync.isAvailable()) {
+        try {
+          cloudData = await window.FirebaseSync.loadUserData(user.id, user.email);
+        } catch (e) {
+          console.warn('Cloud restore check notice:', e);
         }
-      } catch(e) {
-        console.warn('Hydration sync check warning:', e.message);
       }
     }
 
-    // Initial load
+    if (cloudData && typeof cloudData === 'object' && Object.keys(cloudData).length > 0) {
+      console.log('[Hydration] Restored workspace from Firebase Firestore cloud doc.');
+      applyBackupToState(cloudData);
+      persistOfflineImmediately();
+    }
+
+    // Ensure backend in-memory store is synchronized with client state
+    try {
+      const fullSyncPayload = {
+        profile: state.user.profile,
+        preferences: state.user.preferences,
+        subjects: state.subjects,
+        timetable: state.timetable,
+        periodAttendance: state.periodAttendanceRecords,
+        tasks: state.tasks,
+        labs: state.labs,
+        studyPlans: state.studyPlans,
+        studySessions: state.studySessions,
+        vaultFolders: state.vaultFolders,
+        vaultFiles: state.vaultFiles,
+        calendarEvents: state.calendarEvents
+      };
+      await API.restoreCloudData(fullSyncPayload);
+    } catch(e) {
+      console.warn('Backend hydration notice:', e.message);
+    }
+
+    // Fetch and refresh all data with non-destructive merge
     await refreshAllData();
 
     // Check URL hash for direct view navigation
@@ -235,18 +307,40 @@ function syncCloudAndLocal(force = false) {
 
   const storageKey = `college_os_backup_${state.user.email.toLowerCase()}`;
   const existingBackupRaw = localStorage.getItem(storageKey) || localStorage.getItem(`college_os_backup_${state.user.email}`);
-  const isStateEmpty = (!state.subjects || state.subjects.length === 0) &&
-                       (!state.timetable || state.timetable.length === 0) &&
-                       (!state.tasks || state.tasks.length === 0);
+  let existingBackup = null;
+  if (existingBackupRaw) {
+    try { existingBackup = JSON.parse(existingBackupRaw); } catch(e) {}
+  }
 
-  if (isStateEmpty && existingBackupRaw && !force) {
-    try {
-      const existing = JSON.parse(existingBackupRaw);
-      if (existing.subjects && existing.subjects.length > 0) {
-        console.log('[SafeSync] Retaining existing populated offline backup, skipping overwrite with empty state.');
-        return;
-      }
-    } catch(e) {}
+  // Smart retention: never wipe a populated collection with an empty array
+  if (existingBackup) {
+    if ((!state.subjects || state.subjects.length === 0) && Array.isArray(existingBackup.subjects) && existingBackup.subjects.length > 0) {
+      state.subjects = existingBackup.subjects;
+    }
+    if ((!state.timetable || state.timetable.length === 0) && Array.isArray(existingBackup.timetable) && existingBackup.timetable.length > 0) {
+      state.timetable = existingBackup.timetable;
+    }
+    if ((!state.tasks || state.tasks.length === 0) && Array.isArray(existingBackup.tasks) && existingBackup.tasks.length > 0) {
+      state.tasks = existingBackup.tasks;
+    }
+    if ((!state.labs || state.labs.length === 0) && Array.isArray(existingBackup.labs) && existingBackup.labs.length > 0) {
+      state.labs = existingBackup.labs;
+    }
+    if ((!state.periodAttendanceRecords || Object.keys(state.periodAttendanceRecords).length === 0) && existingBackup.periodAttendance && Object.keys(existingBackup.periodAttendance).length > 0) {
+      state.periodAttendanceRecords = existingBackup.periodAttendance;
+    }
+    if ((!state.studyPlans || state.studyPlans.length === 0) && Array.isArray(existingBackup.studyPlans) && existingBackup.studyPlans.length > 0) {
+      state.studyPlans = existingBackup.studyPlans;
+    }
+    if ((!state.studySessions || state.studySessions.length === 0) && Array.isArray(existingBackup.studySessions) && existingBackup.studySessions.length > 0) {
+      state.studySessions = existingBackup.studySessions;
+    }
+    if ((!state.vaultFolders || state.vaultFolders.length === 0) && Array.isArray(existingBackup.vaultFolders) && existingBackup.vaultFolders.length > 0) {
+      state.vaultFolders = existingBackup.vaultFolders;
+    }
+    if ((!state.vaultFiles || state.vaultFiles.length === 0) && Array.isArray(existingBackup.vaultFiles) && existingBackup.vaultFiles.length > 0) {
+      state.vaultFiles = existingBackup.vaultFiles;
+    }
   }
 
   const exportData = {
@@ -279,6 +373,36 @@ function syncCloudAndLocal(force = false) {
 function persistOfflineImmediately() {
   if (!state.user) return;
   const storageKey = `college_os_backup_${state.user.email.toLowerCase()}`;
+  const existingBackupRaw = localStorage.getItem(storageKey) || localStorage.getItem(`college_os_backup_${state.user.email}`);
+  let existingBackup = null;
+  if (existingBackupRaw) {
+    try { existingBackup = JSON.parse(existingBackupRaw); } catch(e) {}
+  }
+
+  if (existingBackup) {
+    if ((!state.subjects || state.subjects.length === 0) && Array.isArray(existingBackup.subjects) && existingBackup.subjects.length > 0) {
+      state.subjects = existingBackup.subjects;
+    }
+    if ((!state.timetable || state.timetable.length === 0) && Array.isArray(existingBackup.timetable) && existingBackup.timetable.length > 0) {
+      state.timetable = existingBackup.timetable;
+    }
+    if ((!state.tasks || state.tasks.length === 0) && Array.isArray(existingBackup.tasks) && existingBackup.tasks.length > 0) {
+      state.tasks = existingBackup.tasks;
+    }
+    if ((!state.labs || state.labs.length === 0) && Array.isArray(existingBackup.labs) && existingBackup.labs.length > 0) {
+      state.labs = existingBackup.labs;
+    }
+    if ((!state.periodAttendanceRecords || Object.keys(state.periodAttendanceRecords).length === 0) && existingBackup.periodAttendance && Object.keys(existingBackup.periodAttendance).length > 0) {
+      state.periodAttendanceRecords = existingBackup.periodAttendance;
+    }
+    if ((!state.studyPlans || state.studyPlans.length === 0) && Array.isArray(existingBackup.studyPlans) && existingBackup.studyPlans.length > 0) {
+      state.studyPlans = existingBackup.studyPlans;
+    }
+    if ((!state.studySessions || state.studySessions.length === 0) && Array.isArray(existingBackup.studySessions) && existingBackup.studySessions.length > 0) {
+      state.studySessions = existingBackup.studySessions;
+    }
+  }
+
   const exportData = {
     email: state.user.email,
     userId: state.user.id,
@@ -434,11 +558,11 @@ async function refreshAllData() {
       API.getCalendarPdf().catch(() => ({ file: null }))
     ]);
 
-    // Safeguard: do not let an empty array from a fresh cold-start backend wipe populated local state!
-    if (subRes && Array.isArray(subRes.subjects) && (subRes.subjects.length > 0 || state.subjects.length === 0)) {
+    // Safeguards: NEVER let an empty array from backend wipe populated client state!
+    if (subRes && Array.isArray(subRes.subjects) && subRes.subjects.length > 0) {
       state.subjects = subRes.subjects;
     }
-    if (ttRes && Array.isArray(ttRes.timetable) && (ttRes.timetable.length > 0 || state.timetable.length === 0)) {
+    if (ttRes && Array.isArray(ttRes.timetable) && ttRes.timetable.length > 0) {
       state.timetable = ttRes.timetable;
     }
     if (periodRecRes && periodRecRes.records && Object.keys(periodRecRes.records).length > 0) {
@@ -450,13 +574,27 @@ async function refreshAllData() {
       state.defaultAttendanceTarget = attRes.defaultTarget || state.defaultAttendanceTarget || 75;
       state.customTargetsEnabled = attRes.customTargetsEnabled || false;
     }
-    if (taskRes?.tasks) state.tasks = taskRes.tasks;
-    if (labRes?.labs) state.labs = labRes.labs;
-    if (planRes?.plans) state.studyPlans = planRes.plans;
-    if (studyRes?.sessions) state.studySessions = studyRes.sessions;
-    if (vaultFldRes?.folders) state.vaultFolders = vaultFldRes.folders;
-    if (vaultFileRes?.files) state.vaultFiles = vaultFileRes.files;
-    if (calRes?.events) state.calendarEvents = calRes.events;
+    if (taskRes && Array.isArray(taskRes.tasks) && taskRes.tasks.length > 0) {
+      state.tasks = taskRes.tasks;
+    }
+    if (labRes && Array.isArray(labRes.labs) && labRes.labs.length > 0) {
+      state.labs = labRes.labs;
+    }
+    if (planRes && Array.isArray(planRes.plans) && planRes.plans.length > 0) {
+      state.studyPlans = planRes.plans;
+    }
+    if (studyRes && Array.isArray(studyRes.sessions) && studyRes.sessions.length > 0) {
+      state.studySessions = studyRes.sessions;
+    }
+    if (vaultFldRes && Array.isArray(vaultFldRes.folders) && vaultFldRes.folders.length > 0) {
+      state.vaultFolders = vaultFldRes.folders;
+    }
+    if (vaultFileRes && Array.isArray(vaultFileRes.files) && vaultFileRes.files.length > 0) {
+      state.vaultFiles = vaultFileRes.files;
+    }
+    if (calRes && Array.isArray(calRes.events) && calRes.events.length > 0) {
+      state.calendarEvents = calRes.events;
+    }
     if (calPdfRes?.file) state.academicCalendarPdf = calPdfRes.file;
 
     // Sync settings UI inputs
@@ -468,10 +606,15 @@ async function refreshAllData() {
 
     recalculateLocalAttendance();
     renderDashboard();
+    renderDailyAttendanceSheet();
+    renderTasks();
+    renderLabs();
+    renderStudyPlanner();
     populateSubjectSelects();
     updateDayHolidayBadges();
 
-    // Cloud & Offline Backup Sync
+    // Persist and Sync
+    persistOfflineImmediately();
     syncCloudAndLocal();
   } catch (err) {
     console.error('Error refreshing workspace data:', err);
@@ -1256,21 +1399,31 @@ function renderTasks() {
 }
 
 async function toggleTaskStatus(id) {
-  await API.toggleTask(id);
   const task = state.tasks.find(t => t.id === id);
   if (task) task.status = task.status === 'Completed' ? 'Pending' : 'Completed';
   renderTasks();
   renderDashboard();
-  syncCloudAndLocal();
+  persistOfflineImmediately();
+  syncCloudAndLocal(true);
+  try {
+    await API.toggleTask(id);
+  } catch(e) {
+    console.warn('Task toggle queued offline:', e.message);
+  }
 }
 
 async function deleteTask(id) {
   if (!confirm('Are you sure you want to delete this college work?')) return;
-  await API.deleteTask(id);
   state.tasks = state.tasks.filter(t => t.id !== id);
   renderTasks();
   renderDashboard();
-  syncCloudAndLocal();
+  persistOfflineImmediately();
+  syncCloudAndLocal(true);
+  try {
+    await API.deleteTask(id);
+  } catch(e) {
+    console.warn('Task delete queued offline:', e.message);
+  }
 }
 
 function renderLabs() {
@@ -1286,16 +1439,26 @@ function renderLabs() {
     <div class="p-6 rounded-3xl theme-card border theme-border shadow-xs flex flex-col justify-between">
       <div>
         <div class="flex items-center justify-between mb-2">
-          <span class="text-[10px] font-bold bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-200 px-2 py-0.5 rounded-full uppercase">${l.subjectCode}</span>
-          <span class="text-xs font-bold px-2 py-0.5 rounded-full ${l.status === 'Completed' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${l.status}</span>
+          <span class="text-[10px] font-bold bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-200 px-2 py-0.5 rounded-full uppercase">${l.subjectCode || 'LAB'}</span>
+          <button onclick="toggleLabCompletionStatus('${l.id}')" title="Click to toggle status" class="text-xs font-bold px-2 py-0.5 rounded-full cursor-pointer transition border ${l.status === 'Completed' ? 'bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-950/60 dark:text-emerald-300' : 'bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-950/60 dark:text-amber-300'}">
+            ${l.status}
+          </button>
         </div>
         <h3 class="text-sm font-bold mt-1">${l.title}</h3>
         <p class="text-xs text-slate-500 font-inter mt-1">${l.description || 'Practical experiment'}</p>
       </div>
 
       <div class="mt-4 pt-3 border-t theme-border flex items-center justify-between text-xs font-inter">
-        <span class="text-slate-500">Sign-off: <strong>${l.recordStatus || 'Pending'}</strong></span>
-        <!-- Working Delete Option for Lab Experiment -->
+        <div class="flex items-center gap-1.5">
+          <span class="text-slate-500">Sign-off:</span>
+          <button onclick="toggleLabRecordStatus('${l.id}')" title="Click to cycle sign-off status" class="px-2 py-0.5 rounded-full text-[11px] font-bold cursor-pointer transition ${
+            l.recordStatus === 'Signed & Approved' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300' :
+            l.recordStatus === 'Submitted' ? 'bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300' :
+            'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300'
+          }">
+            ${l.recordStatus || 'Pending Sign-off'} 🔄
+          </button>
+        </div>
         <button onclick="deleteLab('${l.id}')" title="Delete Lab Record" class="text-red-600 hover:underline font-bold">
           Delete
         </button>
@@ -1304,12 +1467,54 @@ function renderLabs() {
   `).join('');
 }
 
+async function toggleLabRecordStatus(id) {
+  const lab = state.labs.find(l => l.id === id);
+  if (!lab) return;
+  const statuses = ['Pending Sign-off', 'Submitted', 'Signed & Approved'];
+  const curIdx = statuses.indexOf(lab.recordStatus || 'Pending Sign-off');
+  lab.recordStatus = statuses[(curIdx + 1) % statuses.length];
+  if (lab.recordStatus === 'Signed & Approved') {
+    lab.status = 'Completed';
+  }
+  renderLabs();
+  persistOfflineImmediately();
+  syncCloudAndLocal(true);
+  try {
+    if (API.updateLab) {
+      await API.updateLab(id, { recordStatus: lab.recordStatus, status: lab.status });
+    }
+  } catch(e) {
+    console.warn('Lab record status update queued:', e.message);
+  }
+}
+
+async function toggleLabCompletionStatus(id) {
+  const lab = state.labs.find(l => l.id === id);
+  if (!lab) return;
+  lab.status = lab.status === 'Completed' ? 'In Progress' : 'Completed';
+  renderLabs();
+  persistOfflineImmediately();
+  syncCloudAndLocal(true);
+  try {
+    if (API.updateLab) {
+      await API.updateLab(id, { status: lab.status });
+    }
+  } catch(e) {
+    console.warn('Lab status update queued:', e.message);
+  }
+}
+
 async function deleteLab(id) {
   if (!confirm('Delete this laboratory record?')) return;
-  await API.deleteLab(id);
   state.labs = state.labs.filter(l => l.id !== id);
   renderLabs();
-  syncCloudAndLocal();
+  persistOfflineImmediately();
+  syncCloudAndLocal(true);
+  try {
+    await API.deleteLab(id);
+  } catch(e) {
+    console.warn('Lab delete queued offline:', e.message);
+  }
 }
 
 function renderStudyPlanner() {
@@ -1354,25 +1559,40 @@ function renderStudyPlanner() {
 }
 
 async function deleteStudyPlan(id) {
-  await API.deleteStudyPlan(id);
   state.studyPlans = state.studyPlans.filter(p => p.id !== id);
   renderStudyPlanner();
-  syncCloudAndLocal();
+  persistOfflineImmediately();
+  syncCloudAndLocal(true);
+  try {
+    await API.deleteStudyPlan(id);
+  } catch(e) {
+    console.warn('Study plan delete queued offline:', e.message);
+  }
 }
 
 async function deleteStudySession(id) {
-  await API.deleteStudySession(id);
   state.studySessions = state.studySessions.filter(s => s.id !== id);
   renderStudyPlanner();
-  syncCloudAndLocal();
+  persistOfflineImmediately();
+  syncCloudAndLocal(true);
+  try {
+    await API.deleteStudySession(id);
+  } catch(e) {
+    console.warn('Study session delete queued offline:', e.message);
+  }
 }
 
 async function clearAllStudyLogs() {
   if (!confirm('Clear all study history logs?')) return;
-  await API.clearAllStudySessions();
   state.studySessions = [];
   renderStudyPlanner();
-  syncCloudAndLocal();
+  persistOfflineImmediately();
+  syncCloudAndLocal(true);
+  try {
+    await API.clearAllStudySessions();
+  } catch(e) {
+    console.warn('Study sessions clear queued offline:', e.message);
+  }
 }
 
 // Fullscreen Focus Room Controller
@@ -1452,10 +1672,22 @@ function toggleStudyTimer() {
         alert('🎉 Focus Session Completed! Logged to your workspace.');
 
         const duration = Math.round(state.timer.totalSeconds / 60);
-        await API.logStudySession({ durationMinutes: duration, notes: 'Completed Focus Session' });
-        state.studySessions = (await API.getStudySessions()).sessions || [];
+        const newSession = {
+          id: 'sess_' + Date.now(),
+          durationMinutes: duration,
+          notes: 'Completed Focus Session',
+          date: new Date().toISOString().split('T')[0]
+        };
+        state.studySessions.unshift(newSession);
         renderStudyPlanner();
         renderDashboard();
+        persistOfflineImmediately();
+        syncCloudAndLocal(true);
+        try {
+          await API.logStudySession({ durationMinutes: duration, notes: 'Completed Focus Session' });
+        } catch(e) {
+          console.warn('Study session log queued:', e.message);
+        }
       }
     }, 1000);
   }
@@ -1947,24 +2179,84 @@ function closeAllModals() {
 
 async function handleCreateTask(e) {
   e.preventDefault();
-  const title = document.getElementById('task-input-title').value;
+  const title = (document.getElementById('task-input-title').value || '').trim();
+  if (!title) return;
   let type = document.getElementById('task-input-type').value;
   if (type === 'custom') {
     type = document.getElementById('task-input-custom-type').value || 'Academic Task';
   }
   const priority = document.getElementById('task-input-priority').value;
   const subjectId = document.getElementById('task-input-subject').value;
-  const customSubject = subjectId === 'CUSTOM' ? document.getElementById('task-input-custom-subject').value : null;
-  const dueDate = document.getElementById('task-input-due').value;
+  const customSubject = subjectId === 'CUSTOM' ? (document.getElementById('task-input-custom-subject').value || '').trim() : null;
+  const dueDate = document.getElementById('task-input-due').value || new Date(Date.now() + 86400000 * 3).toISOString().split('T')[0];
+
+  let finalSubId = subjectId;
+  let finalSubCode = 'GEN';
+  let finalSubName = 'General Task';
+  let finalColor = '#4776F6';
+
+  if (subjectId === 'CUSTOM' && customSubject) {
+    let existing = state.subjects.find(s => s.name.toLowerCase() === customSubject.toLowerCase());
+    if (!existing) {
+      existing = {
+        id: 'sub_' + Date.now(),
+        code: customSubject.slice(0, 4).toUpperCase(),
+        name: customSubject,
+        faculty: 'Instructor',
+        classroom: 'Room 101',
+        credits: 3,
+        color: '#8B5CF6',
+        targetAttendance: state.defaultAttendanceTarget || 75,
+        attended: 0,
+        total: 0
+      };
+      state.subjects.push(existing);
+      populateSubjectSelects();
+    }
+    finalSubId = existing.id;
+    finalSubCode = existing.code;
+    finalSubName = existing.name;
+    finalColor = existing.color;
+  } else if (subjectId && subjectId !== 'CUSTOM') {
+    const existing = state.subjects.find(s => s.id === subjectId);
+    if (existing) {
+      finalSubCode = existing.code;
+      finalSubName = existing.name;
+      finalColor = existing.color;
+    }
+  }
+
+  const newTask = {
+    id: 'task_' + Date.now(),
+    title,
+    type,
+    subjectId: finalSubId || null,
+    subjectCode: finalSubCode,
+    subjectName: finalSubName,
+    color: finalColor,
+    dueDate,
+    priority: priority || 'Medium',
+    status: 'Pending',
+    description: ''
+  };
+
+  // Instant local addition & UI update (zero wait)
+  state.tasks.unshift(newTask);
+  closeModal('modal-add-task');
+  renderTasks();
+  renderDashboard();
+  persistOfflineImmediately();
+  syncCloudAndLocal(true);
 
   try {
-    await API.createTask({ title, type, priority, subjectId, customSubject, dueDate });
-    closeModal('modal-add-task');
-    state.tasks = (await API.getTasks()).tasks || [];
-    renderTasks();
-    renderDashboard();
+    const res = await API.createTask({ title, type, priority, subjectId: finalSubId, customSubject, dueDate });
+    if (res && res.task && res.task.id) {
+      newTask.id = res.task.id;
+      persistOfflineImmediately();
+      syncCloudAndLocal(true);
+    }
   } catch (err) {
-    alert(err.message);
+    console.warn('Task created locally & queued for cloud sync:', err.message);
   }
 }
 
@@ -2082,9 +2374,10 @@ async function handleCreateSlot(e) {
 
 async function handleCreateLab(e) {
   e.preventDefault();
-  const title = document.getElementById('lab-input-title').value;
+  const title = (document.getElementById('lab-input-title').value || '').trim();
+  if (!title) return;
   const subjectId = document.getElementById('lab-input-subject').value;
-  const customSubject = subjectId === 'CUSTOM' ? document.getElementById('lab-input-custom-subject').value : null;
+  const customSubject = subjectId === 'CUSTOM' ? (document.getElementById('lab-input-custom-subject').value || '').trim() : null;
 
   let labType = document.getElementById('lab-input-type').value;
   if (labType === 'custom') {
@@ -2093,31 +2386,112 @@ async function handleCreateLab(e) {
 
   const description = document.getElementById('lab-input-desc').value;
   const sessionDate = document.getElementById('lab-input-session-date').value || new Date().toISOString().split('T')[0];
-  const deadline = document.getElementById('lab-input-deadline').value;
-  const recordStatus = document.getElementById('lab-input-status').value;
+  const deadline = document.getElementById('lab-input-deadline').value || new Date(Date.now() + 86400000 * 5).toISOString().split('T')[0];
+  const recordStatus = document.getElementById('lab-input-status').value || 'Pending Sign-off';
+
+  let finalSubId = subjectId;
+  let finalSubCode = 'LAB';
+  let finalSubName = 'Laboratory';
+  let finalColor = '#F04438';
+
+  if (subjectId === 'CUSTOM' && customSubject) {
+    let existing = state.subjects.find(s => s.name.toLowerCase() === customSubject.toLowerCase());
+    if (!existing) {
+      existing = {
+        id: 'sub_' + Date.now(),
+        code: customSubject.slice(0, 4).toUpperCase(),
+        name: customSubject,
+        faculty: 'Lab Instructor',
+        classroom: 'Lab Center',
+        credits: 2,
+        color: '#10B981',
+        targetAttendance: state.defaultAttendanceTarget || 75,
+        attended: 0,
+        total: 0
+      };
+      state.subjects.push(existing);
+      populateSubjectSelects();
+    }
+    finalSubId = existing.id;
+    finalSubCode = existing.code;
+    finalSubName = existing.name;
+    finalColor = existing.color;
+  } else if (subjectId && subjectId !== 'CUSTOM') {
+    const existing = state.subjects.find(s => s.id === subjectId);
+    if (existing) {
+      finalSubCode = existing.code;
+      finalSubName = existing.name;
+      finalColor = existing.color;
+    }
+  }
+
+  const newLab = {
+    id: 'lab_' + Date.now(),
+    title,
+    type: labType,
+    subjectId: finalSubId || null,
+    subjectCode: finalSubCode,
+    subjectName: finalSubName,
+    color: finalColor,
+    sessionDate,
+    deadline,
+    status: 'In Progress',
+    recordStatus,
+    description: description || ''
+  };
+
+  // Instant local addition & UI update
+  state.labs.unshift(newLab);
+  closeModal('modal-add-lab');
+  renderLabs();
+  renderDashboard();
+  persistOfflineImmediately();
+  syncCloudAndLocal(true);
 
   try {
-    await API.createLab({ title, subjectId, customSubject, type: labType, description, sessionDate, deadline, recordStatus, status: 'In Progress' });
-    closeModal('modal-add-lab');
-    state.labs = (await API.getLabs()).labs || [];
-    renderLabs();
-    renderDashboard();
+    const res = await API.createLab({ title, subjectId: finalSubId, customSubject, type: labType, description, sessionDate, deadline, recordStatus, status: 'In Progress' });
+    if (res && res.lab && res.lab.id) {
+      newLab.id = res.lab.id;
+      persistOfflineImmediately();
+      syncCloudAndLocal(true);
+    }
   } catch (err) {
-    alert(err.message);
+    console.warn('Lab created locally & queued for cloud sync:', err.message);
   }
 }
 
 async function handleCreateStudyPlan(e) {
   e.preventDefault();
-  const title = document.getElementById('plan-input-title').value;
+  const title = (document.getElementById('plan-input-title').value || '').trim();
+  if (!title) return;
   const subjectId = document.getElementById('plan-input-subject').value;
   const targetMinutes = Number(document.getElementById('plan-input-minutes').value) || 60;
-  const date = document.getElementById('plan-input-date').value;
+  const date = document.getElementById('plan-input-date').value || new Date().toISOString().split('T')[0];
 
-  await API.createStudyPlan({ title, subjectId, targetMinutes, date });
+  const newPlan = {
+    id: 'plan_' + Date.now(),
+    title,
+    subjectId,
+    targetMinutes,
+    date
+  };
+
+  state.studyPlans.push(newPlan);
   closeModal('modal-add-study-plan');
-  state.studyPlans = (await API.getStudyPlans()).plans || [];
   renderStudyPlanner();
+  persistOfflineImmediately();
+  syncCloudAndLocal(true);
+
+  try {
+    const res = await API.createStudyPlan({ title, subjectId, targetMinutes, date });
+    if (res && res.plan && res.plan.id) {
+      newPlan.id = res.plan.id;
+      persistOfflineImmediately();
+      syncCloudAndLocal(true);
+    }
+  } catch(err) {
+    console.warn('Study plan saved offline:', err.message);
+  }
 }
 
 async function handleVaultUpload(e) {

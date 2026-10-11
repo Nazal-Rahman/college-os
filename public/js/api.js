@@ -193,12 +193,14 @@ const API = {
     return this.request(`/api/tasks${q ? '?' + q : ''}`);
   },
   createTask(data) { return this.request('/api/tasks', { method: 'POST', body: JSON.stringify(data) }); },
+  updateTask(id, data) { return this.request(`/api/tasks/${id}`, { method: 'PUT', body: JSON.stringify(data) }); },
   toggleTask(id) { return this.request(`/api/tasks/${id}/toggle`, { method: 'POST' }); },
   deleteTask(id) { return this.request(`/api/tasks/${id}`, { method: 'DELETE' }); },
 
   // Labs
   getLabs() { return this.request('/api/labs'); },
   createLab(data) { return this.request('/api/labs', { method: 'POST', body: JSON.stringify(data) }); },
+  updateLab(id, data) { return this.request(`/api/labs/${id}`, { method: 'PUT', body: JSON.stringify(data) }); },
   deleteLab(id) { return this.request(`/api/labs/${id}`, { method: 'DELETE' }); },
 
   // Study & Focus Timer
