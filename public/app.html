@@ -374,10 +374,6 @@
               <span class="material-symbols-outlined text-[18px]">delete_sweep</span>
               <span>Clear Timetable & Attendance</span>
             </button>
-            <button onclick="openAddSlotModal()" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center gap-1.5 transition shadow-xs">
-              <span class="material-symbols-outlined text-[18px]">add</span>
-              <span>Add Class / Hours</span>
-            </button>
           </div>
         </div>
 
@@ -1232,7 +1228,7 @@
         </div>
         <div>
           <label class="block font-semibold mb-1">Subject</label>
-          <select id="slot-input-subject" onchange="toggleCustomSlotSubject(this.value)" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none">
+          <select id="slot-input-subject" onchange="handleSlotSubjectSelectionChange(this.value)" class="w-full h-10 px-3 rounded-xl border theme-border theme-subtle outline-none">
             <!-- Rendered dynamically -->
           </select>
         </div>

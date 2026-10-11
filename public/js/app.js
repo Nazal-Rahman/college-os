@@ -466,11 +466,10 @@ function renderDashboard() {
   if (dateEl) dateEl.textContent = dateStr;
 
   const todayName = new Date().toLocaleDateString('en-US', { weekday: 'long' });
-  const classesToday = state.timetable.filter(s => s.day.toLowerCase() === todayName.toLowerCase());
-  const classesToShow = classesToday.length > 0 ? classesToday : state.timetable.filter(s => s.day === 'Monday');
+  const classesToday = (state.timetable || []).filter(s => (s.day || '').toLowerCase() === todayName.toLowerCase());
 
   const classesMetric = document.getElementById('metric-classes-today');
-  if (classesMetric) classesMetric.textContent = classesToShow.length;
+  if (classesMetric) classesMetric.textContent = classesToday.length;
 
   if (state.attendanceData && state.attendanceData.overall) {
     const ov = state.attendanceData.overall;
@@ -484,64 +483,142 @@ function renderDashboard() {
   const taskMetric = document.getElementById('metric-pending-tasks');
   if (taskMetric) taskMetric.textContent = pendingTasks.length;
 
-  if (classesToShow.length > 0) {
-    const nextClass = classesToShow[0];
+  if (classesToday.length > 0) {
+    const sortedToday = [...classesToday].sort((a, b) => (Number(a.periodNumber) || 0) - (Number(b.periodNumber) || 0));
+    const nextClass = sortedToday[0];
     const nName = document.getElementById('next-class-name');
     if (nName) nName.textContent = nextClass.subjectName;
     const nRoom = document.getElementById('next-class-room');
-    if (nRoom) nRoom.textContent = `(${nextClass.classroom})`;
+    if (nRoom) nRoom.textContent = `(${nextClass.classroom || 'Lecture Hall'})`;
     const nProf = document.getElementById('next-class-prof');
-    if (nProf) nProf.textContent = nextClass.faculty;
+    if (nProf) nProf.textContent = nextClass.faculty || 'Instructor';
+  } else if (state.timetable && state.timetable.length > 0) {
+    const firstCls = state.timetable[0];
+    const nName = document.getElementById('next-class-name');
+    if (nName) nName.textContent = firstCls.subjectName;
+    const nRoom = document.getElementById('next-class-room');
+    if (nRoom) nRoom.textContent = `(${firstCls.day} ${firstCls.startTime} - ${firstCls.classroom || 'Hall'})`;
+    const nProf = document.getElementById('next-class-prof');
+    if (nProf) nProf.textContent = firstCls.faculty || 'Instructor';
+  } else {
+    const nName = document.getElementById('next-class-name');
+    if (nName) nName.textContent = 'No classes added yet';
+    const nRoom = document.getElementById('next-class-room');
+    if (nRoom) nRoom.textContent = '(Use Timetable to schedule)';
+    const nProf = document.getElementById('next-class-prof');
+    if (nProf) nProf.textContent = 'Schedule classes';
   }
 
   // Today's timeline on dashboard
   const timelineEl = document.getElementById('dash-timeline-list');
   if (timelineEl) {
-    if (classesToShow.length === 0) {
-      timelineEl.innerHTML = `<div class="p-6 text-center text-xs text-slate-400 font-inter">No scheduled classes for today. Great time for independent deep work!</div>`;
-    } else {
-      timelineEl.innerHTML = classesToShow.map(cls => `
-        <div class="p-4 rounded-2xl theme-subtle border theme-border flex items-center justify-between gap-3">
-          <div class="flex items-center gap-3">
-            <div class="w-1.5 h-10 rounded-full" style="background: ${cls.color || '#1D4ED8'}"></div>
-            <div>
-              <div class="flex items-center gap-2">
-                <span class="text-xs font-bold">${cls.subjectCode}: ${cls.subjectName}</span>
-                <span class="text-[10px] theme-card border theme-border px-2 py-0.5 rounded-md font-semibold">${cls.classroom}</span>
-              </div>
-              <div class="text-[11px] text-slate-500 font-inter mt-0.5">
-                ${cls.startTime} - ${cls.endTime} • ${cls.faculty}
+    if (classesToday.length > 0) {
+      const sortedClasses = [...classesToday].sort((a, b) => (Number(a.periodNumber) || 0) - (Number(b.periodNumber) || 0));
+      timelineEl.innerHTML = sortedClasses.map(cls => {
+        const slotKey = `${cls.day}_${cls.subjectId}_period_${cls.periodNumber}`;
+        const attStatus = state.periodAttendanceRecords ? state.periodAttendanceRecords[slotKey] : undefined;
+        const statusBadge = attStatus === 'Present' 
+          ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-200">✓ Present</span>`
+          : (attStatus === 'Absent' 
+            ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-700 dark:bg-red-900/60 dark:text-red-200">✕ Absent</span>`
+            : `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400">Scheduled</span>`);
+
+        return `
+          <div class="p-4 rounded-2xl theme-subtle border theme-border flex items-center justify-between gap-3 hover:border-blue-500/30 transition">
+            <div class="flex items-center gap-3">
+              <div class="w-1.5 h-10 rounded-full" style="background: ${cls.color || '#2563EB'}"></div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-bold">${cls.subjectCode}: ${cls.subjectName}</span>
+                  <span class="text-[10px] theme-card border theme-border px-2 py-0.5 rounded-md font-semibold">${cls.classroom || 'Hall'}</span>
+                  ${statusBadge}
+                </div>
+                <div class="text-[11px] text-slate-500 font-inter mt-0.5">
+                  Period ${cls.periodNumber || 1} • ${cls.startTime} - ${cls.endTime} • ${cls.faculty || 'Instructor'}
+                </div>
               </div>
             </div>
+            <button onclick="navigateTo('timetable'); selectDailySheetDay('${cls.day}')" class="px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/40 dark:hover:bg-blue-900/60 text-blue-600 dark:text-blue-300 text-xs font-bold font-inter transition active:scale-95">
+              Mark Sheet →
+            </button>
           </div>
-          <button onclick="navigateTo('timetable')" class="px-2.5 py-1 rounded-lg bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-200 text-xs font-bold font-inter">
-            Daily Sheet →
+        `;
+      }).join('') + `
+        <div class="pt-2 flex items-center justify-between">
+          <span class="text-xs text-slate-500 font-inter">${classesToday.length} classes scheduled for today (${todayName})</span>
+          <button onclick="openAddSlotForActiveDay('${todayName}')" class="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold font-inter flex items-center gap-1.5 shadow-xs transition active:scale-95">
+            <span class="material-symbols-outlined text-[16px]">add</span>
+            <span>+ Add Class to Today</span>
           </button>
         </div>
-      `).join('');
+      `;
+    } else {
+      timelineEl.innerHTML = `
+        <div class="p-6 rounded-2xl theme-subtle border theme-border text-center space-y-3">
+          <div class="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 flex items-center justify-center mx-auto">
+            <span class="material-symbols-outlined text-2xl">event_available</span>
+          </div>
+          <div>
+            <h4 class="text-sm font-bold">No classes scheduled for today (${todayName})</h4>
+            <p class="text-xs text-slate-500 font-inter mt-1">
+              ${(state.timetable && state.timetable.length > 0) ? 'You have classes scheduled on other days of the week. You can also add classes to today.' : 'Add your subjects and schedule your daily periods to start tracking attendance.'}
+            </p>
+          </div>
+          <div class="flex flex-wrap items-center justify-center gap-2 pt-1">
+            <button onclick="openAddSlotForActiveDay('${todayName}')" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold font-inter flex items-center gap-1.5 shadow-xs transition active:scale-95">
+              <span class="material-symbols-outlined text-[16px]">add</span>
+              <span>+ Add Class to Today (${todayName})</span>
+            </button>
+            <button onclick="navigateTo('timetable')" class="px-4 py-2 rounded-xl theme-card border theme-border hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-bold font-inter transition">
+              Open 7-Day Timetable & Sheet →
+            </button>
+          </div>
+        </div>
+      `;
     }
   }
 
   // Attendance summary on dashboard
   const attSummaryEl = document.getElementById('dash-attendance-summary');
-  if (attSummaryEl && state.attendanceData && state.attendanceData.subjects) {
-    if (state.attendanceData.subjects.length === 0) {
-      attSummaryEl.innerHTML = `<div class="p-4 text-center text-xs text-slate-400 font-inter">No attendance records yet. Add timetable classes to begin tracking.</div>`;
-    } else {
-      attSummaryEl.innerHTML = state.attendanceData.subjects.slice(0, 4).map(sub => `
-        <div class="p-3 rounded-xl theme-subtle border theme-border flex items-center justify-between">
-          <div>
-            <span class="text-xs font-bold block">${sub.code}: ${sub.name}</span>
-            <span class="text-[10px] text-slate-500">${sub.attended}/${sub.total} hours</span>
-          </div>
-          <div class="text-right font-inter">
-            <span class="text-xs font-extrabold ${sub.isAtRisk ? 'text-red-600' : 'text-emerald-600'}">${sub.percentage}%</span>
-            <span class="text-[10px] block ${sub.isAtRisk ? 'text-red-500 font-bold' : 'text-slate-500'}">
-              ${sub.isAtRisk ? `Need ${sub.neededToReach} hrs` : `Safe: ${sub.safeToSkip} hrs`}
-            </span>
-          </div>
+  if (attSummaryEl) {
+    if (!state.subjects || state.subjects.length === 0) {
+      attSummaryEl.innerHTML = `
+        <div class="p-5 text-center text-xs text-slate-400 font-inter space-y-2">
+          <div>No course subjects added yet.</div>
+          <button onclick="navigateTo('settings'); switchSettingsSubTab('subjects-catalog', document.querySelectorAll('.settings-subtab-btn')[1])" class="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition">
+            + Add Course Subjects in Settings
+          </button>
         </div>
-      `).join('');
+      `;
+    } else {
+      attSummaryEl.innerHTML = state.subjects.slice(0, 6).map(sub => {
+        const pct = sub.percentage !== undefined ? sub.percentage : (sub.total > 0 ? Number(((sub.attended / sub.total) * 100).toFixed(1)) : 100.0);
+        const target = sub.targetAttendance || state.defaultAttendanceTarget || 75;
+        const isSafe = pct >= target;
+        return `
+          <div class="p-3.5 rounded-xl theme-subtle border theme-border flex items-center justify-between gap-3">
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background: ${sub.color || '#2563EB'}"></span>
+                <span class="text-xs font-bold truncate">${sub.code}: ${sub.name}</span>
+              </div>
+              <div class="flex items-center gap-2 mt-1">
+                <span class="text-[11px] text-slate-500 font-inter">${sub.attended || 0} / ${sub.total || 0} hrs attended</span>
+                <span class="text-[10px] text-slate-400">• Goal: ${target}%</span>
+              </div>
+              <div class="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full mt-2 overflow-hidden">
+                <div class="h-full rounded-full ${isSafe ? 'bg-emerald-500' : 'bg-red-500'}" style="width: ${Math.min(100, pct)}%"></div>
+              </div>
+            </div>
+            <div class="text-right font-inter shrink-0 pl-2">
+              <span class="text-xs font-black ${isSafe ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}">${pct}%</span>
+              <span class="text-[10px] block mt-0.5 ${isSafe ? 'text-blue-600 dark:text-blue-400 font-bold' : 'text-red-500 font-bold'}">
+                ${isSafe ? `Safe: ${sub.safeToSkip || 0} hrs` : `Need ${sub.neededToReach || 1} hrs`}
+              </span>
+            </div>
+          </div>
+        `;
+      }).join('');
     }
   }
 
@@ -590,8 +667,17 @@ function selectDailySheetDay(day, btn) {
   });
   if (btn) {
     btn.className = 'sheet-day-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-blue-600 text-white shadow-xs';
+  } else {
+    document.querySelectorAll('.sheet-day-btn').forEach(b => {
+      if (b.textContent.trim().startsWith(day.substring(0, 3))) {
+        b.className = 'sheet-day-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-blue-600 text-white shadow-xs';
+      }
+    });
   }
-  document.getElementById('daily-sheet-day-title').textContent = day;
+  const dayTitle = document.getElementById('daily-sheet-day-title');
+  if (dayTitle) dayTitle.textContent = day;
+  const addBtnLabel = document.getElementById('btn-add-class-day-label');
+  if (addBtnLabel) addBtnLabel.textContent = `Add Class to ${day}`;
   updateDayHolidayBadges();
   renderDailyAttendanceSheet();
 }
@@ -662,8 +748,12 @@ function renderDailyAttendanceSheet() {
   if (slotsForDay.length === 0) {
     container.innerHTML = `
       ${holidayBanner}
-      <div class="p-8 text-center text-xs text-slate-400 font-inter">
-        No class periods scheduled for ${day}. Click "Add Class / Hours" above to schedule.
+      <div class="p-8 text-center text-xs text-slate-400 font-inter space-y-3">
+        <div>No class periods scheduled for ${day}.</div>
+        <button onclick="openAddSlotForActiveDay('${day}')" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition inline-flex items-center gap-1.5 shadow-xs active:scale-95">
+          <span class="material-symbols-outlined text-[16px]">add</span>
+          <span>+ Add Class to ${day}</span>
+        </button>
       </div>
     `;
     return;
@@ -677,9 +767,10 @@ function renderDailyAttendanceSheet() {
   // electrical: []
   const grouped = {};
   slotsForDay.forEach(slot => {
-    if (!grouped[slot.subjectId]) {
-      grouped[slot.subjectId] = {
-        subjectId: slot.subjectId,
+    const groupKey = slot.subjectId || ('custom_' + (slot.subjectCode || slot.id));
+    if (!grouped[groupKey]) {
+      grouped[groupKey] = {
+        subjectId: slot.subjectId || groupKey,
         subjectCode: slot.subjectCode,
         subjectName: slot.subjectName,
         classroom: slot.classroom,
@@ -688,7 +779,12 @@ function renderDailyAttendanceSheet() {
         slots: []
       };
     }
-    grouped[slot.subjectId].slots.push(slot);
+    grouped[groupKey].slots.push(slot);
+  });
+
+  // Sort periods in each group
+  Object.values(grouped).forEach(g => {
+    g.slots.sort((a, b) => (Number(a.periodNumber) || 0) - (Number(b.periodNumber) || 0));
   });
 
   const dayKey = state.selectedSheetDay;
@@ -801,29 +897,25 @@ async function markAllPeriodsForDay(present) {
 
   const grouped = {};
   slotsForDay.forEach(slot => {
-    if (!grouped[slot.subjectId]) grouped[slot.subjectId] = [];
-    grouped[slot.subjectId].push(slot);
+    const groupKey = slot.subjectId || ('custom_' + (slot.subjectCode || slot.id));
+    if (!grouped[groupKey]) grouped[groupKey] = [];
+    grouped[groupKey].push(slot);
   });
 
-  for (const [subjectId, subjectSlots] of Object.entries(grouped)) {
+  for (const [subId, subjectSlots] of Object.entries(grouped)) {
     for (let periodNum = 1; periodNum <= subjectSlots.length; periodNum++) {
-      const slotKey = `${day}_${subjectId}_period_${periodNum}`;
+      const slotKey = `${day}_${subId}_period_${periodNum}`;
       state.periodAttendanceRecords[slotKey] = present ? 'Present' : 'Absent';
-      await API.markPeriod({ subjectId, date: day, periodNumber: periodNum, isPresent: present });
+      API.markPeriod({ subjectId: subId, date: day, periodNumber: periodNum, isPresent: present }).catch(() => {});
     }
   }
 
-  const [attRes, subRes] = await Promise.all([
-    API.getAttendance(),
-    API.getSubjects()
-  ]);
-  state.attendanceData = attRes;
-  state.subjects = subRes.subjects || [];
-
-  syncCloudAndLocal();
-
+  recalculateLocalAttendance();
+  persistOfflineImmediately();
   renderDailyAttendanceSheet();
   renderDashboard();
+  renderAttendanceAnalytics();
+  syncCloudAndLocal();
 }
 
 function renderTimetableMatrix() {
@@ -1791,16 +1883,41 @@ function toggleCustomLabType(val) {
   if (container) container.classList.toggle('hidden', val !== 'custom');
 }
 
-function openQuickActionModal() { document.getElementById('modal-quick-actions').classList.remove('hidden'); }
-function openSearchModal() { document.getElementById('modal-search').classList.remove('hidden'); document.getElementById('input-global-search').focus(); }
-function openAddTaskModal() { document.getElementById('modal-add-task').classList.remove('hidden'); }
-function openAddSlotModal() { document.getElementById('modal-add-slot').classList.remove('hidden'); }
-function openAddLabModal() { document.getElementById('modal-add-lab').classList.remove('hidden'); }
-function openAddStudyPlanModal() { document.getElementById('modal-add-study-plan').classList.remove('hidden'); }
-function openUploadVaultModal() { document.getElementById('modal-upload-vault').classList.remove('hidden'); }
-function openScannerModal() { document.getElementById('modal-scanner').classList.remove('hidden'); }
+function openModal(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.remove('hidden');
+}
 
-function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+function handleSlotSubjectSelectionChange(val) {
+  toggleCustomSlotSubject(val);
+  if (val && val !== 'CUSTOM') {
+    const sub = state.subjects.find(s => s.id === val);
+    if (sub) {
+      const roomInput = document.getElementById('slot-input-room');
+      const facInput = document.getElementById('slot-input-faculty');
+      if (roomInput && (!roomInput.value || roomInput.value === 'Lecture Hall')) {
+        roomInput.value = sub.classroom || '';
+      }
+      if (facInput && (!facInput.value || facInput.value === 'Instructor')) {
+        facInput.value = sub.faculty || '';
+      }
+    }
+  }
+}
+
+function openQuickActionModal() { openModal('modal-quick-actions'); }
+function openSearchModal() { openModal('modal-search'); document.getElementById('input-global-search').focus(); }
+function openAddTaskModal() { openModal('modal-add-task'); }
+function openAddSlotModal() { openAddSlotForActiveDay(); }
+function openAddLabModal() { openModal('modal-add-lab'); }
+function openAddStudyPlanModal() { openModal('modal-add-study-plan'); }
+function openUploadVaultModal() { openModal('modal-upload-vault'); }
+function openScannerModal() { openModal('modal-scanner'); }
+
+function closeModal(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.add('hidden');
+}
 function closeAllModals() {
   document.querySelectorAll('[id^="modal-"]').forEach(m => m.classList.add('hidden'));
 }
@@ -1832,24 +1949,91 @@ async function handleCreateSlot(e) {
   e.preventDefault();
   const day = document.getElementById('slot-input-day').value;
   const subjectId = document.getElementById('slot-input-subject').value;
-  const customSubjectName = subjectId === 'CUSTOM' ? document.getElementById('slot-input-custom-name').value : null;
-  const customSubjectCode = subjectId === 'CUSTOM' ? document.getElementById('slot-input-custom-code').value : null;
+  const customSubjectName = subjectId === 'CUSTOM' ? (document.getElementById('slot-input-custom-name').value || '').trim() : null;
+  const customSubjectCode = subjectId === 'CUSTOM' ? (document.getElementById('slot-input-custom-code').value || '').trim() : null;
 
   const periodNum = Number(document.getElementById('slot-input-period').value) || 1;
   const startTime = document.getElementById('slot-input-start-time').value || '08:30';
   const endTime = document.getElementById('slot-input-end-time').value || '09:30';
-  let room = document.getElementById('slot-input-room').value;
-  let faculty = document.getElementById('slot-input-faculty').value;
+  let room = (document.getElementById('slot-input-room').value || '').trim();
+  let faculty = (document.getElementById('slot-input-faculty').value || '').trim();
 
-  const selectedSub = state.subjects.find(s => s.id === subjectId);
-  if (selectedSub) {
-    if (!room) room = selectedSub.classroom || 'Lecture Hall';
-    if (!faculty) faculty = selectedSub.faculty || 'Instructor';
+  let finalSubjectId = subjectId;
+  let finalSubName = 'Course';
+  let finalSubCode = 'SUB';
+  let finalColor = '#2563EB';
+
+  if (subjectId === 'CUSTOM') {
+    if (!customSubjectName) {
+      alert('Please enter a custom subject name.');
+      return;
+    }
+    finalSubName = customSubjectName;
+    finalSubCode = customSubjectCode || customSubjectName.substring(0, 4).toUpperCase();
+
+    let matchedSub = state.subjects.find(s => s.name.toLowerCase() === customSubjectName.toLowerCase() || s.code.toLowerCase() === finalSubCode.toLowerCase());
+    if (!matchedSub) {
+      matchedSub = {
+        id: 'sub_' + Date.now(),
+        name: finalSubName,
+        code: finalSubCode,
+        faculty: faculty || 'Instructor',
+        classroom: room || 'Lecture Hall',
+        credits: 3,
+        color: '#2563EB',
+        targetAttendance: state.defaultAttendanceTarget || 75,
+        attended: 0,
+        total: 0
+      };
+      state.subjects.push(matchedSub);
+    }
+    finalSubjectId = matchedSub.id;
+    finalColor = matchedSub.color || '#2563EB';
+    if (!room) room = matchedSub.classroom || 'Lecture Hall';
+    if (!faculty) faculty = matchedSub.faculty || 'Instructor';
   } else {
-    if (!room) room = 'Lecture Hall';
-    if (!faculty) faculty = 'Instructor';
+    const selectedSub = state.subjects.find(s => s.id === subjectId);
+    if (selectedSub) {
+      finalSubName = selectedSub.name;
+      finalSubCode = selectedSub.code;
+      finalColor = selectedSub.color || '#2563EB';
+      if (!room) room = selectedSub.classroom || 'Lecture Hall';
+      if (!faculty) faculty = selectedSub.faculty || 'Instructor';
+    } else {
+      if (!room) room = 'Lecture Hall';
+      if (!faculty) faculty = 'Instructor';
+    }
   }
 
+  // 1. Immediately create local slot
+  const newSlot = {
+    id: 'tt_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+    subjectId: finalSubjectId,
+    subjectName: finalSubName,
+    subjectCode: finalSubCode,
+    day,
+    periodNumber: periodNum,
+    startTime,
+    endTime,
+    classroom: room,
+    faculty,
+    color: finalColor,
+    status: 'pending'
+  };
+
+  state.timetable.push(newSlot);
+  persistOfflineImmediately();
+
+  closeModal('modal-add-slot');
+  state.selectedSheetDay = day;
+  selectDailySheetDay(day);
+  recalculateLocalAttendance();
+  renderDailyAttendanceSheet();
+  renderTimetableMatrix();
+  renderDashboard();
+  if (window.showToast) window.showToast(`Class scheduled for ${day} successfully!`, 'success');
+
+  // 2. Dispatch to API / Cloud in background
   try {
     const res = await API.createTimetableSlot({
       subjectId,
@@ -1862,35 +2046,12 @@ async function handleCreateSlot(e) {
       classroom: room,
       faculty
     });
-
-    const newSlot = res?.slot || {
-      id: 'tt_' + Date.now(),
-      subjectId: subjectId === 'CUSTOM' ? null : subjectId,
-      subjectName: selectedSub ? selectedSub.name : (customSubjectName || 'Course'),
-      subjectCode: selectedSub ? selectedSub.code : (customSubjectCode || 'SUB'),
-      day,
-      periodNumber: periodNum,
-      startTime,
-      endTime,
-      classroom: room,
-      faculty,
-      status: 'pending'
-    };
-
-    if (!state.timetable.some(s => s.id === newSlot.id)) {
-      state.timetable.push(newSlot);
+    if (res && res.slot && res.slot.id) {
+      newSlot.id = res.slot.id;
+      persistOfflineImmediately();
     }
-    persistOfflineImmediately();
-
-    closeModal('modal-add-slot');
-    try { await refreshAllData(); } catch (err) {}
-    renderDailyAttendanceSheet();
-    renderTimetableMatrix();
-    recalculateLocalAttendance();
-    renderDashboard();
-    if (window.showToast) window.showToast('Class scheduled successfully!', 'success');
   } catch (err) {
-    alert(err.message);
+    console.warn('Class slot saved locally; queued for cloud sync:', err.message);
   }
 }
 
@@ -2410,9 +2571,54 @@ async function deleteSubject(subjectId) {
   renderAttendanceAnalytics();
 }
 
-function openAddSlotForActiveDay() {
-  const day = state.selectedSheetDay || 'Monday';
+function openAddSlotForActiveDay(targetDay) {
+  const day = targetDay || state.selectedSheetDay || 'Monday';
+  state.selectedSheetDay = day;
   const daySelect = document.getElementById('slot-input-day');
   if (daySelect) daySelect.value = day;
+
+  populateSubjectSelects();
+
+  // Find next period on that day
+  const daySlots = (state.timetable || []).filter(s => (s.day || '').toLowerCase() === day.toLowerCase());
+  const maxPeriod = daySlots.reduce((max, s) => Math.max(max, Number(s.periodNumber) || 0), 0);
+  const nextPeriod = maxPeriod + 1;
+  const periodInput = document.getElementById('slot-input-period');
+  if (periodInput) periodInput.value = nextPeriod;
+
+  // Auto timings for period
+  const defaultTimes = {
+    1: ['08:30', '09:30'],
+    2: ['09:30', '10:30'],
+    3: ['10:45', '11:45'],
+    4: ['11:45', '12:45'],
+    5: ['13:30', '14:30'],
+    6: ['14:30', '15:30'],
+    7: ['15:30', '16:30'],
+    8: ['16:30', '17:30']
+  };
+  const times = defaultTimes[nextPeriod] || ['09:00', '10:00'];
+  const startInput = document.getElementById('slot-input-start-time');
+  const endInput = document.getElementById('slot-input-end-time');
+  if (startInput) startInput.value = times[0];
+  if (endInput) endInput.value = times[1];
+
+  const subjSelect = document.getElementById('slot-input-subject');
+  if (subjSelect) {
+    if (state.subjects && state.subjects.length > 0) {
+      if (!subjSelect.value || subjSelect.value === 'CUSTOM') {
+        subjSelect.value = state.subjects[0].id;
+      }
+      const curSub = state.subjects.find(s => s.id === subjSelect.value);
+      if (curSub) {
+        const roomInput = document.getElementById('slot-input-room');
+        const facInput = document.getElementById('slot-input-faculty');
+        if (roomInput) roomInput.value = curSub.classroom || '';
+        if (facInput) facInput.value = curSub.faculty || '';
+      }
+    }
+    toggleCustomSlotSubject(subjSelect.value);
+  }
+
   openModal('modal-add-slot');
 }
